@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
 
-interface TriviaQuestion {
+export interface TriviaQuestion {
   question: string;
   answers: [string, string, string, string];
   correctIndex: number;
