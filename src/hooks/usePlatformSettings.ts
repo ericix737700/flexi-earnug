@@ -5,7 +5,6 @@ interface PlatformSetting {
   id: string;
   setting_key: string;
   setting_value: string;
-  description: string | null;
   updated_at: string;
 }
 

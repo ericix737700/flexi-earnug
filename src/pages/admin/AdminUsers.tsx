@@ -152,22 +152,13 @@ export default function AdminUsers() {
         .update({ balance: newBalance })
         .eq("user_id", selectedUser.user_id);
 
-      // Log adjustment
-      await supabase.from("balance_adjustments").insert({
-        user_id: selectedUser.user_id,
-        admin_id: user.id,
-        amount: finalAmount,
-        reason: adjustReason,
-      });
-
-      // Create transaction
+      // Create transaction record for the adjustment
       await supabase.from("transactions").insert({
         user_id: selectedUser.user_id,
         transaction_type: "adjustment",
         amount: finalAmount,
         balance_after: newBalance,
         description: `Admin adjustment: ${adjustReason}`,
-        admin_id: user.id,
       });
     },
     onSuccess: () => {
