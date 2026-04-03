@@ -1,6 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { UserLayout } from "@/components/layout/UserLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import {
@@ -12,6 +12,7 @@ import {
   ClipboardList,
   Gift,
   HelpCircle,
+  Sparkles,
 } from "lucide-react";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,7 +25,6 @@ export default function Dashboard() {
   const { data: settings } = usePlatformSettings();
   const queryClient = useQueryClient();
 
-  // Get today's earnings
   const { data: todayEarnings } = useQuery({
     queryKey: ["today-earnings", profile?.user_id],
     queryFn: async () => {
@@ -36,13 +36,11 @@ export default function Dashboard() {
         .eq("user_id", profile.user_id)
         .eq("transaction_type", "earning")
         .gte("created_at", today);
-
       return data?.reduce((sum, t) => sum + Number(t.amount), 0) || 0;
     },
     enabled: !!profile?.user_id,
   });
 
-  // Get referral count
   const { data: referralCount } = useQuery({
     queryKey: ["referral-count", profile?.id],
     queryFn: async () => {
@@ -52,204 +50,116 @@ export default function Dashboard() {
         .select("*", { count: "exact", head: true })
         .eq("referred_by", profile.id)
         .eq("registration_paid", true);
-
       return count || 0;
     },
     enabled: !!profile?.id,
   });
 
-  // Check if user can check in today
   const canCheckIn = !profile?.last_checkin_date ||
     new Date(profile.last_checkin_date).toDateString() !== new Date().toDateString();
 
-  // Daily check-in mutation
   const checkInMutation = useMutation({
     mutationFn: async () => {
       if (!profile?.user_id || !canCheckIn) return;
-
-      const reward = settings?.daily_checkin_reward
-        ? Number(settings.daily_checkin_reward)
-        : 100;
-
-      const today = new Date().toISOString().split("T")[0];
+      const reward = settings?.daily_checkin_reward ? Number(settings.daily_checkin_reward) : 100;
       const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
-
-      // Check if streak continues
+      const today = new Date().toISOString().split("T")[0];
       const isConsecutive = profile.last_checkin_date === yesterday;
       const newStreak = isConsecutive ? profile.daily_checkin_streak + 1 : 1;
       const newBalance = Number(profile.balance) + reward;
-
-      // Update profile
-      await supabase
-        .from("profiles")
-        .update({
-          last_checkin_date: today,
-          daily_checkin_streak: newStreak,
-          balance: newBalance,
-        })
-        .eq("user_id", profile.user_id);
-
-      // Create transaction
-      await supabase.from("transactions").insert({
-        user_id: profile.user_id,
-        transaction_type: "earning",
-        amount: reward,
-        balance_after: newBalance,
-        description: `Daily check-in reward (Day ${newStreak})`,
-      });
-
+      await supabase.from("profiles").update({ last_checkin_date: today, daily_checkin_streak: newStreak, balance: newBalance }).eq("user_id", profile.user_id);
+      await supabase.from("transactions").insert({ user_id: profile.user_id, transaction_type: "earning", amount: reward, balance_after: newBalance, description: `Daily check-in reward (Day ${newStreak})` });
       return { reward, streak: newStreak };
     },
     onSuccess: (data) => {
       if (data) {
-        toast.success(
-          `Check-in successful! +UGX ${data.reward.toLocaleString()} (Day ${data.streak} streak)`
-        );
+        toast.success(`Check-in successful! +UGX ${data.reward.toLocaleString()} (Day ${data.streak} streak)`);
         refreshProfile();
         queryClient.invalidateQueries({ queryKey: ["today-earnings"] });
       }
     },
-    onError: () => {
-      toast.error("Check-in failed. Please try again.");
-    },
+    onError: () => toast.error("Check-in failed. Please try again."),
   });
 
   const taskCategories = [
-    {
-      title: "Watch Videos",
-      icon: Play,
-      color: "bg-accent",
-      description: "Earn by watching ads",
-      href: "/tasks?type=video",
-    },
-    {
-      title: "Surveys",
-      icon: ClipboardList,
-      color: "bg-secondary",
-      description: "Complete quick surveys",
-      href: "/tasks?type=survey",
-    },
-    {
-      title: "Trivia",
-      icon: HelpCircle,
-      color: "bg-primary",
-      description: "Answer quiz questions",
-      href: "/tasks?type=trivia",
-    },
-    {
-      title: "Referrals",
-      icon: Gift,
-      color: "bg-success",
-      description: "Invite friends",
-      href: "/referrals",
-    },
+    { title: "Watch Videos", icon: Play, gradient: "from-blue-500/15 to-blue-600/5", iconColor: "text-blue-600 bg-blue-500/15", description: "Earn by watching ads", href: "/tasks?type=video" },
+    { title: "Surveys", icon: ClipboardList, gradient: "from-purple-500/15 to-purple-600/5", iconColor: "text-purple-600 bg-purple-500/15", description: "Complete quick surveys", href: "/tasks?type=survey" },
+    { title: "Trivia", icon: HelpCircle, gradient: "from-secondary/15 to-secondary/5", iconColor: "text-secondary bg-secondary/15", description: "Answer quiz questions", href: "/tasks?type=trivia" },
+    { title: "Referrals", icon: Gift, gradient: "from-primary/15 to-primary/5", iconColor: "text-primary bg-primary/15", description: "Invite friends", href: "/referrals" },
   ];
 
   return (
     <UserLayout>
-      <div className="space-y-6">
+      <div className="space-y-5">
         {/* Daily Check-in Card */}
-        <Card className="border-2 border-primary/50 bg-gradient-to-r from-primary/10 to-accent/10">
-          <CardContent className="flex items-center justify-between py-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-full bg-primary p-2">
-                <Calendar className="h-5 w-5 text-primary-foreground" />
+        <Card className="overflow-hidden border-0 shadow-md">
+          <div className="gradient-primary p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="rounded-full bg-primary-foreground/20 p-2.5">
+                  <Sparkles className="h-5 w-5 text-primary-foreground" />
+                </div>
+                <div>
+                  <p className="font-semibold text-primary-foreground">Daily Check-in</p>
+                  <p className="text-sm text-primary-foreground/70">
+                    {canCheckIn
+                      ? `Earn UGX ${settings?.daily_checkin_reward || 100}`
+                      : `🔥 Streak: ${profile?.daily_checkin_streak || 0} days`}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="font-semibold">Daily Check-in</p>
-                <p className="text-sm text-muted-foreground">
-                  {canCheckIn
-                    ? `Earn UGX ${settings?.daily_checkin_reward || 100}`
-                    : `Streak: ${profile?.daily_checkin_streak || 0} days`}
-                </p>
-              </div>
+              <Button
+                onClick={() => checkInMutation.mutate()}
+                disabled={!canCheckIn || checkInMutation.isPending}
+                size="sm"
+                className={canCheckIn
+                  ? "gradient-gold border-0 text-secondary-foreground font-bold shadow-md hover:opacity-90"
+                  : "bg-primary-foreground/20 text-primary-foreground border-0"}
+              >
+                {canCheckIn ? "Check In" : "Done ✓"}
+              </Button>
             </div>
-            <Button
-              onClick={() => checkInMutation.mutate()}
-              disabled={!canCheckIn || checkInMutation.isPending}
-              variant={canCheckIn ? "default" : "secondary"}
-              size="sm"
-            >
-              {canCheckIn ? "Check In" : "Done ✓"}
-            </Button>
-          </CardContent>
+          </div>
         </Card>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3">
-          <Card>
-            <CardContent className="flex items-center gap-3 py-4">
-              <div className="rounded-lg bg-primary/20 p-2">
-                <Wallet className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Balance</p>
-                <p className="font-bold">
-                  UGX {Number(profile?.balance || 0).toLocaleString()}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="flex items-center gap-3 py-4">
-              <div className="rounded-lg bg-success/20 p-2">
-                <TrendingUp className="h-5 w-5 text-success" />
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Today</p>
-                <p className="font-bold">
-                  +UGX {(todayEarnings || 0).toLocaleString()}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="flex items-center gap-3 py-4">
-              <div className="rounded-lg bg-accent/20 p-2">
-                <Calendar className="h-5 w-5 text-accent" />
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Streak</p>
-                <p className="font-bold">{profile?.daily_checkin_streak || 0} days</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="flex items-center gap-3 py-4">
-              <div className="rounded-lg bg-secondary/20 p-2">
-                <Users className="h-5 w-5 text-secondary" />
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Referrals</p>
-                <p className="font-bold">{referralCount || 0}</p>
-              </div>
-            </CardContent>
-          </Card>
+          {[
+            { icon: Wallet, label: "Balance", value: `UGX ${Number(profile?.balance || 0).toLocaleString()}`, color: "text-primary", bg: "bg-primary/10" },
+            { icon: TrendingUp, label: "Today", value: `+UGX ${(todayEarnings || 0).toLocaleString()}`, color: "text-success", bg: "bg-success/10" },
+            { icon: Calendar, label: "Streak", value: `${profile?.daily_checkin_streak || 0} days`, color: "text-secondary", bg: "bg-secondary/10" },
+            { icon: Users, label: "Referrals", value: `${referralCount || 0}`, color: "text-blue-600", bg: "bg-blue-500/10" },
+          ].map((stat) => (
+            <Card key={stat.label} className="border-border/50 shadow-sm">
+              <CardContent className="flex items-center gap-3 py-3.5">
+                <div className={`rounded-xl p-2 ${stat.bg}`}>
+                  <stat.icon className={`h-4.5 w-4.5 ${stat.color}`} />
+                </div>
+                <div>
+                  <p className="text-[11px] text-muted-foreground">{stat.label}</p>
+                  <p className="font-bold text-sm">{stat.value}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         {/* Task Categories */}
         <div>
-          <h2 className="mb-3 font-semibold">Earn Money</h2>
+          <h2 className="mb-3 font-bold text-foreground">Earn Money</h2>
           <div className="grid grid-cols-2 gap-3">
             {taskCategories.map((category) => (
               <Card
                 key={category.title}
-                className="cursor-pointer transition-transform hover:scale-[1.02]"
+                className={`cursor-pointer border-border/50 bg-gradient-to-br ${category.gradient} shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98]`}
                 onClick={() => navigate(category.href)}
               >
                 <CardContent className="py-4 text-center">
-                  <div
-                    className={`mx-auto mb-2 w-fit rounded-full ${category.color} p-3`}
-                  >
-                    <category.icon className="h-6 w-6 text-white" />
+                  <div className={`mx-auto mb-2.5 w-fit rounded-xl p-2.5 ${category.iconColor}`}>
+                    <category.icon className="h-6 w-6" />
                   </div>
-                  <p className="font-semibold">{category.title}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {category.description}
-                  </p>
+                  <p className="font-semibold text-foreground">{category.title}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{category.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -260,18 +170,17 @@ export default function Dashboard() {
         <div className="grid grid-cols-2 gap-3">
           <Button
             variant="outline"
-            className="h-auto py-4"
+            className="h-auto py-3.5 border-primary/20 hover:bg-primary/5 font-semibold"
             onClick={() => navigate("/wallet")}
           >
-            <Wallet className="mr-2 h-5 w-5" />
+            <Wallet className="mr-2 h-4 w-4 text-primary" />
             Withdraw
           </Button>
           <Button
-            variant="outline"
-            className="h-auto py-4"
+            className="h-auto py-3.5 gradient-primary border-0 text-primary-foreground font-semibold hover:opacity-90"
             onClick={() => navigate("/referrals")}
           >
-            <Users className="mr-2 h-5 w-5" />
+            <Users className="mr-2 h-4 w-4" />
             Invite Friends
           </Button>
         </div>
