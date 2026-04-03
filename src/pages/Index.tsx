@@ -28,18 +28,20 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-lg">
+      <nav className="sticky top-0 z-50 border-b border-border/40 bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
             <PlatformLogo size="sm" />
             <span className="text-xl font-bold text-foreground">FlexiEarn</span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Link to="/login">
-              <Button variant="ghost" size="sm">Log In</Button>
+              <Button variant="ghost" size="sm" className="font-medium">Log In</Button>
             </Link>
             <Link to="/register">
-              <Button size="sm" className="font-semibold">Get Started</Button>
+              <Button size="sm" className="gradient-primary border-0 font-semibold text-primary-foreground shadow-md shadow-primary/25 hover:opacity-90">
+                Get Started
+              </Button>
             </Link>
           </div>
         </div>
@@ -47,54 +49,54 @@ const Index = () => {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10" />
-        <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
+        <div className="absolute inset-0 gradient-hero opacity-[0.07]" />
+        <div className="absolute top-20 -left-32 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute bottom-10 -right-32 h-64 w-64 rounded-full bg-secondary/10 blur-3xl" />
+        <div className="relative mx-auto max-w-6xl px-4 py-14 md:py-24">
           <div className="grid items-center gap-10 md:grid-cols-2">
             <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 rounded-full bg-secondary/10 px-4 py-1.5 text-sm font-medium text-secondary">
+              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary">
                 <Zap className="h-4 w-4" />
                 Uganda's #1 Earning Platform
               </div>
               <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-foreground md:text-5xl lg:text-6xl">
                 Turn Your Phone Into a{" "}
-                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Money Machine
-                </span>
+                <span className="text-gradient-primary">Money Machine</span>
               </h1>
-              <p className="max-w-lg text-lg text-muted-foreground">
-                Join thousands of Ugandans earning real money daily by completing simple tasks, 
-                watching videos, answering trivia, and referring friends. Withdraw straight to 
+              <p className="max-w-lg text-lg leading-relaxed text-muted-foreground">
+                Join thousands of Ugandans earning real money daily by completing simple tasks,
+                watching videos, answering trivia, and referring friends. Withdraw straight to
                 your Mobile Money!
               </p>
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Link to="/register">
-                  <Button size="lg" className="w-full gap-2 text-base font-bold shadow-lg shadow-primary/30 sm:w-auto">
+                  <Button size="lg" className="w-full gap-2 gradient-primary border-0 text-base font-bold text-primary-foreground shadow-lg shadow-primary/30 hover:opacity-90 sm:w-auto">
                     Start Earning Now <ArrowRight className="h-5 w-5" />
                   </Button>
                 </Link>
                 <Link to="/login">
-                  <Button size="lg" variant="outline" className="w-full text-base sm:w-auto">
+                  <Button size="lg" variant="outline" className="w-full text-base border-primary/30 text-primary hover:bg-primary/5 sm:w-auto">
                     I Have an Account
                   </Button>
                 </Link>
               </div>
               <div className="flex items-center gap-6 pt-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1.5">
-                  <CheckCircle className="h-4 w-4 text-secondary" />
+                  <CheckCircle className="h-4 w-4 text-primary" />
                   Instant MTN/Airtel payouts
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <CheckCircle className="h-4 w-4 text-secondary" />
+                  <CheckCircle className="h-4 w-4 text-primary" />
                   24/7 support
                 </div>
               </div>
             </div>
             <div className="relative">
-              <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/20 blur-2xl" />
+              <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-primary/20 via-secondary/10 to-primary/5 blur-2xl" />
               <img
                 src={heroImg}
                 alt="Happy Ugandans earning money on their phones"
-                className="relative rounded-2xl shadow-2xl"
+                className="relative rounded-2xl shadow-2xl ring-1 ring-primary/10"
                 loading="lazy"
               />
             </div>
@@ -103,7 +105,7 @@ const Index = () => {
       </section>
 
       {/* Stats Bar */}
-      <section className="border-y border-border bg-card">
+      <section className="border-y border-border/50 bg-card">
         <div className="mx-auto grid max-w-6xl grid-cols-2 gap-4 px-4 py-8 md:grid-cols-4">
           {[
             { value: "10,000+", label: "Active Earners" },
@@ -136,42 +138,45 @@ const Index = () => {
               icon: Smartphone,
               title: "Create & Activate",
               desc: `Register with your phone number and pay a one-time activation fee of UGX ${registrationFee.toLocaleString()} via Mobile Money. Your account is activated instantly!`,
-              color: "bg-primary/10 text-primary",
+              gradient: "from-primary/10 to-primary/5",
+              iconBg: "bg-primary/15 text-primary",
             },
             {
               step: "2",
               icon: TrendingUp,
               title: "Complete Tasks & Earn",
               desc: "Watch videos, answer trivia questions, take surveys, and check in daily. Every task earns you real money deposited into your wallet.",
-              color: "bg-secondary/10 text-secondary",
+              gradient: "from-secondary/10 to-secondary/5",
+              iconBg: "bg-secondary/15 text-secondary",
             },
             {
               step: "3",
               icon: Gift,
               title: "Withdraw to Mobile Money",
               desc: "Cash out your earnings anytime directly to your MTN or Airtel Mobile Money. Fast, secure, and hassle-free!",
-              color: "bg-accent/10 text-accent",
+              gradient: "from-primary/10 to-secondary/5",
+              iconBg: "bg-primary/15 text-primary",
             },
           ].map((item) => (
             <div
               key={item.step}
-              className="relative rounded-2xl border border-border bg-card p-8 shadow-sm transition-shadow hover:shadow-lg"
+              className={`relative rounded-2xl border border-border/50 bg-gradient-to-br ${item.gradient} p-8 shadow-sm transition-all hover:shadow-lg hover:-translate-y-1`}
             >
-              <div className="absolute -top-4 left-6 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+              <div className="absolute -top-4 left-6 flex h-8 w-8 items-center justify-center rounded-full gradient-primary text-sm font-bold text-primary-foreground shadow-md">
                 {item.step}
               </div>
-              <div className={`mb-4 inline-flex rounded-xl p-3 ${item.color}`}>
+              <div className={`mb-4 inline-flex rounded-xl p-3 ${item.iconBg}`}>
                 <item.icon className="h-7 w-7" />
               </div>
               <h3 className="mb-2 text-xl font-bold text-foreground">{item.title}</h3>
-              <p className="text-muted-foreground">{item.desc}</p>
+              <p className="text-muted-foreground leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Earning Methods */}
-      <section className="bg-gradient-to-b from-muted/50 to-background">
+      <section className="bg-gradient-to-b from-accent/40 to-background">
         <div className="mx-auto max-w-6xl px-4 py-16 md:py-24">
           <div className="mb-12 text-center">
             <h2 className="text-3xl font-extrabold text-foreground md:text-4xl">
@@ -185,21 +190,21 @@ const Index = () => {
           {/* Daily Login Bonus */}
           <div className="mb-16 grid items-center gap-10 md:grid-cols-2">
             <div className="order-2 md:order-1">
-              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
                 <CalendarCheck className="h-4 w-4" />
                 Daily Reward
               </div>
               <h3 className="mt-4 text-2xl font-bold text-foreground md:text-3xl">
                 Daily Login Bonus
               </h3>
-              <p className="mt-3 text-lg text-muted-foreground">
-                Simply open the app and check in every day to earn <strong className="text-primary">UGX {dailyReward.toLocaleString()}</strong> for free! 
+              <p className="mt-3 text-lg leading-relaxed text-muted-foreground">
+                Simply open the app and check in every day to earn <strong className="text-primary font-bold">UGX {dailyReward.toLocaleString()}</strong> for free!
                 Build a streak for even bigger rewards. It takes just 5 seconds.
               </p>
               <ul className="mt-4 space-y-2">
                 {["Earn just by logging in", "Build daily streaks for bonuses", "Never miss a day, never miss money"].map((item) => (
                   <li key={item} className="flex items-center gap-2 text-muted-foreground">
-                    <CheckCircle className="h-4 w-4 shrink-0 text-secondary" />
+                    <CheckCircle className="h-4 w-4 shrink-0 text-primary" />
                     {item}
                   </li>
                 ))}
@@ -209,7 +214,7 @@ const Index = () => {
               <img
                 src={dailyBonusImg}
                 alt="Daily login bonus reward"
-                className="rounded-2xl shadow-xl"
+                className="rounded-2xl shadow-xl ring-1 ring-border/50"
                 loading="lazy"
               />
             </div>
@@ -221,20 +226,20 @@ const Index = () => {
               <img
                 src={referralImg}
                 alt="Friends sharing referral codes"
-                className="rounded-2xl shadow-xl"
+                className="rounded-2xl shadow-xl ring-1 ring-border/50"
                 loading="lazy"
               />
             </div>
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full bg-accent/10 px-3 py-1 text-sm font-medium text-accent">
+              <div className="inline-flex items-center gap-2 rounded-full bg-secondary/10 px-3 py-1 text-sm font-semibold text-secondary">
                 <Users className="h-4 w-4" />
                 Referral Program
               </div>
               <h3 className="mt-4 text-2xl font-bold text-foreground md:text-3xl">
                 Invite Friends, Earn Big
               </h3>
-              <p className="mt-3 text-lg text-muted-foreground">
-                Share your referral code and earn <strong className="text-primary">UGX {referralBonus.toLocaleString()}</strong> for every friend who joins and activates their account. 
+              <p className="mt-3 text-lg leading-relaxed text-muted-foreground">
+                Share your referral code and earn <strong className="text-primary font-bold">UGX {referralBonus.toLocaleString()}</strong> for every friend who joins and activates their account.
                 There's no limit — the more friends you bring, the more you earn!
               </p>
               <ul className="mt-4 space-y-2">
@@ -244,7 +249,7 @@ const Index = () => {
                   "Your friends earn too — everyone wins!",
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-2 text-muted-foreground">
-                    <CheckCircle className="h-4 w-4 shrink-0 text-secondary" />
+                    <CheckCircle className="h-4 w-4 shrink-0 text-primary" />
                     {item}
                   </li>
                 ))}
@@ -256,7 +261,7 @@ const Index = () => {
 
       {/* Trust & Security */}
       <section className="mx-auto max-w-6xl px-4 py-16">
-        <div className="rounded-3xl bg-gradient-to-br from-secondary/10 via-card to-primary/10 p-8 md:p-12">
+        <div className="rounded-3xl border border-border/50 bg-gradient-to-br from-accent/50 via-card to-primary/5 p-8 md:p-12">
           <div className="mb-8 text-center">
             <h2 className="text-3xl font-extrabold text-foreground">
               Why Thousands Trust FlexiEarn
@@ -281,11 +286,11 @@ const Index = () => {
               },
             ].map((item) => (
               <div key={item.title} className="text-center">
-                <div className="mx-auto mb-4 inline-flex rounded-2xl bg-secondary/10 p-4">
-                  <item.icon className="h-8 w-8 text-secondary" />
+                <div className="mx-auto mb-4 inline-flex rounded-2xl bg-primary/10 p-4">
+                  <item.icon className="h-8 w-8 text-primary" />
                 </div>
                 <h3 className="mb-2 text-lg font-bold text-foreground">{item.title}</h3>
-                <p className="text-sm text-muted-foreground">{item.desc}</p>
+                <p className="text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -293,20 +298,19 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-r from-primary via-primary to-accent py-16">
+      <section className="gradient-primary py-16">
         <div className="mx-auto max-w-3xl px-4 text-center">
           <h2 className="text-3xl font-extrabold text-primary-foreground md:text-4xl">
             Ready to Start Earning?
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-lg text-primary-foreground/80">
-            Join FlexiEarn today for just UGX {registrationFee.toLocaleString()} and start earning immediately. 
+            Join FlexiEarn today for just UGX {registrationFee.toLocaleString()} and start earning immediately.
             Your phone is all you need!
           </p>
           <Link to="/register">
             <Button
               size="lg"
-              variant="secondary"
-              className="mt-8 gap-2 text-base font-bold shadow-xl"
+              className="mt-8 gap-2 gradient-gold border-0 text-base font-bold text-secondary-foreground shadow-xl hover:opacity-90"
             >
               Create My Account <ArrowRight className="h-5 w-5" />
             </Button>
@@ -325,8 +329,8 @@ const Index = () => {
             © {new Date().getFullYear()} FlexiEarn Uganda. All rights reserved.
           </p>
           <div className="flex gap-4 text-sm text-muted-foreground">
-            <Link to="/login" className="hover:text-foreground">Login</Link>
-            <Link to="/register" className="hover:text-foreground">Register</Link>
+            <Link to="/login" className="hover:text-primary transition-colors">Login</Link>
+            <Link to="/register" className="hover:text-primary transition-colors">Register</Link>
           </div>
         </div>
       </footer>
