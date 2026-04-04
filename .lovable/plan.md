@@ -1,27 +1,35 @@
 
 
-## Create Admin Account
+## Fix MarzPay API Authentication
 
-### What we'll do
-Create an admin user account with the specified credentials and assign the admin role.
+### Problem
+The current setup stores `MARZPAY_API_KEY` as a single secret, but MarzPay requires HTTP Basic Auth with credentials formatted as `base64(apikey:apisecret)`. We need to store both the API Key and API Secret separately, then compute the base64 encoding in the edge functions.
 
-### Steps
+### Plan
 
-1. **Create the admin user** via a database migration that:
-   - Uses Supabase's `auth.users` table to create the user with email `erickydev72@gmail.com` and password `@ericky72`
-   - This needs to be done through an edge function since we can't directly insert into `auth.users` via migration
+**Step 1: Store two separate secrets**
+- Add `MARZPAY_API_SECRET` as a new secret (value: `JECHiVMg3TYePg9bgdA2jWrMvvnvLNv9` — already provided)
+- Update `MARZPAY_API_KEY` with just the API Key value (user needs to provide this)
 
-2. **Create an edge function `create-admin`** (temporary, one-time use):
-   - Signs up the user with the provided credentials using the Supabase Admin API (service role key)
-   - Inserts a row into `user_roles` with `role = 'admin'`
-   - Updates the profile status to `'active'` and `registration_paid = true`
+**Step 2: Update all 3 edge functions to compute Basic Auth correctly**
 
-3. **Invoke the edge function** to create the account
+In `marzpay-collect/index.ts` and `marzpay-send/index.ts`, change the auth header construction from:
+```typescript
+Authorization: `Basic ${MARZPAY_API_KEY}`
+```
+to:
+```typescript
+const apiKey = Deno.env.get("MARZPAY_API_KEY");
+const apiSecret = Deno.env.get("MARZPAY_API_SECRET");
+const credentials = btoa(`${apiKey}:${apiSecret}`);
+// Then use: Authorization: `Basic ${credentials}`
+```
 
-4. **Clean up** - delete the temporary edge function after use
+**Step 3: Request the API Key from user**
+- Use the `add_secret` tool to ask for the MarzPay API Key (the username/key from their dashboard — separate from the secret they already shared)
 
-### Technical details
-- The edge function will use `supabase.auth.admin.createUser()` with `email_confirm: true` to skip email verification
-- The admin role entry in `user_roles` table grants access to all admin routes
-- The profile will be auto-created by the existing `handle_new_user` trigger
+### Files to modify
+- `supabase/functions/marzpay-collect/index.ts` — update auth header
+- `supabase/functions/marzpay-send/index.ts` — update auth header
+- No changes needed to `marzpay-webhook/index.ts` (it receives callbacks, doesn't call MarzPay API)
 
