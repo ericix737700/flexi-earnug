@@ -112,6 +112,7 @@ export type Database = {
           full_name: string | null
           id: string
           last_checkin_date: string | null
+          last_seen: string | null
           phone: string
           referral_code: string
           referred_by: string | null
@@ -127,6 +128,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           last_checkin_date?: string | null
+          last_seen?: string | null
           phone: string
           referral_code?: string
           referred_by?: string | null
@@ -142,6 +144,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           last_checkin_date?: string | null
+          last_seen?: string | null
           phone?: string
           referral_code?: string
           referred_by?: string | null
