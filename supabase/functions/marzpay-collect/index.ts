@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
     const response = await fetch("https://wallet.wearemarz.com/api/v1/collect-money", {
       method: "POST",
       headers: {
-        Authorization: `Basic ${MARZPAY_API_KEY}`,
+        Authorization: `Basic ${credentials}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
