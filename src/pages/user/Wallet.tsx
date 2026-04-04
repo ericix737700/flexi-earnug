@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserLayout } from "@/components/layout/UserLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -52,6 +52,26 @@ export default function Wallet() {
   const { profile, refreshProfile } = useAuth();
   const { data: settings } = usePlatformSettings();
   const queryClient = useQueryClient();
+
+  // Realtime subscription for live updates
+  useEffect(() => {
+    if (!profile?.user_id) return;
+
+    const channel = supabase
+      .channel('wallet-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions', filter: `user_id=eq.${profile.user_id}` }, () => {
+        queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'withdrawals', filter: `user_id=eq.${profile.user_id}` }, () => {
+        queryClient.invalidateQueries({ queryKey: ["pending-withdrawals"] });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles', filter: `user_id=eq.${profile.user_id}` }, () => {
+        refreshProfile();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [profile?.user_id]);
 
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState("");

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -20,11 +20,30 @@ interface DepositDialogProps {
 }
 
 export function DepositDialog({ open, onOpenChange }: DepositDialogProps) {
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const [amount, setAmount] = useState("");
   const [phoneNumber, setPhoneNumber] = useState(profile?.phone || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  // Listen for deposit status changes in realtime
+  useEffect(() => {
+    if (!user?.id || !success) return;
+
+    const channel = supabase
+      .channel('deposit-status')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'deposits', filter: `user_id=eq.${user.id}` }, (payload) => {
+        if (payload.new.status === 'approved') {
+          refreshProfile();
+        }
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles', filter: `user_id=eq.${user.id}` }, () => {
+        refreshProfile();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [user?.id, success]);
 
   const handleSubmit = async () => {
     if (!amount.trim() || !phoneNumber.trim()) {
