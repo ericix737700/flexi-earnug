@@ -13,9 +13,11 @@ Deno.serve(async (req) => {
 
   try {
     const MARZPAY_API_KEY = Deno.env.get("MARZPAY_API_KEY");
-    if (!MARZPAY_API_KEY) {
-      throw new Error("MARZPAY_API_KEY is not configured");
+    const MARZPAY_API_SECRET = Deno.env.get("MARZPAY_API_SECRET");
+    if (!MARZPAY_API_KEY || !MARZPAY_API_SECRET) {
+      throw new Error("MARZPAY_API_KEY or MARZPAY_API_SECRET is not configured");
     }
+    const credentials = btoa(`${MARZPAY_API_KEY}:${MARZPAY_API_SECRET}`);
 
     const { amount, phone_number, deposit_id } = await req.json();
 
