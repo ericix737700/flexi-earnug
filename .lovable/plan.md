@@ -1,35 +1,59 @@
 
 
-## Fix MarzPay API Authentication
+## Comprehensive Improvements Plan
 
-### Problem
-The current setup stores `MARZPAY_API_KEY` as a single secret, but MarzPay requires HTTP Basic Auth with credentials formatted as `base64(apikey:apisecret)`. We need to store both the API Key and API Secret separately, then compute the base64 encoding in the edge functions.
+This plan addresses all the issues you raised: real-time status updates, admin user detail views, task upload failures, and logo upload failures.
 
-### Plan
+### Root Cause of Upload Failures
 
-**Step 1: Store two separate secrets**
-- Add `MARZPAY_API_SECRET` as a new secret (value: `JECHiVMg3TYePg9bgdA2jWrMvvnvLNv9` — already provided)
-- Update `MARZPAY_API_KEY` with just the API Key value (user needs to provide this)
+Both task video uploads and logo uploads fail because **no storage buckets exist** in the database. We need to create `task-videos` and `branding` buckets.
 
-**Step 2: Update all 3 edge functions to compute Basic Auth correctly**
+### What We'll Build
 
-In `marzpay-collect/index.ts` and `marzpay-send/index.ts`, change the auth header construction from:
-```typescript
-Authorization: `Basic ${MARZPAY_API_KEY}`
-```
-to:
-```typescript
-const apiKey = Deno.env.get("MARZPAY_API_KEY");
-const apiSecret = Deno.env.get("MARZPAY_API_SECRET");
-const credentials = btoa(`${apiKey}:${apiSecret}`);
-// Then use: Authorization: `Basic ${credentials}`
-```
+**1. Create storage buckets (fixes upload failures)**
+- Create `branding` bucket (public) for platform logo
+- Create `task-videos` bucket (public) for task video uploads
+- Add appropriate RLS policies for both
 
-**Step 3: Request the API Key from user**
-- Use the `add_secret` tool to ask for the MarzPay API Key (the username/key from their dashboard — separate from the secret they already shared)
+**2. Real-time balance/status updates for users**
+- Enable Supabase Realtime on `profiles`, `deposits`, `withdrawals`, and `transactions` tables
+- Subscribe to changes in the Wallet page, Dashboard, and DepositDialog so balances and statuses update automatically without manual refresh
 
-### Files to modify
-- `supabase/functions/marzpay-collect/index.ts` — update auth header
-- `supabase/functions/marzpay-send/index.ts` — update auth header
-- No changes needed to `marzpay-webhook/index.ts` (it receives callbacks, doesn't call MarzPay API)
+**3. Add `last_seen` column to profiles**
+- Add a `last_seen` timestamp column to the `profiles` table
+- Update it on each page load via the AuthContext (whenever a user accesses the app)
+
+**4. Enhanced Admin User Detail View**
+- Add a user detail dialog/drawer in AdminUsers that shows:
+  - Online status (green dot if last_seen within 5 minutes) and last seen time
+  - Tasks completed by the user (count + list from `task_completions`)
+  - Referral count (users referred by this user via `referred_by`)
+  - Transaction history summary
+  - Balance and registration status
+
+**5. Improve Admin UI styling**
+- Apply the green/gold theme to all admin pages
+- Better card layouts, stat indicators, and visual hierarchy on the dashboard
+
+### Files to modify/create
+
+| File | Change |
+|---|---|
+| Migration SQL | Create buckets, add `last_seen` column, enable realtime |
+| `src/contexts/AuthContext.tsx` | Update `last_seen` on auth state change |
+| `src/pages/admin/AdminUsers.tsx` | Add user detail dialog with referrals, tasks, last seen |
+| `src/pages/admin/AdminDashboard.tsx` | Improved UI styling |
+| `src/pages/admin/AdminTasks.tsx` | Fix — buckets now exist, uploads will work |
+| `src/pages/admin/AdminSettings.tsx` | Fix — branding bucket now exists |
+| `src/pages/user/Wallet.tsx` | Add realtime subscription for live balance/transaction updates |
+| `src/components/user/DepositDialog.tsx` | Add realtime listener for deposit status changes |
+| `src/components/layout/AdminLayout.tsx` | UI polish with green/gold theme |
+
+### Technical details
+
+- Storage buckets created via migration with `INSERT INTO storage.buckets`
+- RLS policies: authenticated users can upload to task-videos (admins only) and branding (admins only); public can read
+- Realtime: `ALTER PUBLICATION supabase_realtime ADD TABLE` for profiles, deposits, withdrawals, transactions
+- `last_seen` updated via `supabase.from('profiles').update({ last_seen: new Date() })` on each session load
+- User detail panel queries `task_completions`, `profiles` (where `referred_by` matches), and `transactions` for the selected user
 
