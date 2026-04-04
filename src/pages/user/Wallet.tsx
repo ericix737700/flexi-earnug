@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserLayout } from "@/components/layout/UserLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
