@@ -70,6 +70,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateLastSeen = async (userId: string) => {
+    try {
+      await supabase
+        .from("profiles")
+        .update({ last_seen: new Date().toISOString() } as any)
+        .eq("user_id", userId);
+    } catch (e) {
+      // non-critical, ignore
+    }
+  };
+
   useEffect(() => {
     // Set up auth state listener BEFORE checking session
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -79,7 +90,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (session?.user) {
           // Use setTimeout to avoid potential race conditions
-          setTimeout(() => fetchProfile(session.user.id), 0);
+          setTimeout(() => {
+            fetchProfile(session.user.id);
+            updateLastSeen(session.user.id);
+          }, 0);
         } else {
           setProfile(null);
           setIsAdmin(false);
@@ -94,6 +108,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(session?.user ?? null);
       if (session?.user) {
         fetchProfile(session.user.id);
+        updateLastSeen(session.user.id);
       }
       setIsLoading(false);
     });
