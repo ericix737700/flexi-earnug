@@ -366,6 +366,44 @@ export default function AdminSettings() {
             </Button>
           </CardContent>
         </Card>
+        {/* Terms & Conditions */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Store className="h-5 w-5 text-primary" />
+              Terms & Conditions
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Terms & Conditions Content</Label>
+              <Textarea
+                placeholder="Enter your platform terms and conditions..."
+                value={formData.terms_and_conditions}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    terms_and_conditions: e.target.value,
+                  })
+                }
+                rows={10}
+              />
+            </div>
+            <Button
+              onClick={() =>
+                handleSave("terms_and_conditions", formData.terms_and_conditions)
+              }
+              disabled={updateSetting.isPending}
+            >
+              {updateSetting.isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="mr-2 h-4 w-4" />
+              )}
+              Save Terms & Conditions
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </AdminLayout>
   );
