@@ -8,18 +8,24 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { DepositDialog } from "@/components/user/DepositDialog";
 import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+} from "@/components/ui/dialog";
+import {
   User, Phone, Calendar, Shield, LogOut, ChevronRight,
   HelpCircle, FileText, ArrowDownToLine, ArrowUpFromLine,
-  Copy, Star, Flame,
+  Copy, Star, Flame, MessageCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { NotificationsSection } from "@/components/user/NotificationsSection";
 import { PushNotificationToggle } from "@/components/user/PushNotificationToggle";
+import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 
 export default function Profile() {
   const { profile, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [depositOpen, setDepositOpen] = useState(false);
+  const [termsOpen, setTermsOpen] = useState(false);
+  const { data: settings } = usePlatformSettings();
 
   const handleSignOut = async () => {
     await signOut();
@@ -44,6 +50,15 @@ export default function Profile() {
     if (profile?.referral_code) {
       navigator.clipboard.writeText(profile.referral_code);
       toast.success("Referral code copied!");
+    }
+  };
+
+  const openWhatsApp = () => {
+    const number = settings?.support_whatsapp;
+    if (number) {
+      window.open(`https://wa.me/${number}`, "_blank");
+    } else {
+      toast.error("Support number not configured");
     }
   };
 
@@ -96,19 +111,11 @@ export default function Profile() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-3">
-          <Button
-            variant="outline"
-            className="h-14 flex-col gap-1 rounded-xl border-2"
-            onClick={() => setDepositOpen(true)}
-          >
+          <Button variant="outline" className="h-14 flex-col gap-1 rounded-xl border-2" onClick={() => setDepositOpen(true)}>
             <ArrowDownToLine className="h-5 w-5 text-success" />
             <span className="text-sm">Deposit</span>
           </Button>
-          <Button
-            variant="outline"
-            className="h-14 flex-col gap-1 rounded-xl border-2"
-            onClick={() => navigate("/wallet")}
-          >
+          <Button variant="outline" className="h-14 flex-col gap-1 rounded-xl border-2" onClick={() => navigate("/wallet")}>
             <ArrowUpFromLine className="h-5 w-5 text-primary" />
             <span className="text-sm">Withdraw</span>
           </Button>
@@ -178,24 +185,47 @@ export default function Profile() {
         {/* Menu */}
         <Card className="rounded-xl">
           <CardContent className="p-0">
-            {[
-              { icon: HelpCircle, label: "Help & Support" },
-              { icon: FileText, label: "Terms & Conditions" },
-            ].map((item, i) => (
-              <div key={i} className="flex cursor-pointer items-center justify-between border-b last:border-b-0 px-4 py-3.5 hover:bg-muted/50">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
-                    <item.icon className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <span className="text-sm">{item.label}</span>
+            <div
+              className="flex cursor-pointer items-center justify-between border-b px-4 py-3.5 hover:bg-muted/50"
+              onClick={openWhatsApp}
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
+                  <MessageCircle className="h-4 w-4 text-muted-foreground" />
                 </div>
-                <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                <span className="text-sm">Help & Support</span>
               </div>
-            ))}
+              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+            </div>
+            <div
+              className="flex cursor-pointer items-center justify-between px-4 py-3.5 hover:bg-muted/50"
+              onClick={() => setTermsOpen(true)}
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
+                  <FileText className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <span className="text-sm">Terms & Conditions</span>
+              </div>
+              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+            </div>
           </CardContent>
         </Card>
 
         <DepositDialog open={depositOpen} onOpenChange={setDepositOpen} />
+
+        {/* Terms & Conditions Dialog */}
+        <Dialog open={termsOpen} onOpenChange={setTermsOpen}>
+          <DialogContent className="max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Terms & Conditions</DialogTitle>
+              <DialogDescription>Please read our terms carefully.</DialogDescription>
+            </DialogHeader>
+            <div className="whitespace-pre-wrap text-sm text-muted-foreground">
+              {settings?.terms_and_conditions || "Terms and conditions have not been set yet."}
+            </div>
+          </DialogContent>
+        </Dialog>
 
         <Button variant="destructive" className="w-full rounded-xl" onClick={handleSignOut}>
           <LogOut className="mr-2 h-5 w-5" />

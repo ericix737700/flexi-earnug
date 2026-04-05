@@ -36,6 +36,7 @@ export default function AdminSettings() {
     merchant_name: "",
     merchant_id: "",
     support_whatsapp: "",
+    terms_and_conditions: "",
   });
 
   useEffect(() => {
@@ -49,6 +50,7 @@ export default function AdminSettings() {
         merchant_name: settings.merchant_name || "FlexiEarn Payments",
         merchant_id: settings.merchant_id || "256700000000",
         support_whatsapp: settings.support_whatsapp || "",
+        terms_and_conditions: settings.terms_and_conditions || "",
       });
     }
   }, [settings]);
@@ -307,7 +309,7 @@ export default function AdminSettings() {
                 }
               />
               <p className="text-xs text-muted-foreground">
-                This number will be shown to blocked/suspended users as the support contact.
+                This number will be shown on the user profile as support contact and used for the WhatsApp link.
               </p>
             </div>
             <Button
@@ -361,6 +363,44 @@ export default function AdminSettings() {
                 <Save className="mr-2 h-4 w-4" />
               )}
               Update Announcement
+            </Button>
+          </CardContent>
+        </Card>
+        {/* Terms & Conditions */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Store className="h-5 w-5 text-primary" />
+              Terms & Conditions
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Terms & Conditions Content</Label>
+              <Textarea
+                placeholder="Enter your platform terms and conditions..."
+                value={formData.terms_and_conditions}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    terms_and_conditions: e.target.value,
+                  })
+                }
+                rows={10}
+              />
+            </div>
+            <Button
+              onClick={() =>
+                handleSave("terms_and_conditions", formData.terms_and_conditions)
+              }
+              disabled={updateSetting.isPending}
+            >
+              {updateSetting.isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="mr-2 h-4 w-4" />
+              )}
+              Save Terms & Conditions
             </Button>
           </CardContent>
         </Card>
