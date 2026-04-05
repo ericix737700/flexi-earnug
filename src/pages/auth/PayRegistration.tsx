@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Loader2, Smartphone, CheckCircle } from "lucide-react";
+import { Loader2, Smartphone, CheckCircle, Shield, Zap } from "lucide-react";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { useAuth } from "@/contexts/AuthContext";
 import { PlatformLogo } from "@/components/PlatformLogo";
@@ -24,6 +24,40 @@ export default function PayRegistration() {
     ? Number(settings.registration_fee)
     : 5000;
 
+  // Realtime listener — redirect when account gets activated (by admin or webhook)
+  useEffect(() => {
+    if (!profile?.user_id) return;
+
+    // If already paid, redirect immediately
+    if (profile.registration_paid) {
+      navigate("/dashboard", { replace: true });
+      return;
+    }
+
+    const channel = supabase
+      .channel("registration-status")
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "profiles",
+          filter: `user_id=eq.${profile.user_id}`,
+        },
+        (payload) => {
+          const updated = payload.new as any;
+          if (updated.registration_paid) {
+            toast.success("Your account has been activated!");
+            refreshProfile();
+            navigate("/dashboard", { replace: true });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [profile?.user_id, profile?.registration_paid, navigate, refreshProfile]);
+
   const handlePayment = async () => {
     if (!phoneNumber.trim()) {
       toast.error("Please enter your Mobile Money number");
@@ -33,7 +67,6 @@ export default function PayRegistration() {
     setIsLoading(true);
 
     try {
-      // Create a deposit record for the registration fee
       const { data: deposit, error: depositError } = await supabase
         .from("deposits")
         .insert({
@@ -46,7 +79,6 @@ export default function PayRegistration() {
 
       if (depositError) throw depositError;
 
-      // Call MarzPay collect for the registration fee
       const { data, error } = await supabase.functions.invoke("marzpay-collect", {
         body: {
           amount: registrationFee,
@@ -62,63 +94,8 @@ export default function PayRegistration() {
         throw new Error(data.error);
       }
 
-      // Mark registration as paid and activate account
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({
-          registration_paid: true,
-          status: "active",
-        })
-        .eq("user_id", profile?.user_id);
-
-      if (updateError) throw updateError;
-
-      // Create transaction record
-      await supabase.from("transactions").insert({
-        user_id: profile?.user_id,
-        transaction_type: "registration_fee",
-        amount: -registrationFee,
-        balance_after: 0,
-        description: `Registration fee paid via Mobile Money`,
-      });
-
-      // Check if user was referred and pay referral bonus
-      if (profile?.referred_by) {
-        const referralBonus = settings?.referral_bonus
-          ? Number(settings.referral_bonus)
-          : 1000;
-
-        const { data: referrer } = await supabase
-          .from("profiles")
-          .select("user_id, balance")
-          .eq("id", profile.referred_by)
-          .single();
-
-        if (referrer) {
-          const newBalance = Number(referrer.balance) + referralBonus;
-
-          await supabase
-            .from("profiles")
-            .update({ balance: newBalance })
-            .eq("id", profile.referred_by);
-
-          await supabase.from("transactions").insert({
-            user_id: referrer.user_id,
-            transaction_type: "referral_bonus",
-            amount: referralBonus,
-            balance_after: newBalance,
-            description: `Referral bonus for ${profile.full_name || profile.phone}`,
-          });
-        }
-      }
-
       setIsPaid(true);
-      await refreshProfile();
       toast.success("Payment request sent! Check your phone to approve.");
-
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 3000);
     } catch (error: any) {
       console.error("Payment error:", error);
       toast.error(error.message || "Payment failed. Please try again.");
@@ -138,8 +115,12 @@ export default function PayRegistration() {
             <h2 className="mb-2 text-2xl font-bold">Payment Request Sent!</h2>
             <p className="text-muted-foreground">
               Check your phone and approve the Mobile Money prompt.
-              Your account will be activated automatically. Redirecting...
+              Your account will be activated automatically.
             </p>
+            <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Waiting for confirmation...</span>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -184,11 +165,15 @@ export default function PayRegistration() {
             </p>
           </div>
 
-          <div className="rounded-lg border border-secondary bg-secondary/10 p-3">
-            <p className="text-sm text-secondary-foreground">
-              <strong>How it works:</strong> A payment prompt will be sent to your phone. 
-              Approve it to activate your account and start earning immediately!
-            </p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex items-center gap-2 rounded-lg border p-3">
+              <Shield className="h-5 w-5 text-primary" />
+              <span className="text-xs">Secure Payment</span>
+            </div>
+            <div className="flex items-center gap-2 rounded-lg border p-3">
+              <Zap className="h-5 w-5 text-primary" />
+              <span className="text-xs">Instant Activation</span>
+            </div>
           </div>
 
           <Button

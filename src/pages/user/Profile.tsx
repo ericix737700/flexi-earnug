@@ -2,21 +2,15 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserLayout } from "@/components/layout/UserLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { DepositDialog } from "@/components/user/DepositDialog";
 import {
-  User,
-  Phone,
-  Calendar,
-  Shield,
-  LogOut,
-  ChevronRight,
-  HelpCircle,
-  FileText,
-  ArrowDownToLine,
-  ArrowUpFromLine,
+  User, Phone, Calendar, Shield, LogOut, ChevronRight,
+  HelpCircle, FileText, ArrowDownToLine, ArrowUpFromLine,
+  Copy, Star, Flame,
 } from "lucide-react";
 import { toast } from "sonner";
 import { NotificationsSection } from "@/components/user/NotificationsSection";
@@ -33,134 +27,147 @@ export default function Profile() {
     navigate("/login");
   };
 
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString("en-UG", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  };
+  const formatDate = (date: string) =>
+    new Date(date).toLocaleDateString("en-UG", { day: "numeric", month: "long", year: "numeric" });
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "active":
-        return "bg-success";
-      case "pending":
-        return "bg-amber-500";
-      case "suspended":
-        return "bg-destructive";
-      case "blocked":
-        return "bg-destructive";
-      default:
-        return "bg-muted";
+      case "active": return "bg-success text-success-foreground";
+      case "pending": return "bg-amber-500 text-white";
+      case "suspended": return "bg-destructive text-destructive-foreground";
+      case "blocked": return "bg-destructive text-destructive-foreground";
+      default: return "bg-muted";
+    }
+  };
+
+  const copyReferralCode = () => {
+    if (profile?.referral_code) {
+      navigator.clipboard.writeText(profile.referral_code);
+      toast.success("Referral code copied!");
     }
   };
 
   return (
     <UserLayout>
-      <div className="space-y-6">
-        {/* Profile Header */}
-        <Card className="border-2">
-          <CardContent className="py-6">
-            <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-2xl font-bold text-primary-foreground">
-                {profile?.full_name?.charAt(0) || "U"}
-              </div>
-              <div className="flex-1">
-                <h2 className="text-xl font-bold">
-                  {profile?.full_name || "User"}
-                </h2>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Phone className="h-4 w-4" />
-                  <span>{profile?.phone}</span>
-                </div>
-                <Badge className={`mt-2 ${getStatusColor(profile?.status || "pending")}`}>
-                  {profile?.status?.toUpperCase()}
-                </Badge>
-              </div>
+      <div className="space-y-4">
+        {/* Profile Hero */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary/80 p-6 text-primary-foreground">
+          <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-primary-foreground/10" />
+          <div className="absolute -bottom-4 -left-4 h-16 w-16 rounded-full bg-primary-foreground/10" />
+          <div className="relative flex items-center gap-4">
+            <div className="flex h-18 w-18 items-center justify-center rounded-full bg-primary-foreground/20 text-3xl font-bold backdrop-blur-sm"
+              style={{ width: 72, height: 72 }}>
+              {profile?.full_name?.charAt(0)?.toUpperCase() || "U"}
             </div>
-          </CardContent>
-        </Card>
+            <div className="flex-1">
+              <h2 className="text-xl font-bold">{profile?.full_name || "User"}</h2>
+              <div className="flex items-center gap-1.5 text-sm text-primary-foreground/80">
+                <Phone className="h-3.5 w-3.5" />
+                <span>{profile?.phone}</span>
+              </div>
+              <Badge className={`mt-2 ${getStatusColor(profile?.status || "pending")}`}>
+                {profile?.status?.toUpperCase()}
+              </Badge>
+            </div>
+          </div>
 
-        {/* Deposit & Withdraw Buttons */}
+          {/* Stats row */}
+          <div className="relative mt-4 grid grid-cols-3 gap-3">
+            <div className="rounded-xl bg-primary-foreground/15 px-3 py-2 text-center backdrop-blur-sm">
+              <p className="text-lg font-bold">UGX {Number(profile?.balance || 0).toLocaleString()}</p>
+              <p className="text-[10px] text-primary-foreground/70">Balance</p>
+            </div>
+            <div className="rounded-xl bg-primary-foreground/15 px-3 py-2 text-center backdrop-blur-sm">
+              <div className="flex items-center justify-center gap-1">
+                <Flame className="h-4 w-4" />
+                <p className="text-lg font-bold">{profile?.daily_checkin_streak || 0}</p>
+              </div>
+              <p className="text-[10px] text-primary-foreground/70">Day Streak</p>
+            </div>
+            <div className="rounded-xl bg-primary-foreground/15 px-3 py-2 text-center backdrop-blur-sm">
+              <div className="flex items-center justify-center gap-1">
+                <Star className="h-4 w-4" />
+                <p className="text-lg font-bold">{profile?.registration_paid ? "Active" : "Free"}</p>
+              </div>
+              <p className="text-[10px] text-primary-foreground/70">Account</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-3">
           <Button
             variant="outline"
-            className="h-14 flex-col gap-1"
+            className="h-14 flex-col gap-1 rounded-xl border-2"
             onClick={() => setDepositOpen(true)}
           >
             <ArrowDownToLine className="h-5 w-5 text-success" />
-            <span>Deposit</span>
+            <span className="text-sm">Deposit</span>
           </Button>
           <Button
             variant="outline"
-            className="h-14 flex-col gap-1"
+            className="h-14 flex-col gap-1 rounded-xl border-2"
             onClick={() => navigate("/wallet")}
           >
             <ArrowUpFromLine className="h-5 w-5 text-primary" />
-            <span>Withdraw</span>
+            <span className="text-sm">Withdraw</span>
           </Button>
         </div>
 
-         {/* Notifications */}
-         <NotificationsSection />
+        {/* Referral Code Card */}
+        <Card className="border-2 border-dashed border-primary/30">
+          <CardContent className="flex items-center justify-between py-4">
+            <div>
+              <p className="text-xs text-muted-foreground">Your Referral Code</p>
+              <p className="text-xl font-mono font-bold text-primary">{profile?.referral_code}</p>
+            </div>
+            <Button variant="outline" size="sm" onClick={copyReferralCode}>
+              <Copy className="mr-1.5 h-4 w-4" />
+              Copy
+            </Button>
+          </CardContent>
+        </Card>
 
-        {/* Push Notification Settings */}
+        {/* Notifications */}
+        <NotificationsSection />
         <PushNotificationToggle />
 
         {/* Account Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Account Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <User className="h-5 w-5 text-muted-foreground" />
-                <span>Full Name</span>
-              </div>
-              <span className="font-medium">{profile?.full_name || "Not set"}</span>
+        <Card className="rounded-xl">
+          <CardContent className="p-0">
+            <div className="px-4 py-3">
+              <p className="text-sm font-semibold text-muted-foreground">Account Details</p>
             </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Phone className="h-5 w-5 text-muted-foreground" />
-                <span>Phone</span>
+            <Separator />
+            {[
+              { icon: User, label: "Full Name", value: profile?.full_name || "Not set" },
+              { icon: Phone, label: "Phone", value: profile?.phone },
+              { icon: Calendar, label: "Joined", value: profile?.created_at ? formatDate(profile.created_at) : "N/A" },
+              { icon: Shield, label: "Referral Code", value: profile?.referral_code, mono: true },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center justify-between border-b last:border-b-0 px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
+                    <item.icon className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <span className="text-sm">{item.label}</span>
+                </div>
+                <span className={`text-sm font-medium ${item.mono ? "font-mono text-primary" : ""}`}>
+                  {item.value}
+                </span>
               </div>
-              <span className="font-medium">{profile?.phone}</span>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Calendar className="h-5 w-5 text-muted-foreground" />
-                <span>Joined</span>
-              </div>
-              <span className="font-medium">
-                {profile?.created_at ? formatDate(profile.created_at) : "N/A"}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Shield className="h-5 w-5 text-muted-foreground" />
-                <span>Referral Code</span>
-              </div>
-              <span className="font-mono font-medium text-primary">
-                {profile?.referral_code}
-              </span>
-            </div>
+            ))}
           </CardContent>
         </Card>
 
         {/* Admin Link */}
         {isAdmin && (
-          <Card
-            className="cursor-pointer transition-colors hover:bg-muted/50"
-            onClick={() => navigate("/admin")}
-          >
+          <Card className="cursor-pointer rounded-xl transition-colors hover:bg-muted/50" onClick={() => navigate("/admin")}>
             <CardContent className="flex items-center justify-between py-4">
               <div className="flex items-center gap-3">
-                <Shield className="h-5 w-5 text-primary" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                  <Shield className="h-4 w-4 text-primary" />
+                </div>
                 <span className="font-medium">Admin Panel</span>
               </div>
               <ChevronRight className="h-5 w-5 text-muted-foreground" />
@@ -168,35 +175,29 @@ export default function Profile() {
           </Card>
         )}
 
-        {/* Menu Items */}
-        <Card>
-          <CardContent className="divide-y p-0">
-            <div className="flex cursor-pointer items-center justify-between p-4 hover:bg-muted/50">
-              <div className="flex items-center gap-3">
-                <HelpCircle className="h-5 w-5 text-muted-foreground" />
-                <span>Help & Support</span>
+        {/* Menu */}
+        <Card className="rounded-xl">
+          <CardContent className="p-0">
+            {[
+              { icon: HelpCircle, label: "Help & Support" },
+              { icon: FileText, label: "Terms & Conditions" },
+            ].map((item, i) => (
+              <div key={i} className="flex cursor-pointer items-center justify-between border-b last:border-b-0 px-4 py-3.5 hover:bg-muted/50">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
+                    <item.icon className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <span className="text-sm">{item.label}</span>
+                </div>
+                <ChevronRight className="h-5 w-5 text-muted-foreground" />
               </div>
-              <ChevronRight className="h-5 w-5 text-muted-foreground" />
-            </div>
-
-            <div className="flex cursor-pointer items-center justify-between p-4 hover:bg-muted/50">
-              <div className="flex items-center gap-3">
-                <FileText className="h-5 w-5 text-muted-foreground" />
-                <span>Terms & Conditions</span>
-              </div>
-              <ChevronRight className="h-5 w-5 text-muted-foreground" />
-            </div>
+            ))}
           </CardContent>
         </Card>
 
-        {/* Logout Button */}
         <DepositDialog open={depositOpen} onOpenChange={setDepositOpen} />
 
-        <Button
-          variant="destructive"
-          className="w-full"
-          onClick={handleSignOut}
-        >
+        <Button variant="destructive" className="w-full rounded-xl" onClick={handleSignOut}>
           <LogOut className="mr-2 h-5 w-5" />
           Log Out
         </Button>

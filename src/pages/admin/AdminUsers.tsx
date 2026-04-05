@@ -114,6 +114,22 @@ export default function AdminUsers() {
     onError: () => { toast.error("Failed to update user status"); },
   });
 
+  const activateAccountMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ registration_paid: true, status: "active" })
+        .eq("user_id", userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Account activated without payment");
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      setDetailUser(null);
+    },
+    onError: () => { toast.error("Failed to activate account"); },
+  });
+
   const adjustBalanceMutation = useMutation({
     mutationFn: async () => {
       if (!selectedUser || !user) return;
@@ -316,6 +332,21 @@ export default function AdminUsers() {
                   <div className="flex justify-between"><span className="text-muted-foreground">Referral Code</span><span className="font-mono">{detailUser.referral_code}</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Registration</span><span>{detailUser.registration_paid ? "Paid" : "Unpaid"}</span></div>
                 </div>
+
+                {/* Admin Activate Account */}
+                {!detailUser.registration_paid && (
+                  <Button
+                    className="w-full"
+                    onClick={() => activateAccountMutation.mutate(detailUser.user_id)}
+                    disabled={activateAccountMutation.isPending}
+                  >
+                    {activateAccountMutation.isPending ? (
+                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Activating...</>
+                    ) : (
+                      <><UserCheck className="mr-2 h-4 w-4" />Activate Without Payment</>
+                    )}
+                  </Button>
+                )}
               </div>
             )}
           </SheetContent>
