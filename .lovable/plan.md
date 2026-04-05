@@ -1,59 +1,41 @@
 
 
-## Comprehensive Improvements Plan
-
-This plan addresses all the issues you raised: real-time status updates, admin user detail views, task upload failures, and logo upload failures.
-
-### Root Cause of Upload Failures
-
-Both task video uploads and logo uploads fail because **no storage buckets exist** in the database. We need to create `task-videos` and `branding` buckets.
+## Add WhatsApp Support, Terms & Conditions, and User Deletion
 
 ### What We'll Build
 
-**1. Create storage buckets (fixes upload failures)**
-- Create `branding` bucket (public) for platform logo
-- Create `task-videos` bucket (public) for task video uploads
-- Add appropriate RLS policies for both
+**1. WhatsApp Support link on Profile page**
+- Make "Help & Support" open WhatsApp using the `support_whatsapp` setting already configured in Admin Settings
+- Read the number from `usePlatformSettings` hook
 
-**2. Real-time balance/status updates for users**
-- Enable Supabase Realtime on `profiles`, `deposits`, `withdrawals`, and `transactions` tables
-- Subscribe to changes in the Wallet page, Dashboard, and DepositDialog so balances and statuses update automatically without manual refresh
+**2. Terms & Conditions (configurable from Admin)**
+- Add a `terms_and_conditions` setting in Admin Settings with a rich text area
+- Create a Terms & Conditions dialog/page that displays the content
+- "Terms & Conditions" menu item on Profile opens this dialog
 
-**3. Add `last_seen` column to profiles**
-- Add a `last_seen` timestamp column to the `profiles` table
-- Update it on each page load via the AuthContext (whenever a user accesses the app)
+**3. Admin: Add T&C editor**
+- Add a new card in `AdminSettings.tsx` with a `Textarea` for terms and conditions content
+- Uses the same `platform_settings` table (no migration needed -- just upsert a new key)
 
-**4. Enhanced Admin User Detail View**
-- Add a user detail dialog/drawer in AdminUsers that shows:
-  - Online status (green dot if last_seen within 5 minutes) and last seen time
-  - Tasks completed by the user (count + list from `task_completions`)
-  - Referral count (users referred by this user via `referred_by`)
-  - Transaction history summary
-  - Balance and registration status
+**4. Admin: Fix user deletion**
+- The `deleteUserMutation` calls a `delete-user` edge function that doesn't exist
+- Create the edge function using `supabase.auth.admin.deleteUser()` which cascades to profiles via foreign key
 
-**5. Improve Admin UI styling**
-- Apply the green/gold theme to all admin pages
-- Better card layouts, stat indicators, and visual hierarchy on the dashboard
+### Database Changes
+- Insert a new `terms_and_conditions` platform setting row (using insert tool, no migration needed)
 
-### Files to modify/create
+### Files to Create/Modify
 
 | File | Change |
 |---|---|
-| Migration SQL | Create buckets, add `last_seen` column, enable realtime |
-| `src/contexts/AuthContext.tsx` | Update `last_seen` on auth state change |
-| `src/pages/admin/AdminUsers.tsx` | Add user detail dialog with referrals, tasks, last seen |
-| `src/pages/admin/AdminDashboard.tsx` | Improved UI styling |
-| `src/pages/admin/AdminTasks.tsx` | Fix — buckets now exist, uploads will work |
-| `src/pages/admin/AdminSettings.tsx` | Fix — branding bucket now exists |
-| `src/pages/user/Wallet.tsx` | Add realtime subscription for live balance/transaction updates |
-| `src/components/user/DepositDialog.tsx` | Add realtime listener for deposit status changes |
-| `src/components/layout/AdminLayout.tsx` | UI polish with green/gold theme |
+| `supabase/functions/delete-user/index.ts` | New edge function to delete user from auth + cascading data |
+| `src/pages/user/Profile.tsx` | WhatsApp link on Help & Support, T&C dialog on Terms menu item |
+| `src/pages/admin/AdminSettings.tsx` | Add Terms & Conditions textarea card, update WhatsApp description |
+| `src/hooks/usePlatformSettings.ts` | No changes needed (already generic) |
 
-### Technical details
-
-- Storage buckets created via migration with `INSERT INTO storage.buckets`
-- RLS policies: authenticated users can upload to task-videos (admins only) and branding (admins only); public can read
-- Realtime: `ALTER PUBLICATION supabase_realtime ADD TABLE` for profiles, deposits, withdrawals, transactions
-- `last_seen` updated via `supabase.from('profiles').update({ last_seen: new Date() })` on each session load
-- User detail panel queries `task_completions`, `profiles` (where `referred_by` matches), and `transactions` for the selected user
+### Technical Details
+- WhatsApp link: `window.open(\`https://wa.me/\${settings.support_whatsapp}\`)` 
+- T&C displayed in a Dialog component reading from `platform_settings` where `setting_key = 'terms_and_conditions'`
+- Delete user edge function uses `SUPABASE_SERVICE_ROLE_KEY` to call `supabase.auth.admin.deleteUser(userId)` which cascades deletes via the `ON DELETE CASCADE` on profiles
+- The `formData` state in AdminSettings will be extended with `terms_and_conditions`
 
