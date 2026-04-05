@@ -36,6 +36,7 @@ export default function AdminSettings() {
     merchant_name: "",
     merchant_id: "",
     support_whatsapp: "",
+    terms_and_conditions: "",
   });
 
   useEffect(() => {
