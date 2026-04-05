@@ -50,6 +50,7 @@ export default function AdminSettings() {
         merchant_name: settings.merchant_name || "FlexiEarn Payments",
         merchant_id: settings.merchant_id || "256700000000",
         support_whatsapp: settings.support_whatsapp || "",
+        terms_and_conditions: settings.terms_and_conditions || "",
       });
     }
   }, [settings]);
@@ -308,7 +309,7 @@ export default function AdminSettings() {
                 }
               />
               <p className="text-xs text-muted-foreground">
-                This number will be shown to blocked/suspended users as the support contact.
+                This number will be shown on the user profile as support contact and used for the WhatsApp link.
               </p>
             </div>
             <Button
