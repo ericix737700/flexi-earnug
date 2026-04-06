@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
+import { LoadingScreen } from "@/components/LoadingScreen";
 
 // Auth Pages
 import Login from "./pages/auth/Login";
@@ -37,11 +38,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, profile, isLoading } = useAuth();
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (!user) {
@@ -59,11 +56,7 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
   const { user, isAdmin, isLoading } = useAuth();
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (!user || !isAdmin) {
@@ -77,11 +70,7 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
   const { user, profile, isLoading } = useAuth();
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (user && profile?.registration_paid) {
