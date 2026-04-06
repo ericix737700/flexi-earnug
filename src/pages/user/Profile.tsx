@@ -7,24 +7,31 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { DepositDialog } from "@/components/user/DepositDialog";
+import { SupportDialog } from "@/components/user/SupportDialog";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
 import {
+  Sheet, SheetContent, SheetHeader, SheetTitle,
+} from "@/components/ui/sheet";
+import {
   User, Phone, Calendar, Shield, LogOut, ChevronRight,
-  HelpCircle, FileText, ArrowDownToLine, ArrowUpFromLine,
-  Copy, Star, Flame, MessageCircle,
+  FileText, ArrowDownToLine, ArrowUpFromLine,
+  Copy, Star, Flame, MessageCircle, Lock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { NotificationsSection } from "@/components/user/NotificationsSection";
 import { PushNotificationToggle } from "@/components/user/PushNotificationToggle";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
+import { PlatformLogo } from "@/components/PlatformLogo";
 
 export default function Profile() {
   const { profile, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [depositOpen, setDepositOpen] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
+  const [supportOpen, setSupportOpen] = useState(false);
   const { data: settings } = usePlatformSettings();
 
   const handleSignOut = async () => {
@@ -38,10 +45,10 @@ export default function Profile() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "active": return "bg-success text-success-foreground";
-      case "pending": return "bg-amber-500 text-white";
-      case "suspended": return "bg-destructive text-destructive-foreground";
-      case "blocked": return "bg-destructive text-destructive-foreground";
+      case "active": return "bg-green-500/15 text-green-700 border-green-500/30";
+      case "pending": return "bg-amber-500/15 text-amber-700 border-amber-500/30";
+      case "suspended": return "bg-destructive/15 text-destructive border-destructive/30";
+      case "blocked": return "bg-destructive/15 text-destructive border-destructive/30";
       default: return "bg-muted";
     }
   };
@@ -53,15 +60,6 @@ export default function Profile() {
     }
   };
 
-  const openWhatsApp = () => {
-    const number = settings?.support_whatsapp;
-    if (number) {
-      window.open(`https://wa.me/${number}`, "_blank");
-    } else {
-      toast.error("Support number not configured");
-    }
-  };
-
   return (
     <UserLayout>
       <div className="space-y-4">
@@ -70,17 +68,14 @@ export default function Profile() {
           <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-primary-foreground/10" />
           <div className="absolute -bottom-4 -left-4 h-16 w-16 rounded-full bg-primary-foreground/10" />
           <div className="relative flex items-center gap-4">
-            <div className="flex h-18 w-18 items-center justify-center rounded-full bg-primary-foreground/20 text-3xl font-bold backdrop-blur-sm"
-              style={{ width: 72, height: 72 }}>
-              {profile?.full_name?.charAt(0)?.toUpperCase() || "U"}
-            </div>
+            <PlatformLogo size="lg" className="ring-2 ring-primary-foreground/30" />
             <div className="flex-1">
               <h2 className="text-xl font-bold">{profile?.full_name || "User"}</h2>
               <div className="flex items-center gap-1.5 text-sm text-primary-foreground/80">
                 <Phone className="h-3.5 w-3.5" />
                 <span>{profile?.phone}</span>
               </div>
-              <Badge className={`mt-2 ${getStatusColor(profile?.status || "pending")}`}>
+              <Badge className={`mt-2 border ${getStatusColor(profile?.status || "pending")}`} variant="outline">
                 {profile?.status?.toUpperCase()}
               </Badge>
             </div>
@@ -112,7 +107,7 @@ export default function Profile() {
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-3">
           <Button variant="outline" className="h-14 flex-col gap-1 rounded-xl border-2" onClick={() => setDepositOpen(true)}>
-            <ArrowDownToLine className="h-5 w-5 text-success" />
+            <ArrowDownToLine className="h-5 w-5 text-green-600" />
             <span className="text-sm">Deposit</span>
           </Button>
           <Button variant="outline" className="h-14 flex-col gap-1 rounded-xl border-2" onClick={() => navigate("/wallet")}>
@@ -187,18 +182,18 @@ export default function Profile() {
           <CardContent className="p-0">
             <div
               className="flex cursor-pointer items-center justify-between border-b px-4 py-3.5 hover:bg-muted/50"
-              onClick={openWhatsApp}
+              onClick={() => setSupportOpen(true)}
             >
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
-                  <MessageCircle className="h-4 w-4 text-muted-foreground" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-500/10">
+                  <MessageCircle className="h-4 w-4 text-green-600" />
                 </div>
                 <span className="text-sm">Help & Support</span>
               </div>
               <ChevronRight className="h-5 w-5 text-muted-foreground" />
             </div>
             <div
-              className="flex cursor-pointer items-center justify-between px-4 py-3.5 hover:bg-muted/50"
+              className="flex cursor-pointer items-center justify-between border-b px-4 py-3.5 hover:bg-muted/50"
               onClick={() => setTermsOpen(true)}
             >
               <div className="flex items-center gap-3">
@@ -209,10 +204,23 @@ export default function Profile() {
               </div>
               <ChevronRight className="h-5 w-5 text-muted-foreground" />
             </div>
+            <div
+              className="flex cursor-pointer items-center justify-between px-4 py-3.5 hover:bg-muted/50"
+              onClick={() => setPrivacyOpen(true)}
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
+                  <Lock className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <span className="text-sm">Privacy Policy</span>
+              </div>
+              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+            </div>
           </CardContent>
         </Card>
 
         <DepositDialog open={depositOpen} onOpenChange={setDepositOpen} />
+        <SupportDialog open={supportOpen} onOpenChange={setSupportOpen} />
 
         {/* Terms & Conditions Dialog */}
         <Dialog open={termsOpen} onOpenChange={setTermsOpen}>
@@ -223,6 +231,19 @@ export default function Profile() {
             </DialogHeader>
             <div className="whitespace-pre-wrap text-sm text-muted-foreground">
               {settings?.terms_and_conditions || "Terms and conditions have not been set yet."}
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Privacy Policy Dialog */}
+        <Dialog open={privacyOpen} onOpenChange={setPrivacyOpen}>
+          <DialogContent className="max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Privacy Policy</DialogTitle>
+              <DialogDescription>How we handle your data.</DialogDescription>
+            </DialogHeader>
+            <div className="whitespace-pre-wrap text-sm text-muted-foreground">
+              {settings?.privacy_policy || "Privacy policy has not been set yet."}
             </div>
           </DialogContent>
         </Dialog>
