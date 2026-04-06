@@ -125,17 +125,11 @@ export function DepositDialog({ open, onOpenChange }: DepositDialogProps) {
         </DialogHeader>
 
         {success ? (
-          <div className="space-y-4 text-center py-4">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/20">
-              <CheckCircle className="h-8 w-8 text-success" />
-            </div>
-            <div>
-              <p className="font-semibold text-lg">Payment Request Sent!</p>
-              <p className="text-sm text-muted-foreground mt-2">
-                Please check your phone and approve the Mobile Money payment prompt.
-                Your account will be credited automatically once payment is confirmed.
-              </p>
-            </div>
+          <div className="space-y-4 text-center py-2">
+            <SuccessAnimation
+              message="Payment Request Sent!"
+              subMessage="Check your phone and approve the Mobile Money prompt. Your account will be credited automatically."
+            />
             <Button className="w-full" onClick={handleClose}>
               Done
             </Button>
