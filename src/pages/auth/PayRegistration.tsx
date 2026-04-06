@@ -108,18 +108,21 @@ export default function PayRegistration() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/20 via-background to-secondary/20 p-4">
         <Card className="w-full max-w-md border-2 shadow-xl">
-          <CardContent className="flex flex-col items-center py-12 text-center">
-            <div className="mb-4 rounded-full bg-success/20 p-4">
-              <CheckCircle className="h-16 w-16 text-success" />
+          <CardContent className="flex flex-col items-center py-8 text-center">
+            <div className="relative mb-4">
+              <div className="absolute inset-0 animate-ping rounded-full bg-green-400/30" />
+              <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-green-500/20">
+                <CheckCircle className="h-10 w-10 text-green-500" strokeWidth={2.5} />
+              </div>
             </div>
             <h2 className="mb-2 text-2xl font-bold">Payment Request Sent!</h2>
             <p className="text-muted-foreground">
               Check your phone and approve the Mobile Money prompt.
               Your account will be activated automatically.
             </p>
-            <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+            <div className="mt-6 flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm text-primary">
               <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Waiting for confirmation...</span>
+              <span className="font-medium">Waiting for confirmation...</span>
             </div>
           </CardContent>
         </Card>

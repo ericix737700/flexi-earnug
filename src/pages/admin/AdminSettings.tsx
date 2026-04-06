@@ -9,18 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useState, useEffect, useRef } from "react";
 import {
-  Save,
-  Loader2,
-  DollarSign,
-  Gift,
-  Wallet,
-  Calendar,
-  Bell,
-  Store,
-  MessageCircle,
-  ImageIcon,
-  Upload,
-  Trash2,
+  Save, Loader2, DollarSign, Gift, Wallet, Calendar, Bell,
+  Store, MessageCircle, ImageIcon, Upload, Trash2, Send, Lock, Hand,
 } from "lucide-react";
 
 export default function AdminSettings() {
@@ -36,7 +26,10 @@ export default function AdminSettings() {
     merchant_name: "",
     merchant_id: "",
     support_whatsapp: "",
+    support_telegram: "",
     terms_and_conditions: "",
+    privacy_policy: "",
+    welcome_message: "",
   });
 
   useEffect(() => {
@@ -50,13 +43,27 @@ export default function AdminSettings() {
         merchant_name: settings.merchant_name || "FlexiEarn Payments",
         merchant_id: settings.merchant_id || "256700000000",
         support_whatsapp: settings.support_whatsapp || "",
+        support_telegram: settings.support_telegram || "",
         terms_and_conditions: settings.terms_and_conditions || "",
+        privacy_policy: settings.privacy_policy || "",
+        welcome_message: settings.welcome_message || "",
       });
     }
   }, [settings]);
 
   const handleSave = async (key: string, value: string) => {
     try {
+      // Try update first, if no rows affected, insert
+      const { error } = await supabase
+        .from("platform_settings")
+        .update({ setting_value: value })
+        .eq("setting_key", key);
+
+      if (error) {
+        // Insert if doesn't exist
+        await supabase.from("platform_settings").insert({ setting_key: key, setting_value: value });
+      }
+
       await updateSetting.mutateAsync({ key, value });
       toast.success("Setting updated successfully");
     } catch {
@@ -79,9 +86,7 @@ export default function AdminSettings() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold">Platform Settings</h1>
-          <p className="text-muted-foreground">
-            Configure platform fees, rewards, and announcements
-          </p>
+          <p className="text-muted-foreground">Configure platform fees, rewards, branding, and content</p>
         </div>
 
         {/* Logo Upload */}
@@ -89,154 +94,13 @@ export default function AdminSettings() {
 
         <div className="grid gap-6 md:grid-cols-2">
           {/* Registration Fee */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <DollarSign className="h-5 w-5 text-primary" />
-                Registration Fee
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Amount (UGX)</Label>
-                <Input
-                  type="number"
-                  value={formData.registration_fee}
-                  onChange={(e) =>
-                    setFormData({ ...formData, registration_fee: e.target.value })
-                  }
-                />
-              </div>
-              <Button
-                className="w-full"
-                onClick={() =>
-                  handleSave("registration_fee", formData.registration_fee)
-                }
-                disabled={updateSetting.isPending}
-              >
-                {updateSetting.isPending ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Save className="mr-2 h-4 w-4" />
-                )}
-                Save
-              </Button>
-            </CardContent>
-          </Card>
-
+          <SettingCard icon={DollarSign} iconColor="text-primary" title="Registration Fee" label="Amount (UGX)" value={formData.registration_fee} onChange={(v) => setFormData({ ...formData, registration_fee: v })} onSave={() => handleSave("registration_fee", formData.registration_fee)} isPending={updateSetting.isPending} type="number" />
           {/* Referral Bonus */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Gift className="h-5 w-5 text-secondary" />
-                Referral Bonus
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Amount (UGX)</Label>
-                <Input
-                  type="number"
-                  value={formData.referral_bonus}
-                  onChange={(e) =>
-                    setFormData({ ...formData, referral_bonus: e.target.value })
-                  }
-                />
-              </div>
-              <Button
-                className="w-full"
-                onClick={() =>
-                  handleSave("referral_bonus", formData.referral_bonus)
-                }
-                disabled={updateSetting.isPending}
-              >
-                {updateSetting.isPending ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Save className="mr-2 h-4 w-4" />
-                )}
-                Save
-              </Button>
-            </CardContent>
-          </Card>
-
+          <SettingCard icon={Gift} iconColor="text-secondary" title="Referral Bonus" label="Amount (UGX)" value={formData.referral_bonus} onChange={(v) => setFormData({ ...formData, referral_bonus: v })} onSave={() => handleSave("referral_bonus", formData.referral_bonus)} isPending={updateSetting.isPending} type="number" />
           {/* Minimum Withdrawal */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Wallet className="h-5 w-5 text-accent" />
-                Minimum Withdrawal
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Amount (UGX)</Label>
-                <Input
-                  type="number"
-                  value={formData.minimum_withdrawal}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      minimum_withdrawal: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <Button
-                className="w-full"
-                onClick={() =>
-                  handleSave("minimum_withdrawal", formData.minimum_withdrawal)
-                }
-                disabled={updateSetting.isPending}
-              >
-                {updateSetting.isPending ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Save className="mr-2 h-4 w-4" />
-                )}
-                Save
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Daily Check-in Reward */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Calendar className="h-5 w-5 text-success" />
-                Daily Check-in Reward
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Amount (UGX)</Label>
-                <Input
-                  type="number"
-                  value={formData.daily_checkin_reward}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      daily_checkin_reward: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <Button
-                className="w-full"
-                onClick={() =>
-                  handleSave("daily_checkin_reward", formData.daily_checkin_reward)
-                }
-                disabled={updateSetting.isPending}
-              >
-                {updateSetting.isPending ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Save className="mr-2 h-4 w-4" />
-                )}
-                Save
-              </Button>
-            </CardContent>
-          </Card>
+          <SettingCard icon={Wallet} iconColor="text-accent" title="Minimum Withdrawal" label="Amount (UGX)" value={formData.minimum_withdrawal} onChange={(v) => setFormData({ ...formData, minimum_withdrawal: v })} onSave={() => handleSave("minimum_withdrawal", formData.minimum_withdrawal)} isPending={updateSetting.isPending} type="number" />
+          {/* Daily Check-in */}
+          <SettingCard icon={Calendar} iconColor="text-green-600" title="Daily Check-in Reward" label="Amount (UGX)" value={formData.daily_checkin_reward} onChange={(v) => setFormData({ ...formData, daily_checkin_reward: v })} onSave={() => handleSave("daily_checkin_reward", formData.daily_checkin_reward)} isPending={updateSetting.isPending} type="number" />
         </div>
 
         {/* Merchant Settings */}
@@ -251,79 +115,63 @@ export default function AdminSettings() {
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label>Merchant Name</Label>
-                <Input
-                  value={formData.merchant_name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, merchant_name: e.target.value })
-                  }
-                  placeholder="e.g. FlexiEarn Payments"
-                />
+                <Input value={formData.merchant_name} onChange={(e) => setFormData({ ...formData, merchant_name: e.target.value })} placeholder="e.g. FlexiEarn Payments" />
               </div>
               <div className="space-y-2">
                 <Label>Merchant Number/ID</Label>
-                <Input
-                  value={formData.merchant_id}
-                  onChange={(e) =>
-                    setFormData({ ...formData, merchant_id: e.target.value })
-                  }
-                  placeholder="e.g. 256700000000"
-                />
+                <Input value={formData.merchant_id} onChange={(e) => setFormData({ ...formData, merchant_id: e.target.value })} placeholder="e.g. 256700000000" />
               </div>
             </div>
-            <Button
-              onClick={async () => {
-                await handleSave("merchant_name", formData.merchant_name);
-                await handleSave("merchant_id", formData.merchant_id);
-              }}
-              disabled={updateSetting.isPending}
-            >
-              {updateSetting.isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Save className="mr-2 h-4 w-4" />
-              )}
+            <Button onClick={async () => { await handleSave("merchant_name", formData.merchant_name); await handleSave("merchant_id", formData.merchant_id); }} disabled={updateSetting.isPending}>
+              {updateSetting.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
               Save Merchant Settings
             </Button>
           </CardContent>
         </Card>
 
-        {/* WhatsApp Support */}
+        {/* Support Channels */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <MessageCircle className="h-5 w-5 text-green-600" />
-              WhatsApp Support Number
+              Support Channels
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label>WhatsApp Number (with country code)</Label>
+                <Input placeholder="e.g. 256700123456" value={formData.support_whatsapp} onChange={(e) => setFormData({ ...formData, support_whatsapp: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Telegram Username or Link</Label>
+                <Input placeholder="e.g. FlexiEarnSupport or https://t.me/..." value={formData.support_telegram} onChange={(e) => setFormData({ ...formData, support_telegram: e.target.value })} />
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">These will appear as support options on the user profile page.</p>
+            <Button onClick={async () => { await handleSave("support_whatsapp", formData.support_whatsapp); await handleSave("support_telegram", formData.support_telegram); }} disabled={updateSetting.isPending}>
+              {updateSetting.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              Save Support Channels
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Welcome Message */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Hand className="h-5 w-5 text-amber-500" />
+              Welcome Message
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label>WhatsApp Number (with country code)</Label>
-              <Input
-                placeholder="e.g. 256700123456"
-                value={formData.support_whatsapp}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    support_whatsapp: e.target.value,
-                  })
-                }
-              />
-              <p className="text-xs text-muted-foreground">
-                This number will be shown on the user profile as support contact and used for the WhatsApp link.
-              </p>
+              <Label>Message shown on dashboard</Label>
+              <Textarea placeholder="Welcome to FlexiEarn! Start completing tasks to earn money." value={formData.welcome_message} onChange={(e) => setFormData({ ...formData, welcome_message: e.target.value })} rows={3} />
             </div>
-            <Button
-              onClick={() =>
-                handleSave("support_whatsapp", formData.support_whatsapp)
-              }
-              disabled={updateSetting.isPending}
-            >
-              {updateSetting.isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Save className="mr-2 h-4 w-4" />
-              )}
-              Save
+            <Button onClick={() => handleSave("welcome_message", formData.welcome_message)} disabled={updateSetting.isPending}>
+              {updateSetting.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              Save Welcome Message
             </Button>
           </CardContent>
         </Card>
@@ -339,33 +187,15 @@ export default function AdminSettings() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>Announcement Message</Label>
-              <Textarea
-                placeholder="Enter a message to display to all users (leave empty to hide)"
-                value={formData.platform_announcement}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    platform_announcement: e.target.value,
-                  })
-                }
-                rows={3}
-              />
+              <Textarea placeholder="Enter a message to display to all users (leave empty to hide)" value={formData.platform_announcement} onChange={(e) => setFormData({ ...formData, platform_announcement: e.target.value })} rows={3} />
             </div>
-            <Button
-              onClick={() =>
-                handleSave("platform_announcement", formData.platform_announcement)
-              }
-              disabled={updateSetting.isPending}
-            >
-              {updateSetting.isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Save className="mr-2 h-4 w-4" />
-              )}
+            <Button onClick={() => handleSave("platform_announcement", formData.platform_announcement)} disabled={updateSetting.isPending}>
+              {updateSetting.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
               Update Announcement
             </Button>
           </CardContent>
         </Card>
+
         {/* Terms & Conditions */}
         <Card>
           <CardHeader>
@@ -377,35 +207,63 @@ export default function AdminSettings() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>Terms & Conditions Content</Label>
-              <Textarea
-                placeholder="Enter your platform terms and conditions..."
-                value={formData.terms_and_conditions}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    terms_and_conditions: e.target.value,
-                  })
-                }
-                rows={10}
-              />
+              <Textarea placeholder="Enter your platform terms and conditions..." value={formData.terms_and_conditions} onChange={(e) => setFormData({ ...formData, terms_and_conditions: e.target.value })} rows={10} />
             </div>
-            <Button
-              onClick={() =>
-                handleSave("terms_and_conditions", formData.terms_and_conditions)
-              }
-              disabled={updateSetting.isPending}
-            >
-              {updateSetting.isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Save className="mr-2 h-4 w-4" />
-              )}
+            <Button onClick={() => handleSave("terms_and_conditions", formData.terms_and_conditions)} disabled={updateSetting.isPending}>
+              {updateSetting.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
               Save Terms & Conditions
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Privacy Policy */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Lock className="h-5 w-5 text-primary" />
+              Privacy Policy
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Privacy Policy Content</Label>
+              <Textarea placeholder="Enter your privacy policy..." value={formData.privacy_policy} onChange={(e) => setFormData({ ...formData, privacy_policy: e.target.value })} rows={10} />
+            </div>
+            <Button onClick={() => handleSave("privacy_policy", formData.privacy_policy)} disabled={updateSetting.isPending}>
+              {updateSetting.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              Save Privacy Policy
             </Button>
           </CardContent>
         </Card>
       </div>
     </AdminLayout>
+  );
+}
+
+// Reusable setting card
+function SettingCard({ icon: Icon, iconColor, title, label, value, onChange, onSave, isPending, type = "text" }: {
+  icon: any; iconColor: string; title: string; label: string; value: string;
+  onChange: (v: string) => void; onSave: () => void; isPending: boolean; type?: string;
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Icon className={`h-5 w-5 ${iconColor}`} />
+          {title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label>{label}</Label>
+          <Input type={type} value={value} onChange={(e) => onChange(e.target.value)} />
+        </div>
+        <Button className="w-full" onClick={onSave} disabled={isPending}>
+          {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+          Save
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -417,32 +275,16 @@ function LogoUploadCard({ settings, onSave }: { settings: Record<string, string>
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file");
-      return;
-    }
-
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("Image must be under 2MB");
-      return;
-    }
+    if (!file.type.startsWith("image/")) { toast.error("Please select an image file"); return; }
+    if (file.size > 2 * 1024 * 1024) { toast.error("Image must be under 2MB"); return; }
 
     setIsUploading(true);
     try {
       const ext = file.name.split(".").pop();
       const fileName = `logo-${Date.now()}.${ext}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("branding")
-        .upload(fileName, file, { upsert: true });
-
+      const { error: uploadError } = await supabase.storage.from("branding").upload(fileName, file, { upsert: true });
       if (uploadError) throw uploadError;
-
-      const { data: urlData } = supabase.storage
-        .from("branding")
-        .getPublicUrl(fileName);
-
+      const { data: urlData } = supabase.storage.from("branding").getPublicUrl(fileName);
       await onSave("platform_logo", urlData.publicUrl);
       toast.success("Logo uploaded successfully!");
     } catch (error) {
@@ -455,12 +297,7 @@ function LogoUploadCard({ settings, onSave }: { settings: Record<string, string>
   };
 
   const handleRemove = async () => {
-    try {
-      await onSave("platform_logo", "");
-      toast.success("Logo removed");
-    } catch {
-      toast.error("Failed to remove logo");
-    }
+    try { await onSave("platform_logo", ""); toast.success("Logo removed"); } catch { toast.error("Failed to remove logo"); }
   };
 
   return (
@@ -472,47 +309,23 @@ function LogoUploadCard({ settings, onSave }: { settings: Record<string, string>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p className="text-sm text-muted-foreground">
-          Upload a logo that will be displayed across the entire platform (login, register, navigation, etc.)
-        </p>
-
+        <p className="text-sm text-muted-foreground">Upload a logo displayed across the platform (login, register, navigation, etc.)</p>
         {currentLogo && (
           <div className="flex items-center gap-4">
-            <img
-              src={currentLogo}
-              alt="Current logo"
-              className="h-16 w-16 rounded-full object-cover border-2 border-primary"
-            />
+            <img src={currentLogo} alt="Current logo" className="h-16 w-16 rounded-full object-cover border-2 border-primary" />
             <Button variant="destructive" size="sm" onClick={handleRemove}>
               <Trash2 className="mr-2 h-4 w-4" />
               Remove Logo
             </Button>
           </div>
         )}
-
         <div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleUpload}
-            className="hidden"
-          />
-          <Button
-            variant="outline"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading}
-          >
-            {isUploading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Upload className="mr-2 h-4 w-4" />
-            )}
+          <input ref={fileInputRef} type="file" accept="image/*" onChange={handleUpload} className="hidden" />
+          <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
+            {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
             {isUploading ? "Uploading..." : "Upload Logo"}
           </Button>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Recommended: Square image, max 2MB (PNG or JPG)
-          </p>
+          <p className="mt-1 text-xs text-muted-foreground">Recommended: Square image, max 2MB (PNG or JPG)</p>
         </div>
       </CardContent>
     </Card>
