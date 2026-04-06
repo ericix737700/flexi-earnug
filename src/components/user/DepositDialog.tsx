@@ -12,7 +12,8 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { Loader2, CheckCircle, Smartphone } from "lucide-react";
+import { Loader2, Smartphone } from "lucide-react";
+import { SuccessAnimation } from "@/components/user/SuccessAnimation";
 
 interface DepositDialogProps {
   open: boolean;
