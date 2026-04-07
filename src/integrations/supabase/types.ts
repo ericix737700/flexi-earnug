@@ -109,6 +109,7 @@ export type Database = {
           balance: number
           created_at: string
           daily_checkin_streak: number
+          device_fingerprint: string | null
           full_name: string | null
           id: string
           last_checkin_date: string | null
@@ -117,6 +118,7 @@ export type Database = {
           referral_code: string
           referred_by: string | null
           registration_paid: boolean
+          restrictions: Json | null
           status: string
           updated_at: string
           user_id: string
@@ -125,6 +127,7 @@ export type Database = {
           balance?: number
           created_at?: string
           daily_checkin_streak?: number
+          device_fingerprint?: string | null
           full_name?: string | null
           id?: string
           last_checkin_date?: string | null
@@ -133,6 +136,7 @@ export type Database = {
           referral_code?: string
           referred_by?: string | null
           registration_paid?: boolean
+          restrictions?: Json | null
           status?: string
           updated_at?: string
           user_id: string
@@ -141,6 +145,7 @@ export type Database = {
           balance?: number
           created_at?: string
           daily_checkin_streak?: number
+          device_fingerprint?: string | null
           full_name?: string | null
           id?: string
           last_checkin_date?: string | null
@@ -149,6 +154,7 @@ export type Database = {
           referral_code?: string
           referred_by?: string | null
           registration_paid?: boolean
+          restrictions?: Json | null
           status?: string
           updated_at?: string
           user_id?: string
