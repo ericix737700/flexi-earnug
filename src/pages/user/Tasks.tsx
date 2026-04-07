@@ -77,6 +77,7 @@ export default function Tasks() {
   const completeTaskMutation = useMutation({
     mutationFn: async (task: Task) => {
       if (!profile?.user_id) throw new Error("Not authenticated");
+      if ((profile as any)?.restrictions?.no_tasks) throw new Error("Your account is restricted from completing tasks");
 
       // Check if already completed today
       const completionsToday = todayCompletions?.filter((id) => id === task.id).length || 0;

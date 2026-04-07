@@ -124,7 +124,6 @@ export default function AdminDeposits() {
           amount: deposit.amount,
           balance_after: newBalance,
           description: `Deposit approved - Ref: ${deposit.transaction_id}`,
-          admin_id: user.id,
         });
 
          // Create notification for user

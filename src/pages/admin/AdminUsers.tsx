@@ -49,6 +49,8 @@ interface Profile {
   status: UserStatus;
   created_at: string;
   last_seen?: string | null;
+  device_fingerprint?: string | null;
+  restrictions?: { no_transactions?: boolean; no_tasks?: boolean };
 }
 
 export default function AdminUsers() {

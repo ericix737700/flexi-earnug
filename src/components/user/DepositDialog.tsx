@@ -47,6 +47,10 @@ export function DepositDialog({ open, onOpenChange }: DepositDialogProps) {
   }, [user?.id, success]);
 
   const handleSubmit = async () => {
+    if ((profile as any)?.restrictions?.no_transactions) {
+      toast.error("Your account is restricted from making transactions");
+      return;
+    }
     if (!amount.trim() || !phoneNumber.trim()) {
       toast.error("Please fill in all fields");
       return;
