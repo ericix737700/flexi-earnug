@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { DepositDialog } from "@/components/user/DepositDialog";
 import { SupportDialog } from "@/components/user/SupportDialog";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+  Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle,
@@ -223,30 +223,30 @@ export default function Profile() {
         <SupportDialog open={supportOpen} onOpenChange={setSupportOpen} />
 
         {/* Terms & Conditions Dialog */}
-        <Dialog open={termsOpen} onOpenChange={setTermsOpen}>
-          <DialogContent className="max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Terms & Conditions</DialogTitle>
-              <DialogDescription>Please read our terms carefully.</DialogDescription>
-            </DialogHeader>
-            <div className="whitespace-pre-wrap text-sm text-muted-foreground">
+        <Sheet open={termsOpen} onOpenChange={setTermsOpen}>
+          <SheetContent side="right" className="overflow-y-auto w-full sm:max-w-lg">
+            <SheetHeader>
+              <SheetTitle>Terms & Conditions</SheetTitle>
+            </SheetHeader>
+            <div className="mt-4 whitespace-pre-wrap text-sm text-muted-foreground leading-relaxed">
               {settings?.terms_and_conditions || "Terms and conditions have not been set yet."}
             </div>
-          </DialogContent>
-        </Dialog>
+            <Button className="w-full mt-6" variant="outline" onClick={() => setTermsOpen(false)}>Close</Button>
+          </SheetContent>
+        </Sheet>
 
         {/* Privacy Policy Dialog */}
-        <Dialog open={privacyOpen} onOpenChange={setPrivacyOpen}>
-          <DialogContent className="max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Privacy Policy</DialogTitle>
-              <DialogDescription>How we handle your data.</DialogDescription>
-            </DialogHeader>
-            <div className="whitespace-pre-wrap text-sm text-muted-foreground">
+        <Sheet open={privacyOpen} onOpenChange={setPrivacyOpen}>
+          <SheetContent side="right" className="overflow-y-auto w-full sm:max-w-lg">
+            <SheetHeader>
+              <SheetTitle>Privacy Policy</SheetTitle>
+            </SheetHeader>
+            <div className="mt-4 whitespace-pre-wrap text-sm text-muted-foreground leading-relaxed">
               {settings?.privacy_policy || "Privacy policy has not been set yet."}
             </div>
-          </DialogContent>
-        </Dialog>
+            <Button className="w-full mt-6" variant="outline" onClick={() => setPrivacyOpen(false)}>Close</Button>
+          </SheetContent>
+        </Sheet>
 
         <Button variant="destructive" className="w-full rounded-xl" onClick={handleSignOut}>
           <LogOut className="mr-2 h-5 w-5" />

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlatformLogo } from "@/components/PlatformLogo";
+import { LoadingScreen } from "@/components/LoadingScreen";
 import { toast } from "sonner";
 import { Loader2, Phone, Lock, User, Users } from "lucide-react";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
@@ -19,6 +20,7 @@ export default function Register() {
     fullName: "", phone: "", password: "", confirmPassword: "", referralCode,
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
 
   const registrationFee = settings?.registration_fee ? Number(settings.registration_fee) : 5000;
 
@@ -50,13 +52,21 @@ export default function Register() {
       });
 
       if (error) { toast.error(error.message.includes("already registered") ? "This phone number is already registered" : error.message); return; }
-      if (data.user && referrerId) { await supabase.from("profiles").update({ referred_by: referrerId }).eq("user_id", data.user.id); }
+      if (data.user) {
+        if (referrerId) await supabase.from("profiles").update({ referred_by: referrerId }).eq("user_id", data.user.id);
+        // Store device fingerprint
+        const fp = generateFingerprint();
+        await supabase.from("profiles").update({ device_fingerprint: fp } as any).eq("user_id", data.user.id);
+      }
 
       toast.success("Registration successful! Welcome to FlexiEarn.");
-      navigate("/dashboard");
+      setShowLoading(true);
+      setTimeout(() => navigate("/dashboard"), 1500);
     } catch { toast.error("An error occurred. Please try again."); }
     finally { setIsLoading(false); }
   };
+
+  if (showLoading) return <LoadingScreen />;
 
   if (settingsLoading) {
     return <div className="flex min-h-screen items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -113,4 +123,17 @@ export default function Register() {
       </Card>
     </div>
   );
+}
+
+function generateFingerprint(): string {
+  const raw = [
+    navigator.userAgent, screen.width, screen.height, screen.colorDepth,
+    Intl.DateTimeFormat().resolvedOptions().timeZone, navigator.language,
+  ].join("|");
+  let hash = 0;
+  for (let i = 0; i < raw.length; i++) {
+    hash = ((hash << 5) - hash) + raw.charCodeAt(i);
+    hash |= 0;
+  }
+  return "fp_" + Math.abs(hash).toString(36);
 }

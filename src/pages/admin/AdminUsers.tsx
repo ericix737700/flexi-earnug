@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -49,6 +50,8 @@ interface Profile {
   status: UserStatus;
   created_at: string;
   last_seen?: string | null;
+  device_fingerprint?: string | null;
+  restrictions?: { no_transactions?: boolean; no_tasks?: boolean };
 }
 
 export default function AdminUsers() {
@@ -331,7 +334,45 @@ export default function AdminUsers() {
                   <div className="flex justify-between"><span className="text-muted-foreground">Phone</span><span>{detailUser.phone}</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Referral Code</span><span className="font-mono">{detailUser.referral_code}</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Registration</span><span>{detailUser.registration_paid ? "Paid" : "Unpaid"}</span></div>
+                  {detailUser.device_fingerprint && (
+                    <div className="flex justify-between"><span className="text-muted-foreground">Device ID</span><span className="font-mono text-xs">{detailUser.device_fingerprint}</span></div>
+                  )}
                 </div>
+
+                <Separator />
+
+                {/* Restrictions */}
+                <div className="space-y-3">
+                  <h3 className="font-semibold flex items-center gap-2"><Ban className="h-4 w-4" /> Restrictions</h3>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Block transactions</span>
+                    <Switch
+                      checked={!!detailUser.restrictions?.no_transactions}
+                      onCheckedChange={async (checked) => {
+                        const newR = { ...detailUser.restrictions, no_transactions: checked };
+                        await supabase.from("profiles").update({ restrictions: newR } as any).eq("user_id", detailUser.user_id);
+                        setDetailUser({ ...detailUser, restrictions: newR });
+                        queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+                        toast.success("Restriction updated");
+                      }}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Block tasks</span>
+                    <Switch
+                      checked={!!detailUser.restrictions?.no_tasks}
+                      onCheckedChange={async (checked) => {
+                        const newR = { ...detailUser.restrictions, no_tasks: checked };
+                        await supabase.from("profiles").update({ restrictions: newR } as any).eq("user_id", detailUser.user_id);
+                        setDetailUser({ ...detailUser, restrictions: newR });
+                        queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+                        toast.success("Restriction updated");
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <Separator />
 
                 {/* Admin Activate Account */}
                 {!detailUser.registration_paid && (

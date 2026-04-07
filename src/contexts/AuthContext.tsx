@@ -2,6 +2,12 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
+interface Restrictions {
+  no_transactions?: boolean;
+  no_tasks?: boolean;
+  blocked_tasks?: string[];
+}
+
 interface Profile {
   id: string;
   user_id: string;
@@ -16,6 +22,8 @@ interface Profile {
   last_checkin_date: string | null;
   created_at: string;
   updated_at: string;
+  device_fingerprint?: string | null;
+  restrictions?: Restrictions;
 }
 
 interface AuthContextType {

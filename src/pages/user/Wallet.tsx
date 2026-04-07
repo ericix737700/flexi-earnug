@@ -122,6 +122,7 @@ export default function Wallet() {
   const withdrawMutation = useMutation({
     mutationFn: async () => {
       if (!profile?.user_id) throw new Error("Not authenticated");
+      if ((profile as any)?.restrictions?.no_transactions) throw new Error("Your account is restricted from making transactions");
 
       const amount = Number(withdrawAmount);
       if (isNaN(amount) || amount < minimumWithdrawal) {
