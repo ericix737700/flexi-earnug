@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { DepositDialog } from "@/components/user/DepositDialog";
 import { SupportDialog } from "@/components/user/SupportDialog";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+  Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle,
