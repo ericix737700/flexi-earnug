@@ -151,6 +151,13 @@ export function DepositDialog({ open, onOpenChange }: DepositDialogProps) {
                 min={500}
                 max={10000000}
               />
+              <div className="flex flex-wrap gap-2">
+                {[5000, 10000, 50000, 100000].map((v) => (
+                  <Button key={v} type="button" variant="outline" size="sm" onClick={() => setAmount(String(v))}>
+                    {(v / 1000)}K
+                  </Button>
+                ))}
+              </div>
               <p className="text-xs text-muted-foreground">
                 Min: UGX 500 · Max: UGX 10,000,000
               </p>
