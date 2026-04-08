@@ -24,9 +24,10 @@ export function PlatformLogo({ className = "", fallbackText = "FE", size = "md" 
   if (logoUrl) {
     return (
       <img
-        src={logoUrl}
+        src={`${logoUrl}?t=${Date.now()}`}
         alt="Platform Logo"
         className={`${sizeMap[size]} rounded-full object-cover ${className}`}
+        crossOrigin="anonymous"
       />
     );
   }
