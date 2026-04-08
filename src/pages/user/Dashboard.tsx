@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserLayout } from "@/components/layout/UserLayout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,6 +25,21 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { data: settings } = usePlatformSettings();
   const queryClient = useQueryClient();
+
+  // Realtime sync for instant balance updates
+  useEffect(() => {
+    if (!profile?.user_id) return;
+    const channel = supabase
+      .channel('dashboard-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles', filter: `user_id=eq.${profile.user_id}` }, () => {
+        refreshProfile();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions', filter: `user_id=eq.${profile.user_id}` }, () => {
+        queryClient.invalidateQueries({ queryKey: ["today-earnings"] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [profile?.user_id]);
 
   const { data: todayEarnings } = useQuery({
     queryKey: ["today-earnings", profile?.user_id],

@@ -1,19 +1,36 @@
-import { ReactNode } from "react";
+import { ReactNode, useState, useCallback } from "react";
 import { MobileNav } from "./MobileNav";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { PlatformLogo } from "@/components/PlatformLogo";
-import { Bell, Wallet } from "lucide-react";
+import { Bell, Wallet, RefreshCw } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface UserLayoutProps {
   children: ReactNode;
 }
 
 export function UserLayout({ children }: UserLayoutProps) {
-  const { profile } = useAuth();
+  const { profile, refreshProfile } = useAuth();
   const { data: settings } = usePlatformSettings();
+  const queryClient = useQueryClient();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const announcement = settings?.platform_announcement;
+
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await refreshProfile();
+      await queryClient.invalidateQueries();
+      toast.success("Data refreshed");
+    } catch {
+      // ignore
+    } finally {
+      setTimeout(() => setIsRefreshing(false), 500);
+    }
+  }, [refreshProfile, queryClient]);
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
@@ -29,7 +46,14 @@ export function UserLayout({ children }: UserLayoutProps) {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleRefresh}
+              className="rounded-lg p-2 text-primary-foreground/70 hover:bg-primary-foreground/10 transition-colors"
+              disabled={isRefreshing}
+            >
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+            </button>
             <div className="rounded-xl bg-primary-foreground/15 px-3 py-1.5 backdrop-blur-sm">
               <div className="flex items-center gap-1.5">
                 <Wallet className="h-3.5 w-3.5 text-primary-foreground/70" />
