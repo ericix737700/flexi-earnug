@@ -9,15 +9,12 @@ import { Separator } from "@/components/ui/separator";
 import { DepositDialog } from "@/components/user/DepositDialog";
 import { SupportDialog } from "@/components/user/SupportDialog";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle,
-} from "@/components/ui/dialog";
-import {
   Sheet, SheetContent, SheetHeader, SheetTitle,
 } from "@/components/ui/sheet";
 import {
   User, Phone, Calendar, Shield, LogOut, ChevronRight,
   FileText, ArrowDownToLine, ArrowUpFromLine,
-  Copy, Star, Flame, MessageCircle, Lock,
+  Copy, Star, Flame, Lock, Users, MessageCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { NotificationsSection } from "@/components/user/NotificationsSection";
@@ -60,6 +57,15 @@ export default function Profile() {
     }
   };
 
+  const openCommunity = () => {
+    const link = settings?.community_whatsapp;
+    if (link) {
+      window.open(link, "_blank");
+    } else {
+      toast.error("Community link not configured yet");
+    }
+  };
+
   return (
     <UserLayout>
       <div className="space-y-4">
@@ -81,7 +87,6 @@ export default function Profile() {
             </div>
           </div>
 
-          {/* Stats row */}
           <div className="relative mt-4 grid grid-cols-3 gap-3">
             <div className="rounded-xl bg-primary-foreground/15 px-3 py-2 text-center backdrop-blur-sm">
               <p className="text-lg font-bold">UGX {Number(profile?.balance || 0).toLocaleString()}</p>
@@ -116,7 +121,23 @@ export default function Profile() {
           </Button>
         </div>
 
-        {/* Referral Code Card */}
+        {/* Join Community */}
+        <Card className="cursor-pointer rounded-xl border-2 border-green-500/30 bg-green-500/5 transition-colors hover:bg-green-500/10" onClick={openCommunity}>
+          <CardContent className="flex items-center justify-between py-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-500/15">
+                <Users className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <p className="font-semibold">Join Our Community</p>
+                <p className="text-xs text-muted-foreground">Connect with other earners</p>
+              </div>
+            </div>
+            <ChevronRight className="h-5 w-5 text-green-600" />
+          </CardContent>
+        </Card>
+
+        {/* Referral Code */}
         <Card className="border-2 border-dashed border-primary/30">
           <CardContent className="flex items-center justify-between py-4">
             <div>
@@ -180,10 +201,7 @@ export default function Profile() {
         {/* Menu */}
         <Card className="rounded-xl">
           <CardContent className="p-0">
-            <div
-              className="flex cursor-pointer items-center justify-between border-b px-4 py-3.5 hover:bg-muted/50"
-              onClick={() => setSupportOpen(true)}
-            >
+            <div className="flex cursor-pointer items-center justify-between border-b px-4 py-3.5 hover:bg-muted/50" onClick={() => setSupportOpen(true)}>
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-500/10">
                   <MessageCircle className="h-4 w-4 text-green-600" />
@@ -192,10 +210,7 @@ export default function Profile() {
               </div>
               <ChevronRight className="h-5 w-5 text-muted-foreground" />
             </div>
-            <div
-              className="flex cursor-pointer items-center justify-between border-b px-4 py-3.5 hover:bg-muted/50"
-              onClick={() => setTermsOpen(true)}
-            >
+            <div className="flex cursor-pointer items-center justify-between border-b px-4 py-3.5 hover:bg-muted/50" onClick={() => setTermsOpen(true)}>
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
                   <FileText className="h-4 w-4 text-muted-foreground" />
@@ -204,10 +219,7 @@ export default function Profile() {
               </div>
               <ChevronRight className="h-5 w-5 text-muted-foreground" />
             </div>
-            <div
-              className="flex cursor-pointer items-center justify-between px-4 py-3.5 hover:bg-muted/50"
-              onClick={() => setPrivacyOpen(true)}
-            >
+            <div className="flex cursor-pointer items-center justify-between px-4 py-3.5 hover:bg-muted/50" onClick={() => setPrivacyOpen(true)}>
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
                   <Lock className="h-4 w-4 text-muted-foreground" />
@@ -222,12 +234,10 @@ export default function Profile() {
         <DepositDialog open={depositOpen} onOpenChange={setDepositOpen} />
         <SupportDialog open={supportOpen} onOpenChange={setSupportOpen} />
 
-        {/* Terms & Conditions Dialog */}
+        {/* Terms Sheet */}
         <Sheet open={termsOpen} onOpenChange={setTermsOpen}>
           <SheetContent side="right" className="overflow-y-auto w-full sm:max-w-lg">
-            <SheetHeader>
-              <SheetTitle>Terms & Conditions</SheetTitle>
-            </SheetHeader>
+            <SheetHeader><SheetTitle>Terms & Conditions</SheetTitle></SheetHeader>
             <div className="mt-4 whitespace-pre-wrap text-sm text-muted-foreground leading-relaxed">
               {settings?.terms_and_conditions || "Terms and conditions have not been set yet."}
             </div>
@@ -235,12 +245,10 @@ export default function Profile() {
           </SheetContent>
         </Sheet>
 
-        {/* Privacy Policy Dialog */}
+        {/* Privacy Sheet */}
         <Sheet open={privacyOpen} onOpenChange={setPrivacyOpen}>
           <SheetContent side="right" className="overflow-y-auto w-full sm:max-w-lg">
-            <SheetHeader>
-              <SheetTitle>Privacy Policy</SheetTitle>
-            </SheetHeader>
+            <SheetHeader><SheetTitle>Privacy Policy</SheetTitle></SheetHeader>
             <div className="mt-4 whitespace-pre-wrap text-sm text-muted-foreground leading-relaxed">
               {settings?.privacy_policy || "Privacy policy has not been set yet."}
             </div>
@@ -252,6 +260,16 @@ export default function Profile() {
           <LogOut className="mr-2 h-5 w-5" />
           Log Out
         </Button>
+
+        {/* Version & Powered By */}
+        <div className="text-center pb-4 space-y-1">
+          <p className="text-xs text-muted-foreground">
+            Version {settings?.app_version || "1.0.0"}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Powered by {settings?.powered_by || "Veltrix Technologies Ltd"}
+          </p>
+        </div>
       </div>
     </UserLayout>
   );
