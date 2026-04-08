@@ -374,8 +374,8 @@ export default function AdminUsers() {
 
                 <Separator />
 
-                {/* Admin Activate Account */}
-                {!detailUser.registration_paid && (
+                {/* Admin Activate / Deactivate Account */}
+                {!detailUser.registration_paid ? (
                   <Button
                     className="w-full"
                     onClick={() => activateAccountMutation.mutate(detailUser.user_id)}
@@ -386,6 +386,20 @@ export default function AdminUsers() {
                     ) : (
                       <><UserCheck className="mr-2 h-4 w-4" />Activate Without Payment</>
                     )}
+                  </Button>
+                ) : (
+                  <Button
+                    variant="destructive"
+                    className="w-full"
+                    onClick={async () => {
+                      await supabase.from("profiles").update({ registration_paid: false, status: "pending" }).eq("user_id", detailUser.user_id);
+                      toast.success("Account deactivated — user must pay activation fee again");
+                      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+                      setDetailUser({ ...detailUser, registration_paid: false, status: "pending" });
+                    }}
+                  >
+                    <Ban className="mr-2 h-4 w-4" />
+                    Deactivate (Require Re-payment)
                   </Button>
                 )}
               </div>
