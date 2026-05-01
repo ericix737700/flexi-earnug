@@ -108,16 +108,18 @@ export default function Dashboard() {
     <UserLayout>
       <div className="space-y-5">
         {/* Daily Check-in Card */}
-        <Card className="overflow-hidden border-0 shadow-md">
-          <div className="gradient-primary p-4">
-            <div className="flex items-center justify-between">
+        <Card className="relative overflow-hidden border-0 shadow-md glow-primary">
+          <div className="relative gradient-primary p-4">
+            <div aria-hidden className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-secondary/30 blur-2xl" />
+            <div aria-hidden className="absolute -bottom-10 -left-6 h-28 w-28 rounded-full bg-primary-foreground/10 blur-2xl" />
+            <div className="relative flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="rounded-full bg-primary-foreground/20 p-2.5">
+                <div className="rounded-full bg-primary-foreground/20 p-2.5 backdrop-blur">
                   <Sparkles className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <div>
                   <p className="font-semibold text-primary-foreground">Daily Check-in</p>
-                  <p className="text-sm text-primary-foreground/70">
+                  <p className="text-sm text-primary-foreground/80">
                     {canCheckIn
                       ? `Earn UGX ${settings?.daily_checkin_reward || 100}`
                       : `🔥 Streak: ${profile?.daily_checkin_streak || 0} days`}
@@ -129,7 +131,7 @@ export default function Dashboard() {
                 disabled={!canCheckIn || checkInMutation.isPending}
                 size="sm"
                 className={canCheckIn
-                  ? "gradient-gold border-0 text-secondary-foreground font-bold shadow-md hover:opacity-90"
+                  ? "gradient-gold border-0 text-secondary-foreground font-bold shadow-md hover:opacity-90 tap-pop"
                   : "bg-primary-foreground/20 text-primary-foreground border-0"}
               >
                 {canCheckIn ? "Check In" : "Done ✓"}
@@ -137,6 +139,7 @@ export default function Dashboard() {
             </div>
           </div>
         </Card>
+
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3">
@@ -146,7 +149,7 @@ export default function Dashboard() {
             { icon: Calendar, label: "Streak", value: `${profile?.daily_checkin_streak || 0} days`, color: "text-secondary", bg: "bg-secondary/10" },
             { icon: Users, label: "Referrals", value: `${referralCount || 0}`, color: "text-blue-600", bg: "bg-blue-500/10" },
           ].map((stat) => (
-            <Card key={stat.label} className="border-border/50 shadow-sm">
+            <Card key={stat.label} className="glass-card border-0 tap-pop">
               <CardContent className="flex items-center gap-3 py-3.5">
                 <div className={`rounded-xl p-2 ${stat.bg}`}>
                   <stat.icon className={`h-4.5 w-4.5 ${stat.color}`} />
