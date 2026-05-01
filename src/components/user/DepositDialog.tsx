@@ -118,7 +118,7 @@ export function DepositDialog({ open, onOpenChange }: DepositDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="glass-card border-0 sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Deposit Funds</DialogTitle>
           <DialogDescription>
