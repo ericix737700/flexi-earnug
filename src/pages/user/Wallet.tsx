@@ -290,7 +290,8 @@ export default function Wallet() {
 
         {/* Pending Withdrawals */}
         {pendingWithdrawals && pendingWithdrawals.length > 0 && (
-          <Card>
+          <Card className="glass-card border-0">
+
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <Clock className="h-5 w-5 text-amber-500" />
@@ -322,7 +323,7 @@ export default function Wallet() {
         )}
 
         {/* Transaction History */}
-        <Card>
+        <Card className="glass-card border-0">
           <CardHeader>
             <CardTitle className="text-base">Transaction History</CardTitle>
           </CardHeader>
