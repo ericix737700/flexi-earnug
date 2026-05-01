@@ -194,20 +194,23 @@ export default function Wallet() {
     <UserLayout>
       <div className="space-y-6">
         {/* Balance Card */}
-        <Card className="border-2 border-primary bg-gradient-to-br from-primary/20 to-accent/20">
-          <CardContent className="py-6 text-center">
+        <Card className="relative overflow-hidden border-0 glass-card glow-primary">
+          <div aria-hidden className="absolute -top-12 -right-12 h-44 w-44 rounded-full bg-primary/25 blur-3xl" />
+          <div aria-hidden className="absolute -bottom-16 -left-10 h-40 w-40 rounded-full bg-secondary/20 blur-3xl" />
+          <CardContent className="relative py-7 text-center">
             <p className="text-sm text-muted-foreground">Available Balance</p>
-            <p className="text-4xl font-bold text-primary">
+            <p className="mt-1 text-4xl font-extrabold text-gradient-primary tracking-tight">
               UGX {Number(profile?.balance || 0).toLocaleString()}
             </p>
             <Dialog open={isWithdrawOpen} onOpenChange={setIsWithdrawOpen}>
               <DialogTrigger asChild>
-                <Button className="mt-4" size="lg">
+                <Button className="mt-5 gradient-primary border-0 text-primary-foreground shadow-md hover:opacity-95 tap-pop" size="lg">
                   <WalletIcon className="mr-2 h-5 w-5" />
                   Withdraw
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="glass-card border-0">
+
                 <DialogHeader>
                   <DialogTitle>Withdraw Funds</DialogTitle>
                   <DialogDescription>
