@@ -338,7 +338,7 @@ export default function Wallet() {
                   <Button
                     className="w-full"
                     onClick={() => withdrawMutation.mutate()}
-                    disabled={withdrawMutation.isPending}
+                    disabled={withdrawMutation.isPending || !recipientName}
                   >
                     {withdrawMutation.isPending ? (
                       <>
