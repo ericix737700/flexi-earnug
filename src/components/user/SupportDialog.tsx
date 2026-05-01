@@ -51,7 +51,7 @@ export function SupportDialog({ open, onOpenChange }: SupportDialogProps) {
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent className="glass-card border-0 sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Help & Support</DialogTitle>
             <DialogDescription>Choose how you'd like to reach us</DialogDescription>
