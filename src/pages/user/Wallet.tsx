@@ -268,13 +268,42 @@ export default function Wallet() {
 
                   <div className="space-y-2">
                     <Label>Phone Number</Label>
-                    <Input
-                      type="tel"
-                      placeholder="0700123456"
-                      value={withdrawPhone}
-                      onChange={(e) => setWithdrawPhone(e.target.value)}
-                    />
+                    <div className="flex gap-2">
+                      <Input
+                        type="tel"
+                        placeholder="0700123456"
+                        value={withdrawPhone}
+                        onChange={(e) => setWithdrawPhone(e.target.value)}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={verifyRecipientName}
+                        disabled={isLookingUp || !withdrawPhone}
+                      >
+                        {isLookingUp ? <Loader2 className="h-4 w-4 animate-spin" /> : "Verify"}
+                      </Button>
+                    </div>
+                    {recipientName && (
+                      <div className="flex items-start gap-2 rounded-lg border border-success/30 bg-success/10 p-3 text-sm">
+                        <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">Account holder</p>
+                          <p className="font-semibold">{recipientName}</p>
+                        </div>
+                      </div>
+                    )}
+                    {lookupError && (
+                      <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm">
+                        <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+                        <p className="text-destructive">{lookupError}</p>
+                      </div>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      Verify the recipient's registered name before sending.
+                    </p>
                   </div>
+
 
                   <div className="space-y-2">
                     <Label>Network</Label>
