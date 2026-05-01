@@ -92,14 +92,16 @@ export default function Referrals() {
   return (
     <UserLayout>
       <div className="space-y-6">
-        {/* Referral Stats */}
-        <Card className="border-2 border-secondary bg-gradient-to-br from-secondary/20 to-success/20">
-          <CardContent className="py-6 text-center">
-            <div className="mx-auto mb-3 w-fit rounded-full bg-secondary p-3">
+        {/* Referral Stats Banner */}
+        <Card className="relative overflow-hidden border-0 glass-card glow-gold">
+          <div aria-hidden className="absolute -top-10 -right-10 h-36 w-36 rounded-full bg-secondary/30 blur-3xl" />
+          <div aria-hidden className="absolute -bottom-12 -left-8 h-32 w-32 rounded-full bg-primary/25 blur-3xl" />
+          <CardContent className="relative py-7 text-center">
+            <div className="mx-auto mb-3 w-fit rounded-2xl gradient-gold p-3 shadow-md">
               <Gift className="h-8 w-8 text-secondary-foreground" />
             </div>
             <p className="text-sm text-muted-foreground">Referral Bonus</p>
-            <p className="text-2xl font-bold">
+            <p className="text-2xl font-extrabold text-gradient-primary">
               UGX {referralBonus.toLocaleString()} per friend
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -109,23 +111,23 @@ export default function Referrals() {
         </Card>
 
         {/* Referral Code & Link */}
-        <Card>
+        <Card className="glass-card border-0">
           <CardHeader>
             <CardTitle className="text-base">Your Referral Code</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="rounded-lg bg-muted p-4 text-center">
+            <div className="rounded-xl bg-primary/5 border border-primary/15 p-4 text-center">
               <p className="font-mono text-2xl font-bold tracking-widest text-primary">
                 {profile?.referral_code}
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <Button variant="outline" onClick={copyToClipboard}>
+              <Button variant="outline" onClick={copyToClipboard} className="tap-pop">
                 <Copy className="mr-2 h-4 w-4" />
                 Copy Link
               </Button>
-              <Button onClick={shareLink}>
+              <Button onClick={shareLink} className="gradient-primary border-0 text-primary-foreground tap-pop">
                 <Share2 className="mr-2 h-4 w-4" />
                 Share
               </Button>
@@ -135,19 +137,19 @@ export default function Referrals() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-3 gap-3">
-          <Card>
+          <Card className="glass-card border-0">
             <CardContent className="py-4 text-center">
               <p className="text-2xl font-bold text-primary">{completedReferrals}</p>
               <p className="text-xs text-muted-foreground">Completed</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="glass-card border-0">
             <CardContent className="py-4 text-center">
               <p className="text-2xl font-bold text-amber-500">{pendingReferrals}</p>
               <p className="text-xs text-muted-foreground">Pending</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="glass-card border-0">
             <CardContent className="py-4 text-center">
               <p className="text-2xl font-bold text-success">
                 {totalEarned.toLocaleString()}
