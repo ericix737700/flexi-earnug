@@ -201,6 +201,8 @@ export default function Wallet() {
       toast.success(`Withdrawal of UGX ${amount.toLocaleString()} submitted!`);
       setIsWithdrawOpen(false);
       setWithdrawAmount("");
+      setRecipientName(null);
+      setLookupError(null);
       refreshProfile();
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
       queryClient.invalidateQueries({ queryKey: ["pending-withdrawals"] });
