@@ -192,7 +192,7 @@ export default function Wallet() {
         transaction_type: "withdrawal",
         amount: -amount,
         balance_after: newBalance,
-        description: `Withdrawal to ${withdrawNetwork} ${withdrawPhone}`,
+        description: `Withdrawal to ${recipientName} (${withdrawNetwork} ${withdrawPhone})`,
       });
 
       return amount;
