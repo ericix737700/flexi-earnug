@@ -149,7 +149,7 @@ export default function Dashboard() {
             { icon: Calendar, label: "Streak", value: `${profile?.daily_checkin_streak || 0} days`, color: "text-secondary", bg: "bg-secondary/10" },
             { icon: Users, label: "Referrals", value: `${referralCount || 0}`, color: "text-blue-600", bg: "bg-blue-500/10" },
           ].map((stat) => (
-            <Card key={stat.label} className="border-border/50 shadow-sm">
+            <Card key={stat.label} className="glass-card border-0 tap-pop">
               <CardContent className="flex items-center gap-3 py-3.5">
                 <div className={`rounded-xl p-2 ${stat.bg}`}>
                   <stat.icon className={`h-4.5 w-4.5 ${stat.color}`} />
