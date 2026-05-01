@@ -158,6 +158,7 @@ export default function Wallet() {
     mutationFn: async () => {
       if (!profile?.user_id) throw new Error("Not authenticated");
       if ((profile as any)?.restrictions?.no_transactions) throw new Error("Your account is restricted from making transactions");
+      if (!recipientName) throw new Error("Please verify the recipient name first");
 
       const amount = Number(withdrawAmount);
       if (isNaN(amount) || amount < minimumWithdrawal) {
