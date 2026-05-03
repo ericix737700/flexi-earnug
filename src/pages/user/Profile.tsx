@@ -110,6 +110,9 @@ export default function Profile() {
           </div>
         </div>
 
+        {/* Email Prompt (only shows if email is missing) */}
+        <EmailPrompt variant="card" />
+
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-3">
           <Button variant="outline" className="h-14 flex-col gap-1 rounded-xl border-2" onClick={() => setDepositOpen(true)}>
@@ -166,6 +169,7 @@ export default function Profile() {
             {[
               { icon: User, label: "Full Name", value: profile?.full_name || "Not set" },
               { icon: Phone, label: "Phone", value: profile?.phone },
+              { icon: Mail, label: "Email", value: profile?.email || "Not set" },
               { icon: Calendar, label: "Joined", value: profile?.created_at ? formatDate(profile.created_at) : "N/A" },
               { icon: Shield, label: "Referral Code", value: profile?.referral_code, mono: true },
             ].map((item, i) => (
