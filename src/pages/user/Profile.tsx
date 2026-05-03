@@ -14,13 +14,14 @@ import {
 import {
   User, Phone, Calendar, Shield, LogOut, ChevronRight,
   FileText, ArrowDownToLine, ArrowUpFromLine,
-  Copy, Star, Flame, Lock, Users, MessageCircle,
+  Copy, Star, Flame, Lock, Users, MessageCircle, Mail,
 } from "lucide-react";
 import { toast } from "sonner";
 import { NotificationsSection } from "@/components/user/NotificationsSection";
 import { PushNotificationToggle } from "@/components/user/PushNotificationToggle";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { PlatformLogo } from "@/components/PlatformLogo";
+import { EmailPrompt } from "@/components/user/EmailPrompt";
 
 export default function Profile() {
   const { profile, signOut, isAdmin } = useAuth();
