@@ -110,6 +110,7 @@ export type Database = {
           created_at: string
           daily_checkin_streak: number
           device_fingerprint: string | null
+          email: string | null
           full_name: string | null
           id: string
           last_checkin_date: string | null
@@ -128,6 +129,7 @@ export type Database = {
           created_at?: string
           daily_checkin_streak?: number
           device_fingerprint?: string | null
+          email?: string | null
           full_name?: string | null
           id?: string
           last_checkin_date?: string | null
@@ -146,6 +148,7 @@ export type Database = {
           created_at?: string
           daily_checkin_streak?: number
           device_fingerprint?: string | null
+          email?: string | null
           full_name?: string | null
           id?: string
           last_checkin_date?: string | null
