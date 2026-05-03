@@ -104,8 +104,8 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error("marzpay-lookup-name error:", error);
     return new Response(
-      JSON.stringify({ error: (error as Error).message || "Internal error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ success: false, error: (error as Error).message || "Internal error" }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
