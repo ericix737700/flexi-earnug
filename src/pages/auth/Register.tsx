@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { PlatformLogo } from "@/components/PlatformLogo";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { toast } from "sonner";
-import { Loader2, Phone, Lock, User, Users } from "lucide-react";
+import { Loader2, Phone, Lock, User, Users, Mail } from "lucide-react";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 
 export default function Register() {
@@ -17,7 +17,7 @@ export default function Register() {
   const { data: settings, isLoading: settingsLoading } = usePlatformSettings();
 
   const [formData, setFormData] = useState({
-    fullName: "", phone: "", password: "", confirmPassword: "", referralCode,
+    fullName: "", phone: "", email: "", password: "", confirmPassword: "", referralCode,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
@@ -46,14 +46,33 @@ export default function Register() {
         if (referrer) { referrerId = referrer.id; } else { toast.error("Invalid referral code"); setIsLoading(false); return; }
       }
 
+      const trimmedEmail = formData.email.trim().toLowerCase();
+      if (trimmedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+        toast.error("Please enter a valid email address");
+        setIsLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email, password: formData.password,
-        options: { emailRedirectTo: window.location.origin, data: { phone: cleanedPhone, full_name: formData.fullName } },
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: {
+            phone: cleanedPhone,
+            full_name: formData.fullName,
+            recovery_email: trimmedEmail || null,
+          },
+        },
       });
 
       if (error) { toast.error(error.message.includes("already registered") ? "This phone number is already registered" : error.message); return; }
       if (data.user) {
-        if (referrerId) await supabase.from("profiles").update({ referred_by: referrerId }).eq("user_id", data.user.id);
+        const updates: any = {};
+        if (referrerId) updates.referred_by = referrerId;
+        if (trimmedEmail) updates.email = trimmedEmail;
+        if (Object.keys(updates).length) {
+          await supabase.from("profiles").update(updates).eq("user_id", data.user.id);
+        }
         // Store device fingerprint
         const fp = generateFingerprint();
         await supabase.from("profiles").update({ device_fingerprint: fp } as any).eq("user_id", data.user.id);
