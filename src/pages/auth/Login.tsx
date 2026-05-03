@@ -119,14 +119,21 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute inset-0 gradient-hero opacity-[0.06]" />
-      <div className="absolute top-20 -left-20 h-56 w-56 rounded-full bg-primary/15 blur-3xl" />
-      <div className="absolute bottom-20 -right-20 h-56 w-56 rounded-full bg-secondary/15 blur-3xl" />
-      <Card className="relative w-full max-w-md border-border/50 shadow-2xl">
+    <div className="flex min-h-screen items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-secondary/10 via-background to-primary/5">
+      {/* Animated background blobs */}
+      <div className="absolute inset-0 gradient-hero opacity-[0.05]" />
+      <div className="absolute top-20 -left-24 h-72 w-72 rounded-full bg-primary/20 blur-3xl animate-pulse" />
+      <div className="absolute bottom-20 -right-24 h-72 w-72 rounded-full bg-secondary/25 blur-3xl animate-pulse [animation-delay:1.5s]" />
+      <div className="absolute top-1/3 right-1/4 h-40 w-40 rounded-full bg-accent/15 blur-3xl" />
+      {/* Geometric accents */}
+      <div className="absolute top-16 right-10 h-16 w-16 -rotate-12 rounded-2xl border-2 border-primary/20 hidden sm:block" />
+      <div className="absolute bottom-20 left-10 h-20 w-20 rotate-6 rounded-full border-2 border-secondary/30 hidden sm:block" />
+      <div className="absolute top-1/2 left-12 h-10 w-10 -rotate-45 bg-primary/10 hidden md:block" />
+
+      <Card className="relative w-full max-w-md border-border/50 shadow-2xl glass-card">
         <CardHeader className="space-y-1 text-center pb-4">
           <div className="mx-auto mb-4"><PlatformLogo size="lg" /></div>
-          <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
+          <CardTitle className="text-2xl font-bold text-gradient-primary">Welcome Back</CardTitle>
           <CardDescription>Log in to continue earning with FlexiEarn</CardDescription>
         </CardHeader>
         <CardContent>
