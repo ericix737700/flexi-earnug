@@ -12,6 +12,7 @@ interface Profile {
   id: string;
   user_id: string;
   phone: string;
+  email: string | null;
   full_name: string | null;
   referral_code: string;
   referred_by: string | null;
