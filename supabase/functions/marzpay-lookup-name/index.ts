@@ -95,15 +95,17 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: lastError || "Could not retrieve account name",
+        error: lastError
+          ? `Name lookup unavailable: ${lastError}`
+          : "Name lookup service unavailable",
       }),
-      { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
     console.error("marzpay-lookup-name error:", error);
     return new Response(
-      JSON.stringify({ error: (error as Error).message || "Internal error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ success: false, error: (error as Error).message || "Internal error" }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
