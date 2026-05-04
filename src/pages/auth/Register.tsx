@@ -40,10 +40,11 @@ export default function Register() {
       const email = formatPhoneForEmail(formData.phone);
       const cleanedPhone = formData.phone.replace(/\D/g, "");
 
-      let referrerId = null;
+      let referrerId: string | null = null;
       if (formData.referralCode) {
-        const { data: referrer } = await supabase.from("profiles").select("id").eq("referral_code", formData.referralCode.toUpperCase()).single();
-        if (referrer) { referrerId = referrer.id; } else { toast.error("Invalid referral code"); setIsLoading(false); return; }
+        const { data: refId, error: refErr } = await supabase.rpc("find_referrer_by_code" as any, { _code: formData.referralCode.trim() });
+        if (refErr || !refId) { toast.error("Invalid referral code"); setIsLoading(false); return; }
+        referrerId = refId as unknown as string;
       }
 
       const trimmedEmail = formData.email.trim().toLowerCase();
