@@ -277,7 +277,7 @@ export default function AdminUsers() {
                 </TableHeader>
                 <TableBody>
                   {users?.map((profile) => (
-                    <TableRow key={profile.id} className="cursor-pointer" onClick={() => setDetailUser(profile)}>
+                    <TableRow key={profile.id} className="cursor-pointer" onClick={() => { setDetailUser(profile); loadAuthEmail(profile.user_id); }}>
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
                           <div className={`h-2 w-2 rounded-full ${isOnline(profile.last_seen) ? 'bg-green-500' : 'bg-muted-foreground/30'}`} />
@@ -292,7 +292,7 @@ export default function AdminUsers() {
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreVertical className="h-4 w-4" /></Button></DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => setDetailUser(profile)}><Eye className="mr-2 h-4 w-4" />View Details</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { setDetailUser(profile); loadAuthEmail(profile.user_id); }}><Eye className="mr-2 h-4 w-4" />View Details</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => { setSelectedUser(profile); setAdjustType("add"); setIsAdjustOpen(true); }}><Plus className="mr-2 h-4 w-4" />Top Up</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => { setSelectedUser(profile); setAdjustType("deduct"); setIsAdjustOpen(true); }}><Minus className="mr-2 h-4 w-4" />Deduct</DropdownMenuItem>
                             {profile.status === "active" ? (
