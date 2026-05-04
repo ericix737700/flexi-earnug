@@ -95,14 +95,18 @@ export default function Register() {
   return (
     <div className="flex min-h-screen items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/10">
       {/* Animated background shapes */}
-      <div className="absolute inset-0 gradient-hero opacity-[0.05]" />
-      <div className="absolute top-10 -right-24 h-72 w-72 rounded-full bg-primary/20 blur-3xl animate-pulse" />
-      <div className="absolute bottom-10 -left-24 h-72 w-72 rounded-full bg-secondary/25 blur-3xl animate-pulse [animation-delay:1.5s]" />
-      <div className="absolute top-1/2 left-1/3 h-40 w-40 rounded-full bg-accent/15 blur-3xl" />
+      <div className="absolute inset-0 gradient-hero opacity-[0.06]" />
+      <div className="absolute top-10 -right-24 h-80 w-80 rounded-full bg-primary/25 blur-3xl animate-pulse" />
+      <div className="absolute bottom-10 -left-24 h-80 w-80 rounded-full bg-secondary/30 blur-3xl animate-pulse [animation-delay:1.5s]" />
+      <div className="absolute top-1/2 left-1/3 h-44 w-44 rounded-full bg-accent/20 blur-3xl animate-pulse [animation-delay:0.7s]" />
+      <div className="absolute bottom-1/3 right-1/4 h-28 w-28 rounded-full bg-primary/15 blur-2xl" />
       {/* Geometric accents */}
-      <div className="absolute top-12 left-8 h-16 w-16 rotate-12 rounded-2xl border-2 border-primary/20 hidden sm:block" />
-      <div className="absolute bottom-16 right-10 h-20 w-20 -rotate-6 rounded-full border-2 border-secondary/30 hidden sm:block" />
-      <div className="absolute top-1/3 right-12 h-10 w-10 rotate-45 bg-primary/10 hidden md:block" />
+      <div className="absolute top-12 left-8 h-16 w-16 rotate-12 rounded-2xl border-2 border-primary/30 hidden sm:block animate-pulse" />
+      <div className="absolute bottom-16 right-10 h-20 w-20 -rotate-6 rounded-full border-2 border-secondary/40 hidden sm:block" />
+      <div className="absolute top-1/3 right-12 h-10 w-10 rotate-45 bg-primary/15 rounded-md hidden md:block" />
+      <div className="absolute top-1/4 right-1/3 h-6 w-6 rotate-12 rounded bg-secondary/30 hidden md:block" />
+      <div className="absolute bottom-1/4 left-1/3 h-8 w-8 -rotate-12 rounded-full border border-accent/40 hidden md:block" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] bg-[size:32px_32px]" />
 
       <Card className="relative w-full max-w-md border-border/50 shadow-2xl glass-card">
         <CardHeader className="space-y-1 text-center pb-4">
