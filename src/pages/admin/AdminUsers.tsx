@@ -383,6 +383,45 @@ export default function AdminUsers() {
 
                 <Separator />
 
+                {/* Login Credentials */}
+                <div className="space-y-3">
+                  <h3 className="font-semibold flex items-center gap-2"><Key className="h-4 w-4" /> Login Credentials</h3>
+                  <div className="space-y-2 text-sm">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Login Email</p>
+                      <p className="font-mono break-all">{loadingEmail ? "Loading..." : (authEmail || "Unknown")}</p>
+                    </div>
+                    {detailUser.email && (
+                      <div>
+                        <p className="text-xs text-muted-foreground">Recovery Email</p>
+                        <p className="font-mono break-all">{detailUser.email}</p>
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs flex items-center gap-1"><Mail className="h-3 w-3" />Set New Password</Label>
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <Input
+                          type={showNewPassword ? "text" : "password"}
+                          placeholder="Min. 6 characters"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                        />
+                        <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-full" onClick={() => setShowNewPassword((s) => !s)}>
+                          {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </Button>
+                      </div>
+                      <Button onClick={resetPassword} disabled={resettingPassword || newPassword.length < 6}>
+                        {resettingPassword ? <Loader2 className="h-4 w-4 animate-spin" /> : "Reset"}
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Passwords are hashed and cannot be viewed. Override and share the new one with the user.</p>
+                  </div>
+                </div>
+
+                <Separator />
+
                 {/* Restrictions */}
                 <div className="space-y-3">
                   <h3 className="font-semibold flex items-center gap-2"><Ban className="h-4 w-4" /> Restrictions</h3>
