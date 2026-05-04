@@ -404,6 +404,8 @@ export default function Wallet() {
           </CardContent>
         </Card>
 
+        <GiftCodeRedeem />
+
         {/* Pending Withdrawals */}
         {pendingWithdrawals && pendingWithdrawals.length > 0 && (
           <Card className="glass-card border-0">
