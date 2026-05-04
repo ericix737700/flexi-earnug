@@ -25,7 +25,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   Search, MoreVertical, Plus, Minus, UserX, UserCheck, Trash2, Loader2,
-  Ban, AlertTriangle, Eye, Users, ListTodo, Wallet, Clock,
+  Ban, AlertTriangle, Eye, Users, ListTodo, Wallet, Clock, Mail, Key, EyeOff,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -43,6 +43,7 @@ interface Profile {
   id: string;
   user_id: string;
   phone: string;
+  email?: string | null;
   full_name: string | null;
   referral_code: string;
   balance: number;
