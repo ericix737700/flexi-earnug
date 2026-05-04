@@ -25,7 +25,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   Search, MoreVertical, Plus, Minus, UserX, UserCheck, Trash2, Loader2,
-  Ban, AlertTriangle, Eye, Users, ListTodo, Wallet, Clock,
+  Ban, AlertTriangle, Eye, Users, ListTodo, Wallet, Clock, Mail, Key, EyeOff,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -43,6 +43,7 @@ interface Profile {
   id: string;
   user_id: string;
   phone: string;
+  email?: string | null;
   full_name: string | null;
   referral_code: string;
   balance: number;
@@ -66,6 +67,47 @@ export default function AdminUsers() {
   const [adjustType, setAdjustType] = useState<"add" | "deduct">("add");
   const [deleteTarget, setDeleteTarget] = useState<Profile | null>(null);
   const [detailUser, setDetailUser] = useState<Profile | null>(null);
+  const [authEmail, setAuthEmail] = useState<string | null>(null);
+  const [loadingEmail, setLoadingEmail] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [resettingPassword, setResettingPassword] = useState(false);
+
+  const loadAuthEmail = async (userId: string) => {
+    setLoadingEmail(true);
+    setAuthEmail(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-user-actions", {
+        body: { action: "get_email", userId },
+      });
+      if (error) throw error;
+      if (data?.success) setAuthEmail(data.email);
+    } catch {
+      toast.error("Could not fetch login email");
+    } finally {
+      setLoadingEmail(false);
+    }
+  };
+
+  const resetPassword = async () => {
+    if (!detailUser || newPassword.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+    setResettingPassword(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-user-actions", {
+        body: { action: "reset_password", userId: detailUser.user_id, newPassword },
+      });
+      if (error || !data?.success) throw new Error(data?.error || "Failed");
+      toast.success("Password updated");
+      setNewPassword("");
+    } catch (e: any) {
+      toast.error(e.message || "Failed to reset password");
+    } finally {
+      setResettingPassword(false);
+    }
+  };
 
   const { data: users, isLoading } = useQuery({
     queryKey: ["admin-users", search, statusFilter],
@@ -235,7 +277,7 @@ export default function AdminUsers() {
                 </TableHeader>
                 <TableBody>
                   {users?.map((profile) => (
-                    <TableRow key={profile.id} className="cursor-pointer" onClick={() => setDetailUser(profile)}>
+                    <TableRow key={profile.id} className="cursor-pointer" onClick={() => { setDetailUser(profile); loadAuthEmail(profile.user_id); }}>
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
                           <div className={`h-2 w-2 rounded-full ${isOnline(profile.last_seen) ? 'bg-green-500' : 'bg-muted-foreground/30'}`} />
@@ -250,7 +292,7 @@ export default function AdminUsers() {
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreVertical className="h-4 w-4" /></Button></DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => setDetailUser(profile)}><Eye className="mr-2 h-4 w-4" />View Details</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { setDetailUser(profile); loadAuthEmail(profile.user_id); }}><Eye className="mr-2 h-4 w-4" />View Details</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => { setSelectedUser(profile); setAdjustType("add"); setIsAdjustOpen(true); }}><Plus className="mr-2 h-4 w-4" />Top Up</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => { setSelectedUser(profile); setAdjustType("deduct"); setIsAdjustOpen(true); }}><Minus className="mr-2 h-4 w-4" />Deduct</DropdownMenuItem>
                             {profile.status === "active" ? (
@@ -337,6 +379,45 @@ export default function AdminUsers() {
                   {detailUser.device_fingerprint && (
                     <div className="flex justify-between"><span className="text-muted-foreground">Device ID</span><span className="font-mono text-xs">{detailUser.device_fingerprint}</span></div>
                   )}
+                </div>
+
+                <Separator />
+
+                {/* Login Credentials */}
+                <div className="space-y-3">
+                  <h3 className="font-semibold flex items-center gap-2"><Key className="h-4 w-4" /> Login Credentials</h3>
+                  <div className="space-y-2 text-sm">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Login Email</p>
+                      <p className="font-mono break-all">{loadingEmail ? "Loading..." : (authEmail || "Unknown")}</p>
+                    </div>
+                    {detailUser.email && (
+                      <div>
+                        <p className="text-xs text-muted-foreground">Recovery Email</p>
+                        <p className="font-mono break-all">{detailUser.email}</p>
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs flex items-center gap-1"><Mail className="h-3 w-3" />Set New Password</Label>
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <Input
+                          type={showNewPassword ? "text" : "password"}
+                          placeholder="Min. 6 characters"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                        />
+                        <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-full" onClick={() => setShowNewPassword((s) => !s)}>
+                          {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </Button>
+                      </div>
+                      <Button onClick={resetPassword} disabled={resettingPassword || newPassword.length < 6}>
+                        {resettingPassword ? <Loader2 className="h-4 w-4 animate-spin" /> : "Reset"}
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Passwords are hashed and cannot be viewed. Override and share the new one with the user.</p>
+                  </div>
                 </div>
 
                 <Separator />
