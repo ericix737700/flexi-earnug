@@ -67,6 +67,47 @@ export default function AdminUsers() {
   const [adjustType, setAdjustType] = useState<"add" | "deduct">("add");
   const [deleteTarget, setDeleteTarget] = useState<Profile | null>(null);
   const [detailUser, setDetailUser] = useState<Profile | null>(null);
+  const [authEmail, setAuthEmail] = useState<string | null>(null);
+  const [loadingEmail, setLoadingEmail] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [resettingPassword, setResettingPassword] = useState(false);
+
+  const loadAuthEmail = async (userId: string) => {
+    setLoadingEmail(true);
+    setAuthEmail(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-user-actions", {
+        body: { action: "get_email", userId },
+      });
+      if (error) throw error;
+      if (data?.success) setAuthEmail(data.email);
+    } catch {
+      toast.error("Could not fetch login email");
+    } finally {
+      setLoadingEmail(false);
+    }
+  };
+
+  const resetPassword = async () => {
+    if (!detailUser || newPassword.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+    setResettingPassword(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-user-actions", {
+        body: { action: "reset_password", userId: detailUser.user_id, newPassword },
+      });
+      if (error || !data?.success) throw new Error(data?.error || "Failed");
+      toast.success("Password updated");
+      setNewPassword("");
+    } catch (e: any) {
+      toast.error(e.message || "Failed to reset password");
+    } finally {
+      setResettingPassword(false);
+    }
+  };
 
   const { data: users, isLoading } = useQuery({
     queryKey: ["admin-users", search, statusFilter],
