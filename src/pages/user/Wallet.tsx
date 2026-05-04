@@ -30,6 +30,7 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
+import { GiftCodeRedeem } from "@/components/user/GiftCodeRedeem";
 
 interface Transaction {
   id: string;
