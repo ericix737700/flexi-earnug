@@ -120,7 +120,7 @@ export default function Register() {
             {[
               { name: "fullName", label: "Full Name", icon: User, type: "text", placeholder: "Enter your full name", required: true },
               { name: "phone", label: "Phone Number", icon: Phone, type: "tel", placeholder: "0700123456", required: true },
-              { name: "email", label: "Email Address (Optional)", icon: Mail, type: "email", placeholder: "you@example.com", required: false },
+              { name: "email", label: "Email Address", icon: Mail, type: "email", placeholder: "you@example.com", required: true },
               { name: "password", label: "Password", icon: Lock, type: "password", placeholder: "Create a password", required: true },
               { name: "confirmPassword", label: "Confirm Password", icon: Lock, type: "password", placeholder: "Confirm your password", required: true },
             ].map((field) => (
