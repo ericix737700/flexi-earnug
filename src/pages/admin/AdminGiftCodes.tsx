@@ -224,6 +224,45 @@ export default function AdminGiftCodes() {
             )}
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader><CardTitle className="text-lg">Redemption History</CardTitle></CardHeader>
+          <CardContent className="p-0">
+            {redLoading ? (
+              <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Code</TableHead>
+                    <TableHead>User</TableHead>
+                    <TableHead>Contact</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Redeemed At</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {redemptions?.map((r) => (
+                    <TableRow key={r.id}>
+                      <TableCell className="font-mono">{r.code || "—"}</TableCell>
+                      <TableCell>{r.full_name || "—"}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {r.email || r.phone || "—"}
+                      </TableCell>
+                      <TableCell>UGX {Number(r.amount).toLocaleString()}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {new Date(r.redeemed_at).toLocaleString()}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {redemptions?.length === 0 && (
+                    <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">No redemptions yet</TableCell></TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </AdminLayout>
   );
