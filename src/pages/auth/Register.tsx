@@ -34,6 +34,9 @@ export default function Register() {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) { toast.error("Passwords do not match"); return; }
     if (formData.password.length < 6) { toast.error("Password must be at least 6 characters"); return; }
+    const trimmedEmail = formData.email.trim().toLowerCase();
+    if (!trimmedEmail) { toast.error("Email is required"); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) { toast.error("Please enter a valid email address"); return; }
 
     setIsLoading(true);
     try {
@@ -45,13 +48,6 @@ export default function Register() {
         const { data: refId, error: refErr } = await supabase.rpc("find_referrer_by_code" as any, { _code: formData.referralCode.trim() });
         if (refErr || !refId) { toast.error("Invalid referral code"); setIsLoading(false); return; }
         referrerId = refId as unknown as string;
-      }
-
-      const trimmedEmail = formData.email.trim().toLowerCase();
-      if (trimmedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
-        toast.error("Please enter a valid email address");
-        setIsLoading(false);
-        return;
       }
 
       const { data, error } = await supabase.auth.signUp({
