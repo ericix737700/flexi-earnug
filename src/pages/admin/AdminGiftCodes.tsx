@@ -59,6 +59,34 @@ export default function AdminGiftCodes() {
     },
   });
 
+  const { data: redemptions, isLoading: redLoading } = useQuery({
+    queryKey: ["gift-redemptions"],
+    queryFn: async () => {
+      const { data: reds, error } = await supabase
+        .from("gift_code_redemptions" as any)
+        .select("*")
+        .order("redeemed_at", { ascending: false })
+        .limit(500);
+      if (error) throw error;
+      const list = (reds || []) as any[];
+      const codeIds = [...new Set(list.map((r) => r.gift_code_id))];
+      const userIds = [...new Set(list.map((r) => r.user_id))];
+      const [{ data: gcs }, { data: profs }] = await Promise.all([
+        supabase.from("gift_codes" as any).select("id, code").in("id", codeIds.length ? codeIds : ["00000000-0000-0000-0000-000000000000"]),
+        supabase.from("profiles").select("user_id, full_name, phone, email").in("user_id", userIds.length ? userIds : ["00000000-0000-0000-0000-000000000000"]),
+      ]);
+      const codeMap = new Map((gcs as any[] || []).map((g) => [g.id, g.code]));
+      const profMap = new Map((profs || []).map((p: any) => [p.user_id, p]));
+      return list.map((r) => ({
+        ...r,
+        code: codeMap.get(r.gift_code_id),
+        full_name: profMap.get(r.user_id)?.full_name,
+        phone: profMap.get(r.user_id)?.phone,
+        email: profMap.get(r.user_id)?.email,
+      })) as Redemption[];
+    },
+  });
+
   const createMutation = useMutation({
     mutationFn: async () => {
       const amt = Number(amount);
