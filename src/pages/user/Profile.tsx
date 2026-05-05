@@ -31,6 +31,7 @@ export default function Profile() {
   const [termsOpen, setTermsOpen] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const { data: settings } = usePlatformSettings();
 
   const handleSignOut = async () => {
