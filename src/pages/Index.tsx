@@ -259,6 +259,53 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Gift Codes */}
+      <section className="mx-auto max-w-6xl px-4 py-16">
+        <div className="relative overflow-hidden rounded-3xl border border-secondary/30 bg-gradient-to-br from-secondary/15 via-card to-primary/10 p-8 md:p-12">
+          <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-secondary/20 blur-3xl" />
+          <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />
+          <div className="relative grid items-center gap-8 md:grid-cols-2">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-secondary/15 px-3 py-1 text-sm font-semibold text-secondary">
+                <Gift className="h-4 w-4" />
+                Gift Codes
+              </div>
+              <h3 className="mt-4 text-2xl font-bold text-foreground md:text-3xl">
+                Redeem Codes for Instant Cash
+              </h3>
+              <p className="mt-3 text-lg leading-relaxed text-muted-foreground">
+                Watch out for special <strong className="text-primary font-bold">FlexiEarn gift codes</strong> shared on our social media,
+                community groups, and during promotions. Enter them in your wallet to get instant rewards added to your balance.
+              </p>
+              <ul className="mt-4 space-y-2">
+                {[
+                  "Free money straight to your wallet",
+                  "Limited-time promotional rewards",
+                  "Follow our community for exclusive codes",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-muted-foreground">
+                    <CheckCircle className="h-4 w-4 shrink-0 text-primary" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="flex justify-center">
+              <div className="relative w-full max-w-sm rounded-2xl border-2 border-dashed border-primary/40 bg-card/50 p-6 backdrop-blur-sm shadow-xl">
+                <div className="text-center">
+                  <Gift className="mx-auto h-10 w-10 text-primary" />
+                  <p className="mt-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Gift Code</p>
+                  <p className="mt-2 font-mono text-2xl font-extrabold tracking-widest text-gradient-primary">
+                    GIFT-XXXXXX
+                  </p>
+                  <p className="mt-3 text-sm text-muted-foreground">Enter at Wallet → Redeem</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Trust & Security */}
       <section className="mx-auto max-w-6xl px-4 py-16">
         <div className="rounded-3xl border border-border/50 bg-gradient-to-br from-accent/50 via-card to-primary/5 p-8 md:p-12">
