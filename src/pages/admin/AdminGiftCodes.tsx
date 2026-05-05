@@ -24,6 +24,18 @@ interface GiftCode {
   created_at: string;
 }
 
+interface Redemption {
+  id: string;
+  gift_code_id: string;
+  user_id: string;
+  amount: number;
+  redeemed_at: string;
+  code?: string;
+  full_name?: string | null;
+  phone?: string | null;
+  email?: string | null;
+}
+
 const randomCode = () =>
   "GIFT-" + Math.random().toString(36).slice(2, 8).toUpperCase();
 
@@ -44,6 +56,34 @@ export default function AdminGiftCodes() {
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data as unknown as GiftCode[];
+    },
+  });
+
+  const { data: redemptions, isLoading: redLoading } = useQuery({
+    queryKey: ["gift-redemptions"],
+    queryFn: async () => {
+      const { data: reds, error } = await supabase
+        .from("gift_code_redemptions" as any)
+        .select("*")
+        .order("redeemed_at", { ascending: false })
+        .limit(500);
+      if (error) throw error;
+      const list = (reds || []) as any[];
+      const codeIds = [...new Set(list.map((r) => r.gift_code_id))];
+      const userIds = [...new Set(list.map((r) => r.user_id))];
+      const [{ data: gcs }, { data: profs }] = await Promise.all([
+        supabase.from("gift_codes" as any).select("id, code").in("id", codeIds.length ? codeIds : ["00000000-0000-0000-0000-000000000000"]),
+        supabase.from("profiles").select("user_id, full_name, phone, email").in("user_id", userIds.length ? userIds : ["00000000-0000-0000-0000-000000000000"]),
+      ]);
+      const codeMap = new Map((gcs as any[] || []).map((g) => [g.id, g.code]));
+      const profMap = new Map((profs || []).map((p: any) => [p.user_id, p]));
+      return list.map((r) => ({
+        ...r,
+        code: codeMap.get(r.gift_code_id),
+        full_name: profMap.get(r.user_id)?.full_name,
+        phone: profMap.get(r.user_id)?.phone,
+        email: profMap.get(r.user_id)?.email,
+      })) as Redemption[];
     },
   });
 
@@ -178,6 +218,45 @@ export default function AdminGiftCodes() {
                   ))}
                   {codes?.length === 0 && (
                     <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">No gift codes yet</TableCell></TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader><CardTitle className="text-lg">Redemption History</CardTitle></CardHeader>
+          <CardContent className="p-0">
+            {redLoading ? (
+              <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Code</TableHead>
+                    <TableHead>User</TableHead>
+                    <TableHead>Contact</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Redeemed At</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {redemptions?.map((r) => (
+                    <TableRow key={r.id}>
+                      <TableCell className="font-mono">{r.code || "—"}</TableCell>
+                      <TableCell>{r.full_name || "—"}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {r.email || r.phone || "—"}
+                      </TableCell>
+                      <TableCell>UGX {Number(r.amount).toLocaleString()}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {new Date(r.redeemed_at).toLocaleString()}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {redemptions?.length === 0 && (
+                    <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">No redemptions yet</TableCell></TableRow>
                   )}
                 </TableBody>
               </Table>
