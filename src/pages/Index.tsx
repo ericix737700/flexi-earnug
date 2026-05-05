@@ -259,48 +259,93 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Gift Codes */}
+      {/* Gift Codes - How It Works + Redeem CTA */}
       <section className="mx-auto max-w-6xl px-4 py-16">
         <div className="relative overflow-hidden rounded-3xl border border-secondary/30 bg-gradient-to-br from-secondary/15 via-card to-primary/10 p-8 md:p-12">
           <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-secondary/20 blur-3xl" />
           <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />
-          <div className="relative grid items-center gap-8 md:grid-cols-2">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full bg-secondary/15 px-3 py-1 text-sm font-semibold text-secondary">
-                <Gift className="h-4 w-4" />
-                Gift Codes
-              </div>
-              <h3 className="mt-4 text-2xl font-bold text-foreground md:text-3xl">
-                Redeem Codes for Instant Cash
-              </h3>
-              <p className="mt-3 text-lg leading-relaxed text-muted-foreground">
-                Watch out for special <strong className="text-primary font-bold">FlexiEarn gift codes</strong> shared on our social media,
-                community groups, and during promotions. Enter them in your wallet to get instant rewards added to your balance.
-              </p>
-              <ul className="mt-4 space-y-2">
-                {[
-                  "Free money straight to your wallet",
-                  "Limited-time promotional rewards",
-                  "Follow our community for exclusive codes",
-                ].map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-muted-foreground">
-                    <CheckCircle className="h-4 w-4 shrink-0 text-primary" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
+
+          <div className="relative text-center">
+            <div className="inline-flex items-center gap-2 rounded-full bg-secondary/15 px-3 py-1 text-sm font-semibold text-secondary">
+              <Gift className="h-4 w-4" />
+              Gift Codes
             </div>
+            <h2 className="mt-4 text-3xl font-extrabold text-foreground md:text-4xl">
+              Got a Gift Code? Redeem it in 3 Steps
+            </h2>
+            <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
+              Watch out for FlexiEarn gift codes on our social media, community groups, and promotions.
+              Each code instantly credits your wallet with real cash.
+            </p>
+          </div>
+
+          {/* Steps */}
+          <div className="relative mt-10 grid gap-6 md:grid-cols-3">
+            {[
+              {
+                step: "1",
+                title: "Log into your account",
+                desc: "Sign in with your phone number and password. Don't have an account? Create one in seconds.",
+              },
+              {
+                step: "2",
+                title: "Open the Wallet page",
+                desc: "Tap the Wallet icon in the bottom navigation, then scroll to the 'Redeem Gift Code' card.",
+              },
+              {
+                step: "3",
+                title: "Enter your code",
+                desc: "Type or paste the code (e.g. GIFT-XXXXXX) and tap Redeem. Cash lands in your balance instantly.",
+              },
+            ].map((s) => (
+              <div
+                key={s.step}
+                className="relative rounded-2xl border border-border/50 bg-card/70 p-6 backdrop-blur-sm shadow-sm transition-all hover:shadow-lg hover:-translate-y-1"
+              >
+                <div className="absolute -top-4 left-6 flex h-8 w-8 items-center justify-center rounded-full gradient-primary text-sm font-bold text-primary-foreground shadow-md">
+                  {s.step}
+                </div>
+                <h3 className="mt-2 mb-2 text-lg font-bold text-foreground">{s.title}</h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Visual code + CTA */}
+          <div className="relative mt-10 grid items-center gap-6 md:grid-cols-2">
             <div className="flex justify-center">
-              <div className="relative w-full max-w-sm rounded-2xl border-2 border-dashed border-primary/40 bg-card/50 p-6 backdrop-blur-sm shadow-xl">
+              <div className="relative w-full max-w-sm rounded-2xl border-2 border-dashed border-primary/40 bg-card/70 p-6 backdrop-blur-sm shadow-xl">
                 <div className="text-center">
                   <Gift className="mx-auto h-10 w-10 text-primary" />
-                  <p className="mt-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Gift Code</p>
+                  <p className="mt-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Sample Gift Code</p>
                   <p className="mt-2 font-mono text-2xl font-extrabold tracking-widest text-gradient-primary">
                     GIFT-XXXXXX
                   </p>
-                  <p className="mt-3 text-sm text-muted-foreground">Enter at Wallet → Redeem</p>
+                  <p className="mt-3 text-sm text-muted-foreground">Redeem at Wallet → Redeem Gift Code</p>
                 </div>
               </div>
+            </div>
+            <div className="space-y-4">
+              <h3 className="text-2xl font-bold text-foreground">Ready to redeem?</h3>
+              <p className="text-muted-foreground">
+                Already have a code? Sign in and head straight to your Wallet to claim your reward.
+                New here? Create your account and start earning today.
+              </p>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Link to="/wallet" className="w-full sm:w-auto">
+                  <Button size="lg" className="w-full gap-2 gradient-primary border-0 font-bold text-primary-foreground shadow-lg shadow-primary/30 hover:opacity-90 sm:w-auto">
+                    <Gift className="h-5 w-5" /> Redeem a Code
+                  </Button>
+                </Link>
+                <Link to="/register" className="w-full sm:w-auto">
+                  <Button size="lg" variant="outline" className="w-full border-primary/30 text-primary hover:bg-primary/5 sm:w-auto">
+                    Create Account
+                  </Button>
+                </Link>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Tip: Codes are case-insensitive and can only be redeemed once per user.
+              </p>
             </div>
           </div>
         </div>
