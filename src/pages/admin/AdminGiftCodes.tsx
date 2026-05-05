@@ -24,6 +24,18 @@ interface GiftCode {
   created_at: string;
 }
 
+interface Redemption {
+  id: string;
+  gift_code_id: string;
+  user_id: string;
+  amount: number;
+  redeemed_at: string;
+  code?: string;
+  full_name?: string | null;
+  phone?: string | null;
+  email?: string | null;
+}
+
 const randomCode = () =>
   "GIFT-" + Math.random().toString(36).slice(2, 8).toUpperCase();
 
