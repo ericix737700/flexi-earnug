@@ -164,8 +164,11 @@ export default function Profile() {
         {/* Account Info */}
         <Card className="rounded-xl">
           <CardContent className="p-0">
-            <div className="px-4 py-3">
+            <div className="flex items-center justify-between px-4 py-3">
               <p className="text-sm font-semibold text-muted-foreground">Account Details</p>
+              <Button size="sm" variant="outline" className="h-8 gap-1.5" onClick={() => setEditOpen(true)}>
+                <Pencil className="h-3.5 w-3.5" /> Edit
+              </Button>
             </div>
             <Separator />
             {[
