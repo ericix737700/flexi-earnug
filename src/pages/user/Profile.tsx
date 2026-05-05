@@ -243,6 +243,7 @@ export default function Profile() {
 
         <DepositDialog open={depositOpen} onOpenChange={setDepositOpen} />
         <SupportDialog open={supportOpen} onOpenChange={setSupportOpen} />
+        <EditProfileDialog open={editOpen} onOpenChange={setEditOpen} />
 
         {/* Terms Sheet */}
         <Sheet open={termsOpen} onOpenChange={setTermsOpen}>
