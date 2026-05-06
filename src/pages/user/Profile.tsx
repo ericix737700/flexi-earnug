@@ -12,9 +12,12 @@ import {
   Sheet, SheetContent, SheetHeader, SheetTitle,
 } from "@/components/ui/sheet";
 import {
+  Collapsible, CollapsibleContent, CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
   User, Phone, Calendar, Shield, LogOut, ChevronRight,
   FileText, ArrowDownToLine, ArrowUpFromLine,
-  Copy, Star, Flame, Lock, Users, MessageCircle, Mail, Pencil,
+  Copy, Star, Flame, Lock, Users, MessageCircle, Mail, Pencil, ChevronDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import { NotificationsSection } from "@/components/user/NotificationsSection";
@@ -117,14 +120,34 @@ export default function Profile() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" className="h-14 flex-col gap-1 rounded-xl border-2" onClick={() => setDepositOpen(true)}>
-            <ArrowDownToLine className="h-5 w-5 text-green-600" />
-            <span className="text-sm">Deposit</span>
-          </Button>
-          <Button variant="outline" className="h-14 flex-col gap-1 rounded-xl border-2" onClick={() => navigate("/wallet")}>
-            <ArrowUpFromLine className="h-5 w-5 text-primary" />
-            <span className="text-sm">Withdraw</span>
-          </Button>
+          <button
+            onClick={() => setDepositOpen(true)}
+            className="group relative overflow-hidden rounded-xl border border-green-500/30 bg-gradient-to-br from-green-500/15 to-green-500/5 p-4 text-left shadow-sm transition-all hover:shadow-md tap-pop"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-500/20">
+                <ArrowDownToLine className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold">Deposit</p>
+                <p className="text-[11px] text-muted-foreground">Top up wallet</p>
+              </div>
+            </div>
+          </button>
+          <button
+            onClick={() => navigate("/wallet")}
+            className="group relative overflow-hidden rounded-xl border border-primary/30 bg-gradient-to-br from-primary/15 to-primary/5 p-4 text-left shadow-sm transition-all hover:shadow-md tap-pop"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20">
+                <ArrowUpFromLine className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold">Withdraw</p>
+                <p className="text-[11px] text-muted-foreground">Cash out</p>
+              </div>
+            </div>
+          </button>
         </div>
 
         {/* Join Community */}
@@ -161,36 +184,41 @@ export default function Profile() {
         <NotificationsSection />
         <PushNotificationToggle />
 
-        {/* Account Info */}
-        <Card className="rounded-xl">
-          <CardContent className="p-0">
+        {/* Account Info (Collapsible) */}
+        <Card className="rounded-xl overflow-hidden">
+          <Collapsible>
             <div className="flex items-center justify-between px-4 py-3">
-              <p className="text-sm font-semibold text-muted-foreground">Account Details</p>
+              <CollapsibleTrigger className="group flex flex-1 items-center gap-2 text-left">
+                <p className="text-sm font-semibold text-muted-foreground">Account Details</p>
+                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+              </CollapsibleTrigger>
               <Button size="sm" variant="outline" className="h-8 gap-1.5" onClick={() => setEditOpen(true)}>
                 <Pencil className="h-3.5 w-3.5" /> Edit
               </Button>
             </div>
-            <Separator />
-            {[
-              { icon: User, label: "Full Name", value: profile?.full_name || "Not set" },
-              { icon: Phone, label: "Phone", value: profile?.phone },
-              { icon: Mail, label: "Email", value: profile?.email || "Not set" },
-              { icon: Calendar, label: "Joined", value: profile?.created_at ? formatDate(profile.created_at) : "N/A" },
-              { icon: Shield, label: "Referral Code", value: profile?.referral_code, mono: true },
-            ].map((item, i) => (
-              <div key={i} className="flex items-center justify-between border-b last:border-b-0 px-4 py-3">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
-                    <item.icon className="h-4 w-4 text-muted-foreground" />
+            <CollapsibleContent>
+              <Separator />
+              {[
+                { icon: User, label: "Full Name", value: profile?.full_name || "Not set" },
+                { icon: Phone, label: "Phone", value: profile?.phone },
+                { icon: Mail, label: "Email", value: profile?.email || "Not set" },
+                { icon: Calendar, label: "Joined", value: profile?.created_at ? formatDate(profile.created_at) : "N/A" },
+                { icon: Shield, label: "Referral Code", value: profile?.referral_code, mono: true },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center justify-between border-b last:border-b-0 px-4 py-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted">
+                      <item.icon className="h-3.5 w-3.5 text-muted-foreground" />
+                    </div>
+                    <span className="text-xs">{item.label}</span>
                   </div>
-                  <span className="text-sm">{item.label}</span>
+                  <span className={`text-xs font-medium truncate max-w-[55%] text-right ${item.mono ? "font-mono text-primary" : ""}`}>
+                    {item.value}
+                  </span>
                 </div>
-                <span className={`text-sm font-medium ${item.mono ? "font-mono text-primary" : ""}`}>
-                  {item.value}
-                </span>
-              </div>
-            ))}
-          </CardContent>
+              ))}
+            </CollapsibleContent>
+          </Collapsible>
         </Card>
 
         {/* Admin Link */}
