@@ -120,14 +120,34 @@ export default function Profile() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" className="h-14 flex-col gap-1 rounded-xl border-2" onClick={() => setDepositOpen(true)}>
-            <ArrowDownToLine className="h-5 w-5 text-green-600" />
-            <span className="text-sm">Deposit</span>
-          </Button>
-          <Button variant="outline" className="h-14 flex-col gap-1 rounded-xl border-2" onClick={() => navigate("/wallet")}>
-            <ArrowUpFromLine className="h-5 w-5 text-primary" />
-            <span className="text-sm">Withdraw</span>
-          </Button>
+          <button
+            onClick={() => setDepositOpen(true)}
+            className="group relative overflow-hidden rounded-xl border border-green-500/30 bg-gradient-to-br from-green-500/15 to-green-500/5 p-4 text-left shadow-sm transition-all hover:shadow-md tap-pop"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-500/20">
+                <ArrowDownToLine className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold">Deposit</p>
+                <p className="text-[11px] text-muted-foreground">Top up wallet</p>
+              </div>
+            </div>
+          </button>
+          <button
+            onClick={() => navigate("/wallet")}
+            className="group relative overflow-hidden rounded-xl border border-primary/30 bg-gradient-to-br from-primary/15 to-primary/5 p-4 text-left shadow-sm transition-all hover:shadow-md tap-pop"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20">
+                <ArrowUpFromLine className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold">Withdraw</p>
+                <p className="text-[11px] text-muted-foreground">Cash out</p>
+              </div>
+            </div>
+          </button>
         </div>
 
         {/* Join Community */}
