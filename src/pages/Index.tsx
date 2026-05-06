@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PlatformLogo } from "@/components/PlatformLogo";
+import { LoadingScreen } from "@/components/LoadingScreen";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import {
   Smartphone,
@@ -24,6 +26,14 @@ const Index = () => {
   const registrationFee = settings?.registration_fee ? Number(settings.registration_fee) : 5000;
   const dailyReward = settings?.daily_checkin_reward ? Number(settings.daily_checkin_reward) : 800;
   const referralBonus = settings?.referral_bonus ? Number(settings.referral_bonus) : 3000;
+
+  const [bootLoading, setBootLoading] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setBootLoading(false), 900);
+    return () => clearTimeout(t);
+  }, []);
+
+  if (bootLoading) return <LoadingScreen />;
 
   return (
     <div className="min-h-screen bg-background">
