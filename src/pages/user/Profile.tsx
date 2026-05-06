@@ -12,9 +12,12 @@ import {
   Sheet, SheetContent, SheetHeader, SheetTitle,
 } from "@/components/ui/sheet";
 import {
+  Collapsible, CollapsibleContent, CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
   User, Phone, Calendar, Shield, LogOut, ChevronRight,
   FileText, ArrowDownToLine, ArrowUpFromLine,
-  Copy, Star, Flame, Lock, Users, MessageCircle, Mail, Pencil,
+  Copy, Star, Flame, Lock, Users, MessageCircle, Mail, Pencil, ChevronDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import { NotificationsSection } from "@/components/user/NotificationsSection";
