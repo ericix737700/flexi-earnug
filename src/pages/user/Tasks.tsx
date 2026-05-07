@@ -14,6 +14,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Play, ClipboardList, HelpCircle, Loader2, Clock, Coins, CheckCircle } from "lucide-react";
 import { TriviaQuiz } from "@/components/user/TriviaQuiz";
+import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 
 interface Task {
   id: string;
