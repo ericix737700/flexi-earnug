@@ -119,33 +119,29 @@ export default function Profile() {
         <EmailPrompt variant="card" />
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 items-stretch">
           <button
             onClick={() => setDepositOpen(true)}
-            className="group relative overflow-hidden rounded-xl border border-green-500/30 bg-gradient-to-br from-green-500/15 to-green-500/5 p-4 text-left shadow-sm transition-all hover:shadow-md tap-pop"
+            className="group relative flex h-full min-h-[76px] w-full items-center gap-3 overflow-hidden rounded-xl border border-green-500/30 bg-card p-3 text-left shadow-sm ring-1 ring-green-500/5 transition-all hover:shadow-md hover:border-green-500/50 active:scale-[0.98] tap-pop"
           >
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-500/20">
-                <ArrowDownToLine className="h-5 w-5 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold">Deposit</p>
-                <p className="text-[11px] text-muted-foreground">Top up wallet</p>
-              </div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-500/15">
+              <ArrowDownToLine className="h-5 w-5 text-green-600" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold">Deposit</p>
+              <p className="truncate text-[11px] text-muted-foreground">Top up wallet</p>
             </div>
           </button>
           <button
             onClick={() => navigate("/wallet")}
-            className="group relative overflow-hidden rounded-xl border border-primary/30 bg-gradient-to-br from-primary/15 to-primary/5 p-4 text-left shadow-sm transition-all hover:shadow-md tap-pop"
+            className="group relative flex h-full min-h-[76px] w-full items-center gap-3 overflow-hidden rounded-xl border border-primary/30 bg-card p-3 text-left shadow-sm ring-1 ring-primary/5 transition-all hover:shadow-md hover:border-primary/50 active:scale-[0.98] tap-pop"
           >
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20">
-                <ArrowUpFromLine className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold">Withdraw</p>
-                <p className="text-[11px] text-muted-foreground">Cash out</p>
-              </div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/15">
+              <ArrowUpFromLine className="h-5 w-5 text-primary" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold">Withdraw</p>
+              <p className="truncate text-[11px] text-muted-foreground">Cash out</p>
             </div>
           </button>
         </div>
