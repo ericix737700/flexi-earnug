@@ -31,17 +31,101 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Find the deposit by transaction_id
+    // Try to find a deposit first; otherwise treat as a withdrawal payout
     const { data: deposit, error: findError } = await supabase
       .from("deposits")
       .select("*")
       .eq("transaction_id", transactionUuid)
-      .single();
+      .maybeSingle();
 
-    if (findError || !deposit) {
-      console.error("Deposit not found for transaction:", transactionUuid);
-      return new Response(JSON.stringify({ error: "Deposit not found" }), {
-        status: 404,
+    if (!deposit) {
+      // Withdrawal payout webhook
+      const { data: withdrawal } = await supabase
+        .from("withdrawals")
+        .select("*")
+        .eq("transaction_id", transactionUuid)
+        .maybeSingle();
+
+      if (!withdrawal) {
+        console.error("No deposit or withdrawal for transaction:", transactionUuid);
+        return new Response(JSON.stringify({ error: "Transaction not found" }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      if (withdrawal.status === "processed" || withdrawal.status === "rejected") {
+        return new Response(JSON.stringify({ message: "Already finalized" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const isSuccess =
+        eventType === "disbursement.completed" ||
+        eventType === "send_money.completed" ||
+        eventType === "withdrawal.completed" ||
+        status === "completed" ||
+        status === "successful";
+
+      const isFailure =
+        eventType === "disbursement.failed" ||
+        eventType === "send_money.failed" ||
+        eventType === "withdrawal.failed" ||
+        status === "failed" ||
+        status === "rejected";
+
+      if (isSuccess) {
+        await supabase
+          .from("withdrawals")
+          .update({ status: "processed", processed_at: new Date().toISOString() })
+          .eq("id", withdrawal.id);
+
+        await supabase.from("notifications").insert({
+          user_id: withdrawal.user_id,
+          title: "Withdrawal Sent",
+          message: `Your withdrawal of UGX ${Number(withdrawal.amount).toLocaleString()} has been sent to ${withdrawal.network} ${withdrawal.phone_number}.`,
+          notification_type: "transaction",
+        });
+      } else if (isFailure) {
+        // Refund the user
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("balance")
+          .eq("user_id", withdrawal.user_id)
+          .single();
+
+        const newBalance = Number(profileData?.balance || 0) + Number(withdrawal.amount);
+        await supabase
+          .from("profiles")
+          .update({ balance: newBalance })
+          .eq("user_id", withdrawal.user_id);
+
+        await supabase.from("transactions").insert({
+          user_id: withdrawal.user_id,
+          transaction_type: "adjustment",
+          amount: Number(withdrawal.amount),
+          balance_after: newBalance,
+          description: "Withdrawal failed at MarzPay - refunded",
+        });
+
+        await supabase
+          .from("withdrawals")
+          .update({
+            status: "rejected",
+            rejection_reason: "Payment failed at MarzPay",
+            processed_at: new Date().toISOString(),
+          })
+          .eq("id", withdrawal.id);
+
+        await supabase.from("notifications").insert({
+          user_id: withdrawal.user_id,
+          title: "Withdrawal Failed",
+          message: `Your withdrawal of UGX ${Number(withdrawal.amount).toLocaleString()} failed and your balance has been refunded.`,
+          notification_type: "transaction",
+        });
+      }
+
+      return new Response(JSON.stringify({ success: true, kind: "withdrawal" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
