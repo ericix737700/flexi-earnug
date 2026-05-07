@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { MaintenanceGate } from "@/components/MaintenanceGate";
 
 // Auth Pages
 import Login from "./pages/auth/Login";
