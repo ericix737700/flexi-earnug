@@ -38,7 +38,10 @@ export default function Tasks() {
   const [videoWatched, setVideoWatched] = useState(false);
   const [videoProgress, setVideoProgress] = useState(0);
   const { profile, refreshProfile } = useAuth();
+  const { data: settings } = usePlatformSettings();
   const queryClient = useQueryClient();
+  const tasksDisabled = settings?.kill_tasks === "true" || settings?.emergency_mode === "true";
+  const rewardsDisabled = settings?.kill_rewards === "true" || settings?.emergency_mode === "true";
 
   const { data: tasks, isLoading } = useQuery({
     queryKey: ["tasks"],
