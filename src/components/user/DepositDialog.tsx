@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { toast } from "sonner";
 import { Loader2, Smartphone } from "lucide-react";
 import { SuccessAnimation } from "@/components/user/SuccessAnimation";
