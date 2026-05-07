@@ -145,6 +145,12 @@ export default function Tasks() {
       <div className="space-y-4">
         <h1 className="text-xl font-bold">Available Tasks</h1>
 
+        {(tasksDisabled || rewardsDisabled) && (
+          <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-700">
+            ⚠️ {tasksDisabled ? "Tasks" : "Rewards"} are temporarily disabled by the admin.
+          </div>
+        )}
+
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="video">Videos</TabsTrigger>
