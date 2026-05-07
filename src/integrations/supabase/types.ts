@@ -392,36 +392,42 @@ export type Database = {
           amount: number
           created_at: string
           id: string
+          marzpay_reference: string | null
           network: string
           phone_number: string
           processed_at: string | null
           processed_by: string | null
           rejection_reason: string | null
           status: string
+          transaction_id: string | null
           user_id: string
         }
         Insert: {
           amount: number
           created_at?: string
           id?: string
+          marzpay_reference?: string | null
           network: string
           phone_number: string
           processed_at?: string | null
           processed_by?: string | null
           rejection_reason?: string | null
           status?: string
+          transaction_id?: string | null
           user_id: string
         }
         Update: {
           amount?: number
           created_at?: string
           id?: string
+          marzpay_reference?: string | null
           network?: string
           phone_number?: string
           processed_at?: string | null
           processed_by?: string | null
           rejection_reason?: string | null
           status?: string
+          transaction_id?: string | null
           user_id?: string
         }
         Relationships: []
