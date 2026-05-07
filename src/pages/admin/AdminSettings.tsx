@@ -12,7 +12,12 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   Save, Loader2, DollarSign, Gift, Wallet, Calendar, Bell,
   Store, MessageCircle, ImageIcon, Upload, Trash2, Send, Lock, Hand, Info, Users,
+  ShieldAlert, AlertTriangle, Power, Zap,
 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 
 export default function AdminSettings() {
   const { data: settings, isLoading } = usePlatformSettings();
