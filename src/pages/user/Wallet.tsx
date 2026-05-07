@@ -159,6 +159,9 @@ export default function Wallet() {
   const withdrawMutation = useMutation({
     mutationFn: async () => {
       if (!profile?.user_id) throw new Error("Not authenticated");
+      if (settings?.emergency_mode === "true" || settings?.kill_withdrawals === "true") {
+        throw new Error("Withdrawals are temporarily disabled. Please try again later.");
+      }
       if ((profile as any)?.restrictions?.no_transactions) throw new Error("Your account is restricted from making transactions");
       if (!recipientName) throw new Error("Please verify the recipient name first");
 
@@ -172,12 +175,12 @@ export default function Wallet() {
       }
 
       // Create withdrawal request
-      const { error } = await supabase.from("withdrawals").insert({
+      const { data: withdrawalRow, error } = await supabase.from("withdrawals").insert({
         user_id: profile.user_id,
         amount,
         phone_number: withdrawPhone,
         network: withdrawNetwork,
-      });
+      }).select("id").single();
 
       if (error) throw error;
 
@@ -197,10 +200,26 @@ export default function Wallet() {
         description: `Withdrawal to ${recipientName} (${withdrawNetwork} ${withdrawPhone})`,
       });
 
-      return amount;
+      // Automatic mode: trigger MarzPay send immediately
+      const isAutomatic = settings?.withdrawal_mode === "automatic";
+      let auto = false;
+      if (isAutomatic && withdrawalRow?.id) {
+        const { data: sendData, error: sendError } = await supabase.functions.invoke("marzpay-send", {
+          body: { withdrawal_id: withdrawalRow.id, amount, phone_number: withdrawPhone },
+        });
+        if (!sendError && !sendData?.error) {
+          auto = true;
+        }
+      }
+
+      return { amount, auto };
     },
-    onSuccess: (amount) => {
-      toast.success(`Withdrawal of UGX ${amount.toLocaleString()} submitted!`);
+    onSuccess: ({ amount, auto }) => {
+      toast.success(
+        auto
+          ? `Withdrawal of UGX ${amount.toLocaleString()} sent! Check your phone.`
+          : `Withdrawal of UGX ${amount.toLocaleString()} submitted for approval.`
+      );
       setIsWithdrawOpen(false);
       setWithdrawAmount("");
       setRecipientName(null);

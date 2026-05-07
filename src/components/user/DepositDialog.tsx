@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { toast } from "sonner";
 import { Loader2, Smartphone } from "lucide-react";
 import { SuccessAnimation } from "@/components/user/SuccessAnimation";
@@ -22,6 +23,7 @@ interface DepositDialogProps {
 
 export function DepositDialog({ open, onOpenChange }: DepositDialogProps) {
   const { user, profile, refreshProfile } = useAuth();
+  const { data: settings } = usePlatformSettings();
   const [amount, setAmount] = useState("");
   const [phoneNumber, setPhoneNumber] = useState(profile?.phone || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -47,6 +49,10 @@ export function DepositDialog({ open, onOpenChange }: DepositDialogProps) {
   }, [user?.id, success]);
 
   const handleSubmit = async () => {
+    if (settings?.emergency_mode === "true" || settings?.kill_deposits === "true") {
+      toast.error("Deposits are temporarily disabled. Please try again later.");
+      return;
+    }
     if ((profile as any)?.restrictions?.no_transactions) {
       toast.error("Your account is restricted from making transactions");
       return;

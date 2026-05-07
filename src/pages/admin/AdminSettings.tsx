@@ -12,7 +12,12 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   Save, Loader2, DollarSign, Gift, Wallet, Calendar, Bell,
   Store, MessageCircle, ImageIcon, Upload, Trash2, Send, Lock, Hand, Info, Users,
+  ShieldAlert, AlertTriangle, Power, Zap,
 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 
 export default function AdminSettings() {
   const { data: settings, isLoading } = usePlatformSettings();
@@ -96,6 +101,9 @@ export default function AdminSettings() {
           <h1 className="text-2xl font-bold">Platform Settings</h1>
           <p className="text-muted-foreground">Configure platform fees, rewards, branding, and content</p>
         </div>
+
+        {/* System Controls (Maintenance / Emergency / Kill Switches / Withdrawal Mode) */}
+        <SystemControlsCard settings={settings} onSave={handleSave} />
 
         {/* Logo Upload */}
         <LogoUploadCard settings={settings} onSave={handleSave} />
@@ -346,6 +354,187 @@ function LogoUploadCard({ settings, onSave }: { settings: Record<string, string>
             {isUploading ? "Uploading..." : "Upload Logo"}
           </Button>
           <p className="mt-1 text-xs text-muted-foreground">Recommended: Square image, max 2MB (PNG or JPG)</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function SystemControlsCard({
+  settings,
+  onSave,
+}: {
+  settings: Record<string, string> | undefined;
+  onSave: (key: string, value: string) => Promise<void>;
+}) {
+  const [maintenance, setMaintenance] = useState(settings?.maintenance_mode === "true");
+  const [maintenanceMsg, setMaintenanceMsg] = useState(settings?.maintenance_message || "");
+  const [emergency, setEmergency] = useState(settings?.emergency_mode === "true");
+  const [emergencyMsg, setEmergencyMsg] = useState(settings?.emergency_message || "");
+  const [killDeposits, setKillDeposits] = useState(settings?.kill_deposits === "true");
+  const [killWithdrawals, setKillWithdrawals] = useState(settings?.kill_withdrawals === "true");
+  const [killTasks, setKillTasks] = useState(settings?.kill_tasks === "true");
+  const [killRewards, setKillRewards] = useState(settings?.kill_rewards === "true");
+  const [withdrawalMode, setWithdrawalMode] = useState(settings?.withdrawal_mode || "manual");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!settings) return;
+    setMaintenance(settings.maintenance_mode === "true");
+    setMaintenanceMsg(settings.maintenance_message || "");
+    setEmergency(settings.emergency_mode === "true");
+    setEmergencyMsg(settings.emergency_message || "");
+    setKillDeposits(settings.kill_deposits === "true");
+    setKillWithdrawals(settings.kill_withdrawals === "true");
+    setKillTasks(settings.kill_tasks === "true");
+    setKillRewards(settings.kill_rewards === "true");
+    setWithdrawalMode(settings.withdrawal_mode || "manual");
+  }, [settings]);
+
+  const toggle = async (key: string, value: boolean, setter: (v: boolean) => void) => {
+    setter(value);
+    await onSave(key, value ? "true" : "false");
+  };
+
+  const saveMessages = async () => {
+    setSaving(true);
+    try {
+      await onSave("maintenance_message", maintenanceMsg);
+      await onSave("emergency_message", emergencyMsg);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const saveWithdrawalMode = async (mode: string) => {
+    setWithdrawalMode(mode);
+    await onSave("withdrawal_mode", mode);
+  };
+
+  const SwitchRow = ({
+    icon: Icon,
+    color,
+    title,
+    desc,
+    checked,
+    onChange,
+  }: {
+    icon: any;
+    color: string;
+    title: string;
+    desc: string;
+    checked: boolean;
+    onChange: (v: boolean) => void;
+  }) => (
+    <div className="flex items-center justify-between gap-3 rounded-lg border bg-card/40 p-3">
+      <div className="flex items-start gap-3">
+        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${color}`}>
+          <Icon className="h-4 w-4" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold">{title}</p>
+          <p className="text-xs text-muted-foreground">{desc}</p>
+        </div>
+      </div>
+      <Switch checked={checked} onCheckedChange={onChange} />
+    </div>
+  );
+
+  return (
+    <Card className="border-destructive/30">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <ShieldAlert className="h-5 w-5 text-destructive" />
+          System Controls & Kill Switches
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid gap-3 md:grid-cols-2">
+          <SwitchRow
+            icon={Power}
+            color="bg-amber-500/15 text-amber-600"
+            title="Maintenance Mode"
+            desc="Show a maintenance screen to all users."
+            checked={maintenance}
+            onChange={(v) => toggle("maintenance_mode", v, setMaintenance)}
+          />
+          <SwitchRow
+            icon={AlertTriangle}
+            color="bg-destructive/15 text-destructive"
+            title="Emergency Mode"
+            desc="Force-stop all activity instantly."
+            checked={emergency}
+            onChange={(v) => toggle("emergency_mode", v, setEmergency)}
+          />
+          <SwitchRow
+            icon={Wallet}
+            color="bg-green-500/15 text-green-600"
+            title="Disable Deposits"
+            desc="Block new deposits across the platform."
+            checked={killDeposits}
+            onChange={(v) => toggle("kill_deposits", v, setKillDeposits)}
+          />
+          <SwitchRow
+            icon={Send}
+            color="bg-primary/15 text-primary"
+            title="Disable Withdrawals"
+            desc="Block new withdrawal requests."
+            checked={killWithdrawals}
+            onChange={(v) => toggle("kill_withdrawals", v, setKillWithdrawals)}
+          />
+          <SwitchRow
+            icon={Zap}
+            color="bg-secondary/15 text-secondary-foreground"
+            title="Disable Tasks"
+            desc="Stop users from completing tasks."
+            checked={killTasks}
+            onChange={(v) => toggle("kill_tasks", v, setKillTasks)}
+          />
+          <SwitchRow
+            icon={Gift}
+            color="bg-accent/15 text-accent-foreground"
+            title="Disable Rewards"
+            desc="Pause check-ins, gift codes & referral bonuses."
+            checked={killRewards}
+            onChange={(v) => toggle("kill_rewards", v, setKillRewards)}
+          />
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label>Maintenance message</Label>
+            <Textarea rows={2} value={maintenanceMsg} onChange={(e) => setMaintenanceMsg(e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label>Emergency message</Label>
+            <Textarea rows={2} value={emergencyMsg} onChange={(e) => setEmergencyMsg(e.target.value)} />
+          </div>
+        </div>
+        <Button onClick={saveMessages} disabled={saving}>
+          {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+          Save messages
+        </Button>
+
+        <div className="rounded-lg border bg-muted/30 p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold">Withdrawal Processing Mode</p>
+              <p className="text-xs text-muted-foreground">
+                <strong>Manual</strong>: admin must approve each withdrawal before MarzPay sends.
+                <br />
+                <strong>Automatic</strong>: MarzPay sends instantly when a user submits.
+              </p>
+            </div>
+            <Select value={withdrawalMode} onValueChange={saveWithdrawalMode}>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="manual">Manual</SelectItem>
+                <SelectItem value="automatic">Automatic</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </CardContent>
     </Card>

@@ -14,6 +14,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Play, ClipboardList, HelpCircle, Loader2, Clock, Coins, CheckCircle } from "lucide-react";
 import { TriviaQuiz } from "@/components/user/TriviaQuiz";
+import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 
 interface Task {
   id: string;
@@ -37,7 +38,10 @@ export default function Tasks() {
   const [videoWatched, setVideoWatched] = useState(false);
   const [videoProgress, setVideoProgress] = useState(0);
   const { profile, refreshProfile } = useAuth();
+  const { data: settings } = usePlatformSettings();
   const queryClient = useQueryClient();
+  const tasksDisabled = settings?.kill_tasks === "true" || settings?.emergency_mode === "true";
+  const rewardsDisabled = settings?.kill_rewards === "true" || settings?.emergency_mode === "true";
 
   const { data: tasks, isLoading } = useQuery({
     queryKey: ["tasks"],
@@ -66,6 +70,8 @@ export default function Tasks() {
   const completeTaskMutation = useMutation({
     mutationFn: async (task: Task) => {
       if (!profile?.user_id) throw new Error("Not authenticated");
+      if (tasksDisabled) throw new Error("Tasks are temporarily disabled");
+      if (rewardsDisabled) throw new Error("Rewards are temporarily disabled");
       if ((profile as any)?.restrictions?.no_tasks) throw new Error("Your account is restricted from completing tasks");
       const completionsToday = todayCompletions?.filter((id) => id === task.id).length || 0;
       if (task.daily_limit && completionsToday >= task.daily_limit) throw new Error("Daily limit reached for this task");
@@ -138,6 +144,12 @@ export default function Tasks() {
     <UserLayout>
       <div className="space-y-4">
         <h1 className="text-xl font-bold">Available Tasks</h1>
+
+        {(tasksDisabled || rewardsDisabled) && (
+          <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-700">
+            ⚠️ {tasksDisabled ? "Tasks" : "Rewards"} are temporarily disabled by the admin.
+          </div>
+        )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-3">
