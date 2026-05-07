@@ -70,6 +70,8 @@ export default function Tasks() {
   const completeTaskMutation = useMutation({
     mutationFn: async (task: Task) => {
       if (!profile?.user_id) throw new Error("Not authenticated");
+      if (tasksDisabled) throw new Error("Tasks are temporarily disabled");
+      if (rewardsDisabled) throw new Error("Rewards are temporarily disabled");
       if ((profile as any)?.restrictions?.no_tasks) throw new Error("Your account is restricted from completing tasks");
       const completionsToday = todayCompletions?.filter((id) => id === task.id).length || 0;
       if (task.daily_limit && completionsToday >= task.daily_limit) throw new Error("Daily limit reached for this task");
