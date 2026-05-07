@@ -10,12 +10,18 @@ import { Gift, Loader2, Sparkles, CheckCircle2, PartyPopper } from "lucide-react
 
 export function GiftCodeRedeem() {
   const { refreshProfile } = useAuth();
+  const { data: settings } = usePlatformSettings();
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<{ amount: number; code: string } | null>(null);
+  const rewardsDisabled = settings?.kill_rewards === "true" || settings?.emergency_mode === "true";
 
   const redeem = async () => {
     if (!code.trim()) return;
+    if (rewardsDisabled) {
+      toast.error("Gift code redemptions are temporarily disabled");
+      return;
+    }
     setLoading(true);
     try {
       const { data, error } = await supabase.rpc("redeem_gift_code" as any, { _code: code.trim() });
