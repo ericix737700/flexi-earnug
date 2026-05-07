@@ -102,6 +102,9 @@ export default function AdminSettings() {
           <p className="text-muted-foreground">Configure platform fees, rewards, branding, and content</p>
         </div>
 
+        {/* System Controls (Maintenance / Emergency / Kill Switches / Withdrawal Mode) */}
+        <SystemControlsCard settings={settings} onSave={handleSave} />
+
         {/* Logo Upload */}
         <LogoUploadCard settings={settings} onSave={handleSave} />
 
