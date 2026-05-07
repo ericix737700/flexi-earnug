@@ -51,7 +51,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/pay-registration" replace />;
   }
 
-  return <>{children}</>;
+  return <MaintenanceGate>{children}</MaintenanceGate>;
 }
 
 function AdminRoute({ children }: { children: React.ReactNode }) {
