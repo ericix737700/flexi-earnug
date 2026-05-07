@@ -19,7 +19,6 @@ Deno.serve(async (req) => {
     }
     const credentials = btoa(`${MARZPAY_API_KEY}:${MARZPAY_API_SECRET}`);
 
-    // Verify admin
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -28,13 +27,13 @@ Deno.serve(async (req) => {
       });
     }
 
-    const supabase = createClient(
+    const userClient = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_ANON_KEY")!,
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(
+    const { data: claimsData, error: claimsError } = await userClient.auth.getClaims(
       authHeader.replace("Bearer ", "")
     );
     if (claimsError || !claimsData?.claims) {
@@ -46,25 +45,10 @@ Deno.serve(async (req) => {
 
     const userId = claimsData.claims.sub;
 
-    // Check admin role
-    const adminSupabase = createClient(
+    const adminClient = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
-
-    const { data: roleData } = await adminSupabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .eq("role", "admin")
-      .single();
-
-    if (!roleData) {
-      return new Response(JSON.stringify({ error: "Admin access required" }), {
-        status: 403,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
 
     const { amount, phone_number, withdrawal_id } = await req.json();
 
@@ -73,6 +57,53 @@ Deno.serve(async (req) => {
         JSON.stringify({ error: "Missing required fields" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    // Authorization: must be either admin OR the owner of the withdrawal in automatic mode.
+    const { data: roleData } = await adminClient
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    const { data: withdrawal } = await adminClient
+      .from("withdrawals")
+      .select("id, user_id, status")
+      .eq("id", withdrawal_id)
+      .maybeSingle();
+
+    if (!withdrawal) {
+      return new Response(JSON.stringify({ error: "Withdrawal not found" }), {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const isAdmin = !!roleData;
+    const isOwner = withdrawal.user_id === userId;
+
+    if (!isAdmin) {
+      // Non-admin: only allowed when withdrawal_mode = automatic AND owner
+      const { data: modeSetting } = await adminClient
+        .from("platform_settings")
+        .select("setting_value")
+        .eq("setting_key", "withdrawal_mode")
+        .maybeSingle();
+      const mode = modeSetting?.setting_value || "manual";
+      if (mode !== "automatic" || !isOwner) {
+        return new Response(JSON.stringify({ error: "Not authorized" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    if (withdrawal.status !== "pending") {
+      return new Response(JSON.stringify({ error: `Withdrawal is already ${withdrawal.status}` }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     let formattedPhone = phone_number.replace(/\D/g, "");
@@ -111,10 +142,24 @@ Deno.serve(async (req) => {
       );
     }
 
+    const transactionUuid = data.data?.transaction?.uuid || null;
+
+    // Mark withdrawal as approved (payout in flight) + record references
+    await adminClient
+      .from("withdrawals")
+      .update({
+        status: "approved",
+        transaction_id: transactionUuid,
+        marzpay_reference: reference,
+        processed_by: userId,
+        processed_at: new Date().toISOString(),
+      })
+      .eq("id", withdrawal_id);
+
     return new Response(
       JSON.stringify({
         success: true,
-        transaction_uuid: data.data?.transaction?.uuid,
+        transaction_uuid: transactionUuid,
         reference,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -122,7 +167,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error("Error in marzpay-send:", error);
     return new Response(
-      JSON.stringify({ error: error.message || "Internal server error" }),
+      JSON.stringify({ error: (error as Error).message || "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
