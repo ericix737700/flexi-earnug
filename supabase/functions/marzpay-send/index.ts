@@ -132,13 +132,33 @@ Deno.serve(async (req) => {
       }),
     });
 
-    const data = await response.json();
+    const rawText = await response.text();
+    let data: any = {};
+    try { data = JSON.parse(rawText); } catch { /* non-JSON response */ }
 
-    if (!response.ok || data.status === "error") {
-      console.error("MarzPay send error:", data);
+    console.log("MarzPay send-money response", {
+      http_status: response.status,
+      body: data,
+      raw: rawText?.slice(0, 500),
+    });
+
+    if (!response.ok || data?.status === "error") {
+      const detailed =
+        data?.message ||
+        data?.error ||
+        (data?.errors && JSON.stringify(data.errors)) ||
+        rawText ||
+        `Send money failed (HTTP ${response.status})`;
+      console.error("MarzPay send error:", detailed);
+      // Return 200 so the client (admin UI) reliably receives the detailed message
+      // instead of a generic FunctionsHttpError "non-2xx status code".
       return new Response(
-        JSON.stringify({ error: data.message || "Send money failed" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({
+          error: detailed,
+          marzpay_status: response.status,
+          marzpay_body: data,
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
