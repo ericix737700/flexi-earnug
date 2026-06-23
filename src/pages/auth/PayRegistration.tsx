@@ -6,10 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Loader2, Smartphone, CheckCircle, Shield, Zap } from "lucide-react";
+import { Loader2, Smartphone, CheckCircle, Shield, Zap, MessageCircle, Info } from "lucide-react";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { useAuth } from "@/contexts/AuthContext";
 import { PlatformLogo } from "@/components/PlatformLogo";
+import { SecurityBadge } from "@/components/SecurityBadge";
 
 export default function PayRegistration() {
   const navigate = useNavigate();
