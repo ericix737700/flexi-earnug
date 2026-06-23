@@ -148,6 +148,7 @@ export default function Register() {
             <span className="text-muted-foreground">Already have an account? </span>
             <Link to="/login" className="font-semibold text-primary hover:underline">Log In</Link>
           </div>
+          <SecurityBadge variant="encrypted" className="mt-4" />
         </CardContent>
       </Card>
     </div>
