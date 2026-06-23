@@ -105,6 +105,18 @@ export default function PayRegistration() {
     }
   };
 
+  const supportWa = (settings as any)?.support_whatsapp as string | undefined;
+  const openSupport = () => {
+    if (supportWa) {
+      const msg = encodeURIComponent(
+        `Hello, I paid the activation fee of UGX ${registrationFee.toLocaleString()} from ${phoneNumber} but my account is still pending. Please assist.`
+      );
+      window.open(`https://wa.me/${supportWa}?text=${msg}`, "_blank");
+    } else {
+      toast.error("Support contact not configured");
+    }
+  };
+
   if (isPaid) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/20 via-background to-secondary/20 p-4">
@@ -125,6 +137,24 @@ export default function PayRegistration() {
               <Loader2 className="h-4 w-4 animate-spin" />
               <span className="font-medium">Waiting for confirmation...</span>
             </div>
+
+            <div className="mt-6 w-full space-y-3 rounded-lg border border-dashed border-muted-foreground/30 bg-muted/40 p-4 text-left">
+              <p className="text-xs text-muted-foreground">
+                Already paid but still pending? Money debited but no activation?
+                Contact our support team — we'll resolve it instantly.
+              </p>
+              <Button
+                onClick={openSupport}
+                variant="outline"
+                className="w-full"
+                size="sm"
+              >
+                <MessageCircle className="mr-2 h-4 w-4" />
+                Contact Support
+              </Button>
+            </div>
+
+            <SecurityBadge variant="secure-payment" className="mt-4" />
           </CardContent>
         </Card>
       </div>
