@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Loader2, Bot, User, X } from "lucide-react";
+import { Send, Loader2, Bot, User, X, Lock } from "lucide-react";
 
 interface Message {
   role: "user" | "assistant";
