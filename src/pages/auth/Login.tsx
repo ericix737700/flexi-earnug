@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlatformLogo } from "@/components/PlatformLogo";
+import { SecurityBadge } from "@/components/SecurityBadge";
 import { SupportDialog } from "@/components/user/SupportDialog";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { toast } from "sonner";
