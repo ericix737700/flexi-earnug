@@ -181,6 +181,7 @@ export default function Login() {
             <span className="text-muted-foreground">Don't have an account? </span>
             <Link to="/register" className="font-semibold text-primary hover:underline">Register Now</Link>
           </div>
+          <SecurityBadge variant="encrypted" className="mt-4" />
         </CardContent>
       </Card>
     </div>
