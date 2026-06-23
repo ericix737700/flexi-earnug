@@ -179,6 +179,12 @@ export default function PayRegistration() {
             <p className="text-3xl font-bold text-primary">
               UGX {registrationFee.toLocaleString()}
             </p>
+            <div className="mt-2 flex items-start gap-1.5 rounded-md bg-amber-500/10 px-2 py-1.5 text-left">
+              <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-600" />
+              <p className="text-[11px] leading-tight text-amber-700 dark:text-amber-400">
+                Transaction fees from your mobile money provider may apply on top of this amount.
+              </p>
+            </div>
           </div>
 
           <div className="space-y-2">
