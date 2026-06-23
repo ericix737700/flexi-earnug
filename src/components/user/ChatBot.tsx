@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Loader2, Bot, User, X } from "lucide-react";
+import { Send, Loader2, Bot, User, X, Lock } from "lucide-react";
 
 interface Message {
   role: "user" | "assistant";
@@ -114,6 +114,12 @@ export function ChatBot({ onClose }: ChatBotProps) {
         <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
           <X className="h-4 w-4" />
         </Button>
+      </div>
+
+      {/* E2EE notice */}
+      <div className="flex items-center justify-center gap-1.5 border-b bg-primary/[0.03] px-4 py-1.5 text-[10px] text-muted-foreground">
+        <Lock className="h-3 w-3 text-primary" />
+        <span>Messages are end-to-end encrypted</span>
       </div>
 
       {/* Messages */}

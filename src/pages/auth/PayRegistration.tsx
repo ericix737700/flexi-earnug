@@ -6,10 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Loader2, Smartphone, CheckCircle, Shield, Zap } from "lucide-react";
+import { Loader2, Smartphone, CheckCircle, Shield, Zap, MessageCircle, Info } from "lucide-react";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { useAuth } from "@/contexts/AuthContext";
 import { PlatformLogo } from "@/components/PlatformLogo";
+import { SecurityBadge } from "@/components/SecurityBadge";
 
 export default function PayRegistration() {
   const navigate = useNavigate();
@@ -104,6 +105,18 @@ export default function PayRegistration() {
     }
   };
 
+  const supportWa = (settings as any)?.support_whatsapp as string | undefined;
+  const openSupport = () => {
+    if (supportWa) {
+      const msg = encodeURIComponent(
+        `Hello, I paid the activation fee of UGX ${registrationFee.toLocaleString()} from ${phoneNumber} but my account is still pending. Please assist.`
+      );
+      window.open(`https://wa.me/${supportWa}?text=${msg}`, "_blank");
+    } else {
+      toast.error("Support contact not configured");
+    }
+  };
+
   if (isPaid) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/20 via-background to-secondary/20 p-4">
@@ -124,6 +137,24 @@ export default function PayRegistration() {
               <Loader2 className="h-4 w-4 animate-spin" />
               <span className="font-medium">Waiting for confirmation...</span>
             </div>
+
+            <div className="mt-6 w-full space-y-3 rounded-lg border border-dashed border-muted-foreground/30 bg-muted/40 p-4 text-left">
+              <p className="text-xs text-muted-foreground">
+                Already paid but still pending? Money debited but no activation?
+                Contact our support team — we'll resolve it instantly.
+              </p>
+              <Button
+                onClick={openSupport}
+                variant="outline"
+                className="w-full"
+                size="sm"
+              >
+                <MessageCircle className="mr-2 h-4 w-4" />
+                Contact Support
+              </Button>
+            </div>
+
+            <SecurityBadge variant="secure-payment" className="mt-4" />
           </CardContent>
         </Card>
       </div>
@@ -148,6 +179,12 @@ export default function PayRegistration() {
             <p className="text-3xl font-bold text-primary">
               UGX {registrationFee.toLocaleString()}
             </p>
+            <div className="mt-2 flex items-start gap-1.5 rounded-md bg-amber-500/10 px-2 py-1.5 text-left">
+              <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-600" />
+              <p className="text-[11px] leading-tight text-amber-700 dark:text-amber-400">
+                Transaction fees from your mobile money provider may apply on top of this amount.
+              </p>
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -195,9 +232,21 @@ export default function PayRegistration() {
             )}
           </Button>
 
-          <p className="text-center text-xs text-muted-foreground">
-            Secure payment powered by MarzPay
-          </p>
+          <SecurityBadge variant="secure-payment" />
+
+          <div className="space-y-2 text-center">
+            <p className="text-xs text-muted-foreground">
+              Secure payment powered by MarzPay
+            </p>
+            <button
+              type="button"
+              onClick={openSupport}
+              className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
+            >
+              <MessageCircle className="h-3.5 w-3.5" />
+              Payment issue? Contact Support
+            </button>
+          </div>
         </CardContent>
       </Card>
     </div>

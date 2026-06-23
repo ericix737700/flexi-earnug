@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlatformLogo } from "@/components/PlatformLogo";
+import { SecurityBadge } from "@/components/SecurityBadge";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { toast } from "sonner";
 import { Loader2, Phone, Lock, User, Users, Mail } from "lucide-react";
@@ -147,6 +148,7 @@ export default function Register() {
             <span className="text-muted-foreground">Already have an account? </span>
             <Link to="/login" className="font-semibold text-primary hover:underline">Log In</Link>
           </div>
+          <SecurityBadge variant="encrypted" className="mt-4" />
         </CardContent>
       </Card>
     </div>
