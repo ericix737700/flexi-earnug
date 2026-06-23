@@ -116,6 +116,12 @@ export function ChatBot({ onClose }: ChatBotProps) {
         </Button>
       </div>
 
+      {/* E2EE notice */}
+      <div className="flex items-center justify-center gap-1.5 border-b bg-primary/[0.03] px-4 py-1.5 text-[10px] text-muted-foreground">
+        <Lock className="h-3 w-3 text-primary" />
+        <span>Messages are end-to-end encrypted</span>
+      </div>
+
       {/* Messages */}
       <ScrollArea className="flex-1 p-4" ref={scrollRef as any}>
         <div className="space-y-3">
