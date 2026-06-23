@@ -232,9 +232,21 @@ export default function PayRegistration() {
             )}
           </Button>
 
-          <p className="text-center text-xs text-muted-foreground">
-            Secure payment powered by MarzPay
-          </p>
+          <SecurityBadge variant="secure-payment" />
+
+          <div className="space-y-2 text-center">
+            <p className="text-xs text-muted-foreground">
+              Secure payment powered by MarzPay
+            </p>
+            <button
+              type="button"
+              onClick={openSupport}
+              className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
+            >
+              <MessageCircle className="h-3.5 w-3.5" />
+              Payment issue? Contact Support
+            </button>
+          </div>
         </CardContent>
       </Card>
     </div>
