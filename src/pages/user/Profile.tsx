@@ -13,6 +13,7 @@ import {
   User, Phone, Shield, LogOut, ChevronRight,
   FileText, ArrowDownToLine, ArrowUpFromLine,
   Copy, Lock, Users, MessageCircle, Mail, Pencil, Bell, Wallet as WalletIcon,
+  Sun, Moon, Monitor, Palette,
 } from "lucide-react";
 import { toast } from "sonner";
 import { NotificationsSection } from "@/components/user/NotificationsSection";
@@ -21,6 +22,8 @@ import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { PlatformLogo } from "@/components/PlatformLogo";
 import { EmailPrompt } from "@/components/user/EmailPrompt";
 import { EditProfileDialog } from "@/components/user/EditProfileDialog";
+import { useTheme, type Theme } from "@/hooks/useTheme";
+
 
 type RowProps = {
   icon: React.ElementType;
@@ -65,12 +68,12 @@ export default function Profile() {
   const { profile, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [depositOpen, setDepositOpen] = useState(false);
-  const [termsOpen, setTermsOpen] = useState(false);
-  const [privacyOpen, setPrivacyOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const { data: settings } = usePlatformSettings();
+  const { theme, setTheme } = useTheme();
+
 
 
   const handleSignOut = async () => {
@@ -154,17 +157,48 @@ export default function Profile() {
         {/* Preferences */}
         <Group title="Preferences">
           <Row icon={Bell} label="Notifications" onClick={() => setNotificationsOpen(true)} />
+          <div className="px-4 py-3">
+            <div className="mb-2 flex items-center gap-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted">
+                <Palette className="h-4 w-4 text-primary" />
+              </div>
+              <span className="flex-1 text-sm font-medium">Appearance</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {([
+                { v: "light", label: "Light", Icon: Sun },
+                { v: "dark", label: "Dark", Icon: Moon },
+                { v: "system", label: "Auto", Icon: Monitor },
+              ] as { v: Theme; label: string; Icon: React.ElementType }[]).map(({ v, label, Icon }) => {
+                const active = theme === v;
+                return (
+                  <button
+                    key={v}
+                    onClick={() => setTheme(v)}
+                    className={`flex flex-col items-center gap-1 rounded-xl border px-2 py-2.5 text-xs font-medium transition-all ${
+                      active
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-card hover:bg-muted"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
           <Row icon={Users} label="Join Our Community" onClick={openCommunity} />
           <Row icon={Copy} label="Copy Referral Code" onClick={copyReferralCode} />
-
         </Group>
 
         {/* Support */}
         <Group title="Support">
           <Row icon={MessageCircle} label="Help Center" onClick={() => setSupportOpen(true)} iconClass="text-green-600" />
-          <Row icon={FileText} label="Terms & Conditions" onClick={() => setTermsOpen(true)} />
-          <Row icon={Lock} label="Privacy Policy" onClick={() => setPrivacyOpen(true)} />
+          <Row icon={FileText} label="Terms & Conditions" onClick={() => navigate("/terms")} />
+          <Row icon={Lock} label="Privacy Policy" onClick={() => navigate("/privacy")} />
         </Group>
+
 
         {isAdmin && (
           <Group title="Admin">
@@ -186,25 +220,17 @@ export default function Profile() {
         <SupportDialog open={supportOpen} onOpenChange={setSupportOpen} />
         <EditProfileDialog open={editOpen} onOpenChange={setEditOpen} />
 
-        <Sheet open={termsOpen} onOpenChange={setTermsOpen}>
+        <Sheet open={notificationsOpen} onOpenChange={setNotificationsOpen}>
           <SheetContent side="right" className="glass-card border-0 overflow-y-auto w-full sm:max-w-lg">
-            <SheetHeader><SheetTitle className="text-gradient-primary">Terms & Conditions</SheetTitle></SheetHeader>
-            <div className="mt-4 whitespace-pre-wrap text-sm text-muted-foreground leading-relaxed">
-              {settings?.terms_and_conditions || "Terms and conditions have not been set yet."}
+            <SheetHeader><SheetTitle className="text-gradient-primary">Notifications</SheetTitle></SheetHeader>
+            <div className="mt-4 space-y-3">
+              <NotificationsSection />
+              <PushNotificationToggle />
             </div>
-            <Button className="w-full mt-6" variant="outline" onClick={() => setTermsOpen(false)}>Close</Button>
+            <Button className="w-full mt-6" variant="outline" onClick={() => setNotificationsOpen(false)}>Close</Button>
           </SheetContent>
         </Sheet>
 
-        <Sheet open={privacyOpen} onOpenChange={setPrivacyOpen}>
-          <SheetContent side="right" className="glass-card border-0 overflow-y-auto w-full sm:max-w-lg">
-            <SheetHeader><SheetTitle className="text-gradient-primary">Privacy Policy</SheetTitle></SheetHeader>
-            <div className="mt-4 whitespace-pre-wrap text-sm text-muted-foreground leading-relaxed">
-              {settings?.privacy_policy || "Privacy policy has not been set yet."}
-            </div>
-            <Button className="w-full mt-6" variant="outline" onClick={() => setPrivacyOpen(false)}>Close</Button>
-          </SheetContent>
-        </Sheet>
 
         <Sheet open={notificationsOpen} onOpenChange={setNotificationsOpen}>
           <SheetContent side="right" className="glass-card border-0 overflow-y-auto w-full sm:max-w-lg">
