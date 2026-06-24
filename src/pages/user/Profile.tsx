@@ -69,7 +69,9 @@ export default function Profile() {
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const { data: settings } = usePlatformSettings();
+
 
   const handleSignOut = async () => {
     await signOut();
@@ -151,12 +153,10 @@ export default function Profile() {
 
         {/* Preferences */}
         <Group title="Preferences">
-          <Row icon={Bell} label="Notifications" onClick={() => {
-            const el = document.getElementById("notifications-section");
-            el?.scrollIntoView({ behavior: "smooth" });
-          }} />
+          <Row icon={Bell} label="Notifications" onClick={() => setNotificationsOpen(true)} />
           <Row icon={Users} label="Join Our Community" onClick={openCommunity} />
           <Row icon={Copy} label="Copy Referral Code" onClick={copyReferralCode} />
+
         </Group>
 
         {/* Support */}
@@ -172,12 +172,8 @@ export default function Profile() {
           </Group>
         )}
 
-        <div id="notifications-section" className="space-y-3 pt-1">
-          <NotificationsSection />
-          <PushNotificationToggle />
-        </div>
-
         <Button variant="outline" className="w-full rounded-xl text-destructive hover:text-destructive" onClick={handleSignOut}>
+
           <LogOut className="mr-2 h-4 w-4" /> Log Out
         </Button>
 
@@ -209,6 +205,18 @@ export default function Profile() {
             <Button className="w-full mt-6" variant="outline" onClick={() => setPrivacyOpen(false)}>Close</Button>
           </SheetContent>
         </Sheet>
+
+        <Sheet open={notificationsOpen} onOpenChange={setNotificationsOpen}>
+          <SheetContent side="right" className="glass-card border-0 overflow-y-auto w-full sm:max-w-lg">
+            <SheetHeader><SheetTitle className="text-gradient-primary">Notifications</SheetTitle></SheetHeader>
+            <div className="mt-4 space-y-3">
+              <NotificationsSection />
+              <PushNotificationToggle />
+            </div>
+            <Button className="w-full mt-6" variant="outline" onClick={() => setNotificationsOpen(false)}>Close</Button>
+          </SheetContent>
+        </Sheet>
+
       </div>
     </UserLayout>
   );
