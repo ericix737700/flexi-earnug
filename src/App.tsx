@@ -7,6 +7,8 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { MaintenanceGate } from "@/components/MaintenanceGate";
+import { CookieConsent } from "@/components/CookieConsent";
+import { InstallAppPrompt } from "@/components/InstallAppPrompt";
 
 // Auth Pages
 import Login from "./pages/auth/Login";
@@ -125,6 +127,8 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <AppRoutes />
+          <InstallAppPrompt />
+          <CookieConsent />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

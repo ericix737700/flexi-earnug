@@ -8,7 +8,7 @@ import { PlatformLogo } from "@/components/PlatformLogo";
 import { SecurityBadge } from "@/components/SecurityBadge";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { toast } from "sonner";
-import { Loader2, Phone, Lock, User, Users, Mail } from "lucide-react";
+import { Loader2, Phone, Lock, User, Users, Mail, Eye, EyeOff } from "lucide-react";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 
 export default function Register() {
@@ -22,6 +22,8 @@ export default function Register() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const registrationFee = settings?.registration_fee ? Number(settings.registration_fee) : 5000;
 
@@ -122,14 +124,41 @@ export default function Register() {
               { name: "fullName", label: "Full Name", icon: User, type: "text", placeholder: "Enter your full name", required: true },
               { name: "phone", label: "Phone Number", icon: Phone, type: "tel", placeholder: "0700123456", required: true },
               { name: "email", label: "Email Address", icon: Mail, type: "email", placeholder: "you@example.com", required: true },
-              { name: "password", label: "Password", icon: Lock, type: "password", placeholder: "Create a password", required: true },
-              { name: "confirmPassword", label: "Confirm Password", icon: Lock, type: "password", placeholder: "Confirm your password", required: true },
             ].map((field) => (
               <div key={field.name} className="space-y-1.5">
                 <label className="text-sm font-medium">{field.label}</label>
                 <div className="relative">
                   <field.icon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input name={field.name} type={field.type} placeholder={field.placeholder} value={formData[field.name as keyof typeof formData]} onChange={handleChange} className="pl-10 h-11" required={field.required} />
+                </div>
+              </div>
+            ))}
+            {([
+              { name: "password", label: "Password", placeholder: "Create a password", show: showPassword, toggle: () => setShowPassword(v => !v) },
+              { name: "confirmPassword", label: "Confirm Password", placeholder: "Confirm your password", show: showConfirm, toggle: () => setShowConfirm(v => !v) },
+            ] as const).map((field) => (
+              <div key={field.name} className="space-y-1.5">
+                <label className="text-sm font-medium">{field.label}</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    name={field.name}
+                    type={field.show ? "text" : "password"}
+                    placeholder={field.placeholder}
+                    value={formData[field.name as keyof typeof formData]}
+                    onChange={handleChange}
+                    className="pl-10 pr-10 h-11"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={field.toggle}
+                    className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+                    aria-label={field.show ? "Hide password" : "Show password"}
+                    tabIndex={-1}
+                  >
+                    {field.show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
               </div>
             ))}
