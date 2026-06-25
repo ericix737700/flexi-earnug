@@ -8,8 +8,8 @@ type BIPEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 
-const DISMISS_KEY = "flexiearn_install_dismissed_at";
-const DISMISS_DAYS = 7;
+const DISMISS_KEY = "flexiearn_install_dismissed";
+const SESSION_KEY = "flexiearn_install_session_dismissed";
 
 export function InstallAppPrompt() {
   const [evt, setEvt] = useState<BIPEvent | null>(null);
@@ -23,8 +23,10 @@ export function InstallAppPrompt() {
       window.navigator.standalone === true;
     if (standalone) return;
 
-    const dismissed = Number(localStorage.getItem(DISMISS_KEY) || 0);
-    if (dismissed && Date.now() - dismissed < DISMISS_DAYS * 86400_000) return;
+    // Permanently dismissed by the user (X) — never show again unless they clear storage.
+    if (localStorage.getItem(DISMISS_KEY) === "1") return;
+    // Dismissed for this browser session.
+    if (sessionStorage.getItem(SESSION_KEY) === "1") return;
 
     const handler = (e: Event) => {
       e.preventDefault();
@@ -33,7 +35,11 @@ export function InstallAppPrompt() {
     };
     window.addEventListener("beforeinstallprompt", handler);
 
-    const installed = () => setVisible(false);
+    const installed = () => {
+      localStorage.setItem(DISMISS_KEY, "1");
+      setVisible(false);
+      setEvt(null);
+    };
     window.addEventListener("appinstalled", installed);
 
     return () => {
@@ -43,8 +49,11 @@ export function InstallAppPrompt() {
   }, []);
 
   const dismiss = () => {
-    localStorage.setItem(DISMISS_KEY, String(Date.now()));
+    // Permanent dismiss — keeps it from reappearing.
+    localStorage.setItem(DISMISS_KEY, "1");
+    sessionStorage.setItem(SESSION_KEY, "1");
     setVisible(false);
+    setEvt(null);
   };
 
   const install = async () => {

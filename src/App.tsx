@@ -14,6 +14,8 @@ import { InstallAppPrompt } from "@/components/InstallAppPrompt";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import PayRegistration from "./pages/auth/PayRegistration";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 
 // User Pages
 import Dashboard from "./pages/user/Dashboard";
@@ -94,6 +96,8 @@ function AppRoutes() {
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
       <Route path="/pay-registration" element={<PayRegistration />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/privacy" element={<Privacy />} />
 

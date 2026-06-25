@@ -10,6 +10,7 @@ import { LoadingScreen } from "@/components/LoadingScreen";
 import { toast } from "sonner";
 import { Loader2, Phone, Lock, User, Users, Mail, Eye, EyeOff } from "lucide-react";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
+import { PasswordStrength, evaluatePassword } from "@/components/PasswordStrength";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -36,7 +37,11 @@ export default function Register() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) { toast.error("Passwords do not match"); return; }
-    if (formData.password.length < 6) { toast.error("Password must be at least 6 characters"); return; }
+    const { passed, total } = evaluatePassword(formData.password);
+    if (passed < total - 1) {
+      toast.error("Password is too weak. Please meet at least 4 of the 5 rules.");
+      return;
+    }
     const trimmedEmail = formData.email.trim().toLowerCase();
     if (!trimmedEmail) { toast.error("Email is required"); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) { toast.error("Please enter a valid email address"); return; }
@@ -160,6 +165,11 @@ export default function Register() {
                     {field.show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
+                {field.name === "password" && (
+                  <div className="pt-1">
+                    <PasswordStrength password={formData.password} />
+                  </div>
+                )}
               </div>
             ))}
             <div className="space-y-1.5">
