@@ -10,7 +10,7 @@ import { SecurityBadge } from "@/components/SecurityBadge";
 import { SupportDialog } from "@/components/user/SupportDialog";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { toast } from "sonner";
-import { Loader2, Phone, Lock, ShieldAlert, Mail } from "lucide-react";
+import { Loader2, Phone, Lock, ShieldAlert, Mail, Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -18,6 +18,7 @@ export default function Login() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
   const [blockedStatus, setBlockedStatus] = useState<{ status: string } | null>(null);
@@ -170,7 +171,23 @@ export default function Login() {
               <label className="text-sm font-medium">Password</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} className="pl-10 h-11" required />
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-10 pr-10 h-11"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
             </div>
             <Button type="submit" className="w-full h-11 font-semibold gradient-primary border-0 text-primary-foreground hover:opacity-90" disabled={isLoading}>
