@@ -37,6 +37,7 @@ import AdminGiftCodes from "./pages/admin/AdminGiftCodes";
 
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import Offline from "./pages/Offline";
 import Terms from "./pages/legal/Terms";
 import Privacy from "./pages/legal/Privacy";
 
@@ -100,6 +101,7 @@ function AppRoutes() {
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/privacy" element={<Privacy />} />
+      <Route path="/offline" element={<Offline />} />
 
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
