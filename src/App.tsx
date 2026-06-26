@@ -37,6 +37,7 @@ import AdminGiftCodes from "./pages/admin/AdminGiftCodes";
 
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import Offline from "./pages/Offline";
 import Terms from "./pages/legal/Terms";
 import Privacy from "./pages/legal/Privacy";
 

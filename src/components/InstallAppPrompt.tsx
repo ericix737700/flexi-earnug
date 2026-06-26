@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, X } from "lucide-react";
+import { Download, X, Share, Plus } from "lucide-react";
 import { PlatformLogo } from "@/components/PlatformLogo";
 
 type BIPEvent = Event & {
@@ -9,24 +9,40 @@ type BIPEvent = Event & {
 };
 
 const DISMISS_KEY = "flexiearn_install_dismissed";
+const IOS_DISMISS_KEY = "flexiearn_ios_install_dismissed";
 const SESSION_KEY = "flexiearn_install_session_dismissed";
+
+function isStandalone() {
+  return (
+    window.matchMedia?.("(display-mode: standalone)").matches ||
+    // @ts-ignore iOS Safari
+    window.navigator.standalone === true
+  );
+}
+
+function isIos() {
+  const ua = window.navigator.userAgent;
+  return /iPad|iPhone|iPod/.test(ua) && !("MSStream" in window);
+}
 
 export function InstallAppPrompt() {
   const [evt, setEvt] = useState<BIPEvent | null>(null);
   const [visible, setVisible] = useState(false);
+  const [iosVisible, setIosVisible] = useState(false);
 
   useEffect(() => {
-    // Already installed?
-    const standalone =
-      window.matchMedia?.("(display-mode: standalone)").matches ||
-      // @ts-ignore iOS
-      window.navigator.standalone === true;
-    if (standalone) return;
-
-    // Permanently dismissed by the user (X) — never show again unless they clear storage.
-    if (localStorage.getItem(DISMISS_KEY) === "1") return;
-    // Dismissed for this browser session.
+    if (isStandalone()) return;
     if (sessionStorage.getItem(SESSION_KEY) === "1") return;
+
+    // iOS path — no beforeinstallprompt; show A2HS hint.
+    if (isIos()) {
+      if (localStorage.getItem(IOS_DISMISS_KEY) === "1") return;
+      const t = setTimeout(() => setIosVisible(true), 1500);
+      return () => clearTimeout(t);
+    }
+
+    // Other browsers — only show when the real event fires.
+    if (localStorage.getItem(DISMISS_KEY) === "1") return;
 
     const handler = (e: Event) => {
       e.preventDefault();
@@ -37,7 +53,9 @@ export function InstallAppPrompt() {
 
     const installed = () => {
       localStorage.setItem(DISMISS_KEY, "1");
+      localStorage.setItem(IOS_DISMISS_KEY, "1");
       setVisible(false);
+      setIosVisible(false);
       setEvt(null);
     };
     window.addEventListener("appinstalled", installed);
@@ -49,11 +67,16 @@ export function InstallAppPrompt() {
   }, []);
 
   const dismiss = () => {
-    // Permanent dismiss — keeps it from reappearing.
     localStorage.setItem(DISMISS_KEY, "1");
     sessionStorage.setItem(SESSION_KEY, "1");
     setVisible(false);
     setEvt(null);
+  };
+
+  const dismissIos = () => {
+    localStorage.setItem(IOS_DISMISS_KEY, "1");
+    sessionStorage.setItem(SESSION_KEY, "1");
+    setIosVisible(false);
   };
 
   const install = async () => {
@@ -63,6 +86,28 @@ export function InstallAppPrompt() {
     setVisible(false);
     setEvt(null);
   };
+
+  if (iosVisible) {
+    return (
+      <div className="fixed top-3 inset-x-0 z-[90] px-3 animate-in slide-in-from-top-5 duration-300 pointer-events-none">
+        <div className="mx-auto max-w-md glass-card rounded-2xl border border-border/60 shadow-2xl p-3 pointer-events-auto">
+          <div className="flex items-start gap-3">
+            <PlatformLogo size="sm" />
+            <div className="flex-1 min-w-0">
+              <div className="font-semibold text-sm">Install FlexiEarn on iPhone</div>
+              <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1 flex-wrap">
+                Tap <Share className="inline h-3.5 w-3.5" /> Share, then
+                <Plus className="inline h-3.5 w-3.5" /> Add to Home Screen.
+              </div>
+            </div>
+            <button onClick={dismissIos} className="text-muted-foreground hover:text-foreground p-1" aria-label="Dismiss">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!visible || !evt) return null;
 
@@ -82,11 +127,7 @@ export function InstallAppPrompt() {
           <Download className="h-3.5 w-3.5 mr-1" />
           Install
         </Button>
-        <button
-          onClick={dismiss}
-          className="text-muted-foreground hover:text-foreground p-1"
-          aria-label="Dismiss"
-        >
+        <button onClick={dismiss} className="text-muted-foreground hover:text-foreground p-1" aria-label="Dismiss">
           <X className="h-4 w-4" />
         </button>
       </div>
