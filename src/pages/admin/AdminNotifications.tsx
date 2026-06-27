@@ -121,12 +121,23 @@
          notificationData.user_id = null;
        }
  
-       const { error } = await supabase
-         .from("notifications")
-         .insert(notificationData);
- 
-       if (error) throw error;
-     },
+        const { error } = await supabase
+          .from("notifications")
+          .insert(notificationData);
+
+        if (error) throw error;
+
+        if (alsoPush) {
+          const payload: Record<string, unknown> = { title, body: message };
+          if (notificationType === "public") payload.broadcast = true;
+          else if (notificationType === "personal") payload.user_id = selectedUserId;
+          try {
+            await supabase.functions.invoke("send-push", { body: payload });
+          } catch (e) {
+            console.warn("send-push failed", e);
+          }
+        }
+      },
      onSuccess: () => {
        toast.success("Notification sent successfully");
        setIsCreateOpen(false);
