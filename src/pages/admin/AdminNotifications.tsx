@@ -290,7 +290,16 @@
                      value={message}
                      onChange={(e) => setMessage(e.target.value)}
                    />
-                 </div>
+                  </div>
+
+                  <label className="flex items-center gap-2 text-sm">
+                    <Checkbox
+                      checked={alsoPush}
+                      onCheckedChange={(v) => setAlsoPush(v === true)}
+                    />
+                    Also send as push notification
+                  </label>
+
  
                  <Button
                    className="w-full"
