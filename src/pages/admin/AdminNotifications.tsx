@@ -68,6 +68,7 @@
    const [message, setMessage] = useState("");
    const [notificationType, setNotificationType] = useState<NotificationType>("public");
    const [selectedUserId, setSelectedUserId] = useState<string>("");
+   const [alsoPush, setAlsoPush] = useState(true);
  
    // Fetch all notifications
    const { data: notifications, isLoading } = useQuery({
