@@ -40,9 +40,10 @@
    Loader2,
    Trash2,
  } from "lucide-react";
- 
+ import { Checkbox } from "@/components/ui/checkbox";
+
  type NotificationType = "transaction" | "public" | "personal";
- 
+
  interface Notification {
    id: string;
    user_id: string | null;
@@ -66,6 +67,7 @@
    const [message, setMessage] = useState("");
    const [notificationType, setNotificationType] = useState<NotificationType>("public");
    const [selectedUserId, setSelectedUserId] = useState<string>("");
+   const [alsoPush, setAlsoPush] = useState(true);
  
    // Fetch all notifications
    const { data: notifications, isLoading } = useQuery({
@@ -118,12 +120,23 @@
          notificationData.user_id = null;
        }
  
-       const { error } = await supabase
-         .from("notifications")
-         .insert(notificationData);
- 
-       if (error) throw error;
-     },
+        const { error } = await supabase
+          .from("notifications")
+          .insert(notificationData);
+
+        if (error) throw error;
+
+        if (alsoPush) {
+          const payload: Record<string, unknown> = { title, body: message };
+          if (notificationType === "public") payload.broadcast = true;
+          else if (notificationType === "personal") payload.user_id = selectedUserId;
+          try {
+            await supabase.functions.invoke("send-push", { body: payload });
+          } catch (e) {
+            console.warn("send-push failed", e);
+          }
+        }
+      },
      onSuccess: () => {
        toast.success("Notification sent successfully");
        setIsCreateOpen(false);
@@ -276,7 +289,16 @@
                      value={message}
                      onChange={(e) => setMessage(e.target.value)}
                    />
-                 </div>
+                  </div>
+
+                  <label className="flex items-center gap-2 text-sm">
+                    <Checkbox
+                      checked={alsoPush}
+                      onCheckedChange={(v) => setAlsoPush(v === true)}
+                    />
+                    Also send as push notification
+                  </label>
+
  
                  <Button
                    className="w-full"
