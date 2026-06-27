@@ -137,6 +137,8 @@ const App = () => (
           <AppRoutes />
           <InstallAppPrompt />
           <CookieConsent />
+          <NetworkStatusBanner />
+          <SessionTimeoutWarning />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
