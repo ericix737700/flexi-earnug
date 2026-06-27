@@ -42,7 +42,9 @@
  } from "lucide-react";
  
  type NotificationType = "transaction" | "public" | "personal";
- 
+
+ import { Checkbox } from "@/components/ui/checkbox";
+
  interface Notification {
    id: string;
    user_id: string | null;
