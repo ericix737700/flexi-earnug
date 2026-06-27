@@ -40,10 +40,9 @@
    Loader2,
    Trash2,
  } from "lucide-react";
- 
- type NotificationType = "transaction" | "public" | "personal";
-
  import { Checkbox } from "@/components/ui/checkbox";
+
+ type NotificationType = "transaction" | "public" | "personal";
 
  interface Notification {
    id: string;
