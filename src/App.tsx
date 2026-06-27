@@ -9,6 +9,8 @@ import { LoadingScreen } from "@/components/LoadingScreen";
 import { MaintenanceGate } from "@/components/MaintenanceGate";
 import { CookieConsent } from "@/components/CookieConsent";
 import { InstallAppPrompt } from "@/components/InstallAppPrompt";
+import { NetworkStatusBanner } from "@/components/NetworkStatusBanner";
+import { SessionTimeoutWarning } from "@/components/SessionTimeoutWarning";
 
 // Auth Pages
 import Login from "./pages/auth/Login";
@@ -135,6 +137,8 @@ const App = () => (
           <AppRoutes />
           <InstallAppPrompt />
           <CookieConsent />
+          <NetworkStatusBanner />
+          <SessionTimeoutWarning />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
