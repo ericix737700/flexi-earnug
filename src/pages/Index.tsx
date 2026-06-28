@@ -420,22 +420,8 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border bg-card">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 py-8 md:flex-row md:justify-between">
-          <div className="flex items-center gap-2">
-            <PlatformLogo size="sm" />
-            <span className="font-bold text-foreground">FlexiEarn</span>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} FlexiEarn Uganda. All rights reserved.
-          </p>
-          <div className="flex gap-4 text-sm text-muted-foreground">
-            <Link to="/login" className="hover:text-primary transition-colors">Login</Link>
-            <Link to="/register" className="hover:text-primary transition-colors">Register</Link>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter />
+
     </div>
   );
 };
