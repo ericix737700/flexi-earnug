@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PlatformLogo } from "@/components/PlatformLogo";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { PublicFooter } from "@/components/PublicFooter";
+import { SEO } from "@/components/SEO";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import {
   Smartphone,
@@ -37,6 +39,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO title="FlexiEarn Uganda — Smart Earning & Investments" description="Earn through investments, daily tasks, referrals and gift codes. Paid in UGX via mobile money. Join FlexiEarn Uganda today." path="/" />
       {/* Navigation */}
       <nav className="sticky top-0 z-50 border-b border-border/40 bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
@@ -420,22 +423,8 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border bg-card">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 py-8 md:flex-row md:justify-between">
-          <div className="flex items-center gap-2">
-            <PlatformLogo size="sm" />
-            <span className="font-bold text-foreground">FlexiEarn</span>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} FlexiEarn Uganda. All rights reserved.
-          </p>
-          <div className="flex gap-4 text-sm text-muted-foreground">
-            <Link to="/login" className="hover:text-primary transition-colors">Login</Link>
-            <Link to="/register" className="hover:text-primary transition-colors">Register</Link>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter />
+
     </div>
   );
 };

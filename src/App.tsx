@@ -42,6 +42,10 @@ import NotFound from "./pages/NotFound";
 import Offline from "./pages/Offline";
 import Terms from "./pages/legal/Terms";
 import Privacy from "./pages/legal/Privacy";
+import About from "./pages/public/About";
+import FAQ from "./pages/public/FAQ";
+import Contact from "./pages/public/Contact";
+import Status from "./pages/public/Status";
 
 
 const queryClient = new QueryClient();
@@ -103,6 +107,10 @@ function AppRoutes() {
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/privacy" element={<Privacy />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/faq" element={<FAQ />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/status" element={<Status />} />
       <Route path="/offline" element={<Offline />} />
 
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
