@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PlatformLogo } from "@/components/PlatformLogo";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { PublicFooter } from "@/components/PublicFooter";
+import { SEO } from "@/components/SEO";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import {
   Smartphone,
