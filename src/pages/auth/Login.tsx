@@ -85,11 +85,13 @@ export default function Login() {
               await supabase.from("profiles").update({ status: "suspended" } as any).eq("user_id", dupe.user_id);
             }
             await supabase.auth.signOut();
-          toast.error("Multiple accounts detected on this device. Your accounts have been suspended.");
-          setBlockedStatus({ status: "suspended" });
-          return;
+            toast.error("Multiple accounts detected on this device. Your accounts have been suspended.");
+            setBlockedStatus({ status: "suspended" });
+            return;
+          }
         }
       }
+
 
       setShowLoading(true);
       toast.success("Welcome back!");
