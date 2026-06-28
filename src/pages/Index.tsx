@@ -39,6 +39,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO title="FlexiEarn Uganda — Smart Earning & Investments" description="Earn through investments, daily tasks, referrals and gift codes. Paid in UGX via mobile money. Join FlexiEarn Uganda today." path="/" />
       {/* Navigation */}
       <nav className="sticky top-0 z-50 border-b border-border/40 bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
