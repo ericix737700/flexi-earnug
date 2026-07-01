@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { PlatformLogo } from "@/components/PlatformLogo";
 import { SecurityBadge } from "@/components/SecurityBadge";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { SEO } from "@/components/SEO";
 import { toast } from "sonner";
 import { Loader2, Phone, Lock, User, Users, Mail, Eye, EyeOff } from "lucide-react";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
@@ -98,6 +99,7 @@ export default function Register() {
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/10">
+      <SEO title="Create Account" description="Register on FlexiEarn Uganda in seconds. Start earning through tasks, referrals and gift codes paid via Mobile Money." path="/register" />
       {/* Animated background shapes */}
       <div className="absolute inset-0 gradient-hero opacity-[0.06]" />
       <div className="absolute top-10 -right-24 h-80 w-80 rounded-full bg-primary/25 blur-3xl animate-pulse" />
