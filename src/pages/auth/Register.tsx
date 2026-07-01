@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { PlatformLogo } from "@/components/PlatformLogo";
 import { SecurityBadge } from "@/components/SecurityBadge";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { SEO } from "@/components/SEO";
 import { toast } from "sonner";
 import { Loader2, Phone, Lock, User, Users, Mail, Eye, EyeOff } from "lucide-react";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";

@@ -9,6 +9,7 @@ import { PlatformLogo } from "@/components/PlatformLogo";
 import { SecurityBadge } from "@/components/SecurityBadge";
 import { SupportDialog } from "@/components/user/SupportDialog";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { SEO } from "@/components/SEO";
 import { toast } from "sonner";
 import { Loader2, Phone, Lock, ShieldAlert, Mail, Eye, EyeOff } from "lucide-react";
 

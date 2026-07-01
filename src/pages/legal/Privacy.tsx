@@ -3,6 +3,7 @@ import { ArrowLeft, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { SecurityBadge } from "@/components/SecurityBadge";
+import { SEO } from "@/components/SEO";
 
 export default function Privacy() {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ export default function Privacy() {
 
   return (
     <div className="min-h-screen app-bg">
+      <SEO title="Privacy Policy" description="How FlexiEarn Uganda collects, uses and protects your personal information, phone number, and transaction data." path="/privacy" />
       <header className="sticky top-0 z-40 border-b bg-card/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-2xl items-center gap-3 px-4 py-3">
           <Button variant="ghost" size="icon" onClick={() => navigate(-1)} aria-label="Back">

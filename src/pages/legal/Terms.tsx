@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
+import { SEO } from "@/components/SEO";
 
 export default function Terms() {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ export default function Terms() {
 
   return (
     <div className="min-h-screen app-bg">
+      <SEO title="Terms & Conditions" description="Read the FlexiEarn Uganda terms of service governing use of the platform, tasks, payouts and referrals." path="/terms" />
       <header className="sticky top-0 z-40 border-b bg-card/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-2xl items-center gap-3 px-4 py-3">
           <Button variant="ghost" size="icon" onClick={() => navigate(-1)} aria-label="Back">
