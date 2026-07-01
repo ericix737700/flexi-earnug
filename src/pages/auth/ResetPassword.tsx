@@ -9,6 +9,7 @@ import { SecurityBadge } from "@/components/SecurityBadge";
 import { PasswordStrength, evaluatePassword } from "@/components/PasswordStrength";
 import { toast } from "sonner";
 import { Loader2, Lock, Eye, EyeOff } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 export default function ResetPassword() {
   const navigate = useNavigate();

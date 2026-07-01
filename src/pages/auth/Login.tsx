@@ -138,6 +138,7 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-secondary/10 via-background to-primary/5">
+      <SEO title="Log In" description="Sign in to your FlexiEarn Uganda account to check earnings, complete tasks and withdraw to Mobile Money." path="/login" />
       {/* Animated background blobs */}
       <div className="absolute inset-0 gradient-hero opacity-[0.06]" />
       <div className="absolute top-20 -left-24 h-72 w-72 rounded-full bg-primary/25 blur-3xl animate-pulse" />

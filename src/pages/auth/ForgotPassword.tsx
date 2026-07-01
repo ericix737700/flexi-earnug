@@ -8,6 +8,7 @@ import { PlatformLogo } from "@/components/PlatformLogo";
 import { SecurityBadge } from "@/components/SecurityBadge";
 import { toast } from "sonner";
 import { Loader2, Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
