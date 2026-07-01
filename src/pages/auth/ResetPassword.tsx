@@ -61,6 +61,7 @@ export default function ResetPassword() {
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/10">
+      <SEO title="Reset Password" description="Set a new password for your FlexiEarn Uganda account." path="/reset-password" />
       <div className="absolute top-10 -right-24 h-80 w-80 rounded-full bg-primary/25 blur-3xl animate-pulse" />
       <div className="absolute bottom-10 -left-24 h-80 w-80 rounded-full bg-secondary/30 blur-3xl animate-pulse [animation-delay:1.5s]" />
 

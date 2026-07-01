@@ -7,7 +7,8 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { MessageCircle, Send, ExternalLink, Bot } from "lucide-react";
+import { MessageCircle, Send, ExternalLink, Bot, Activity } from "lucide-react";
+import { Link } from "react-router-dom";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { ChatBot } from "./ChatBot";
 import { toast } from "sonner";
@@ -100,6 +101,22 @@ export function SupportDialog({ open, onOpenChange }: SupportDialogProps) {
               </div>
               <ExternalLink className="h-4 w-4 text-muted-foreground" />
             </button>
+
+            {/* System Status */}
+            <Link
+              to="/status"
+              onClick={() => onOpenChange(false)}
+              className="flex w-full items-center gap-4 rounded-xl border-2 border-border p-4 transition-all hover:border-primary hover:bg-primary/5 active:scale-[0.98]"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/15">
+                <Activity className="h-6 w-6 text-primary" />
+              </div>
+              <div className="flex-1 text-left">
+                <p className="font-semibold">System Status</p>
+                <p className="text-sm text-muted-foreground">Check if there's an outage</p>
+              </div>
+              <ExternalLink className="h-4 w-4 text-muted-foreground" />
+            </Link>
           </div>
         </DialogContent>
       </Dialog>
