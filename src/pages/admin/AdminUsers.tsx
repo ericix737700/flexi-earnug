@@ -342,7 +342,7 @@ export default function AdminUsers() {
               <SheetTitle className="flex items-center gap-2">
                 <div className={`h-3 w-3 rounded-full ${isOnline(detailUser?.last_seen) ? 'bg-green-500' : 'bg-muted-foreground/30'}`} />
                 <span>{detailUser?.full_name || detailUser?.phone}</span>
-                {detailUser?.is_verified && <VerifiedBadge size="sm" />}
+                {detailUser?.is_verified && <VerifiedBadge size="sm" label="Verified by FlexiEarn — trusted account" />}
               </SheetTitle>
             </SheetHeader>
             {detailUser && (
