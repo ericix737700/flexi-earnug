@@ -298,7 +298,7 @@ export default function AdminUsers() {
                         <div className="flex items-center gap-2">
                           <div className={`h-2 w-2 rounded-full ${isOnline(profile.last_seen) ? 'bg-green-500' : 'bg-muted-foreground/30'}`} />
                           <span className="truncate">{profile.full_name || "N/A"}</span>
-                          {profile.is_verified && <VerifiedBadge size="xs" />}
+                          {profile.is_verified && <VerifiedBadge size="xs" label="Verified by FlexiEarn — trusted account" />}
                         </div>
                       </TableCell>
                       <TableCell>{profile.phone}</TableCell>
@@ -342,7 +342,7 @@ export default function AdminUsers() {
               <SheetTitle className="flex items-center gap-2">
                 <div className={`h-3 w-3 rounded-full ${isOnline(detailUser?.last_seen) ? 'bg-green-500' : 'bg-muted-foreground/30'}`} />
                 <span>{detailUser?.full_name || detailUser?.phone}</span>
-                {detailUser?.is_verified && <VerifiedBadge size="sm" />}
+                {detailUser?.is_verified && <VerifiedBadge size="sm" label="Verified by FlexiEarn — trusted account" />}
               </SheetTitle>
             </SheetHeader>
             {detailUser && (

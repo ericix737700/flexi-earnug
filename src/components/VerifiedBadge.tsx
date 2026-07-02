@@ -20,12 +20,13 @@ interface VerifiedBadgeProps {
  * Blue verified tick, similar to social platforms.
  * Awarded by admins to trusted / verified accounts.
  */
-export function VerifiedBadge({ size = "sm", className, label = "Verified account" }: VerifiedBadgeProps) {
+export function VerifiedBadge({ size = "sm", className, label }: VerifiedBadgeProps) {
+  const resolvedLabel = label ?? "Verified by FlexiEarn — trusted account";
   return (
     <span
       role="img"
-      aria-label={label}
-      title={label}
+      aria-label={resolvedLabel}
+      title={resolvedLabel}
       className={cn("inline-flex items-center justify-center text-[hsl(210_100%_50%)]", className)}
     >
       <BadgeCheck className={cn(sizeMap[size], "fill-[hsl(210_100%_50%)] text-white")} strokeWidth={2.5} />

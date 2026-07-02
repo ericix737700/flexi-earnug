@@ -118,7 +118,7 @@ export default function Profile() {
           <div className="min-w-0 flex-1">
             <p className="truncate text-base font-semibold flex items-center gap-1">
               <span className="truncate">{profile?.full_name || "User"}</span>
-              {profile?.is_verified && <VerifiedBadge size="sm" />}
+              {profile?.is_verified && <VerifiedBadge size="sm" label="Verified by FlexiEarn — this is a trusted account" />}
             </p>
             <p className="truncate text-xs text-muted-foreground">{profile?.email || profile?.phone}</p>
             <Badge className={`mt-1.5 border text-[10px] ${getStatusColor(profile?.status || "pending")}`} variant="outline">
