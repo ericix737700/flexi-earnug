@@ -161,6 +161,20 @@ export default function AdminUsers() {
     onError: () => { toast.error("Failed to update user status"); },
   });
 
+  const toggleVerifiedMutation = useMutation({
+    mutationFn: async ({ userId, verified }: { userId: string; verified: boolean }) => {
+      const { error } = await supabase.from("profiles").update({ is_verified: verified } as any).eq("user_id", userId);
+      if (error) throw error;
+      return verified;
+    },
+    onSuccess: (verified) => {
+      toast.success(verified ? "User verified" : "Verification removed");
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      if (detailUser) setDetailUser({ ...detailUser, is_verified: verified });
+    },
+    onError: () => { toast.error("Failed to update verification"); },
+  });
+
   const activateAccountMutation = useMutation({
     mutationFn: async (userId: string) => {
       const { error } = await supabase
@@ -283,7 +297,8 @@ export default function AdminUsers() {
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
                           <div className={`h-2 w-2 rounded-full ${isOnline(profile.last_seen) ? 'bg-green-500' : 'bg-muted-foreground/30'}`} />
-                          {profile.full_name || "N/A"}
+                          <span className="truncate">{profile.full_name || "N/A"}</span>
+                          {profile.is_verified && <VerifiedBadge size="xs" />}
                         </div>
                       </TableCell>
                       <TableCell>{profile.phone}</TableCell>
