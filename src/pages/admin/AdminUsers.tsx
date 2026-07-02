@@ -25,8 +25,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   Search, MoreVertical, Plus, Minus, UserX, UserCheck, Trash2, Loader2,
-  Ban, AlertTriangle, Eye, Users, ListTodo, Wallet, Clock, Mail, Key, EyeOff,
+  Ban, AlertTriangle, Eye, Users, ListTodo, Wallet, Clock, Mail, Key, EyeOff, BadgeCheck,
 } from "lucide-react";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
@@ -53,6 +54,7 @@ interface Profile {
   last_seen?: string | null;
   device_fingerprint?: string | null;
   restrictions?: { no_transactions?: boolean; no_tasks?: boolean };
+  is_verified?: boolean;
 }
 
 export default function AdminUsers() {
