@@ -25,8 +25,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   Search, MoreVertical, Plus, Minus, UserX, UserCheck, Trash2, Loader2,
-  Ban, AlertTriangle, Eye, Users, ListTodo, Wallet, Clock, Mail, Key, EyeOff,
+  Ban, AlertTriangle, Eye, Users, ListTodo, Wallet, Clock, Mail, Key, EyeOff, BadgeCheck,
 } from "lucide-react";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
@@ -53,6 +54,7 @@ interface Profile {
   last_seen?: string | null;
   device_fingerprint?: string | null;
   restrictions?: { no_transactions?: boolean; no_tasks?: boolean };
+  is_verified?: boolean;
 }
 
 export default function AdminUsers() {
@@ -157,6 +159,20 @@ export default function AdminUsers() {
     },
     onSuccess: () => { toast.success("User status updated"); queryClient.invalidateQueries({ queryKey: ["admin-users"] }); },
     onError: () => { toast.error("Failed to update user status"); },
+  });
+
+  const toggleVerifiedMutation = useMutation({
+    mutationFn: async ({ userId, verified }: { userId: string; verified: boolean }) => {
+      const { error } = await supabase.from("profiles").update({ is_verified: verified } as any).eq("user_id", userId);
+      if (error) throw error;
+      return verified;
+    },
+    onSuccess: (verified) => {
+      toast.success(verified ? "User verified" : "Verification removed");
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      if (detailUser) setDetailUser({ ...detailUser, is_verified: verified });
+    },
+    onError: () => { toast.error("Failed to update verification"); },
   });
 
   const activateAccountMutation = useMutation({
@@ -281,7 +297,8 @@ export default function AdminUsers() {
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
                           <div className={`h-2 w-2 rounded-full ${isOnline(profile.last_seen) ? 'bg-green-500' : 'bg-muted-foreground/30'}`} />
-                          {profile.full_name || "N/A"}
+                          <span className="truncate">{profile.full_name || "N/A"}</span>
+                          {profile.is_verified && <VerifiedBadge size="xs" />}
                         </div>
                       </TableCell>
                       <TableCell>{profile.phone}</TableCell>
@@ -295,6 +312,10 @@ export default function AdminUsers() {
                             <DropdownMenuItem onClick={() => { setDetailUser(profile); loadAuthEmail(profile.user_id); }}><Eye className="mr-2 h-4 w-4" />View Details</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => { setSelectedUser(profile); setAdjustType("add"); setIsAdjustOpen(true); }}><Plus className="mr-2 h-4 w-4" />Top Up</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => { setSelectedUser(profile); setAdjustType("deduct"); setIsAdjustOpen(true); }}><Minus className="mr-2 h-4 w-4" />Deduct</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => toggleVerifiedMutation.mutate({ userId: profile.user_id, verified: !profile.is_verified })}>
+                              <BadgeCheck className="mr-2 h-4 w-4 text-[hsl(210_100%_50%)]" />
+                              {profile.is_verified ? "Remove Verification" : "Verify User"}
+                            </DropdownMenuItem>
                             {profile.status === "active" ? (
                               <DropdownMenuItem onClick={() => updateStatusMutation.mutate({ userId: profile.user_id, status: "suspended" })}><UserX className="mr-2 h-4 w-4" />Suspend</DropdownMenuItem>
                             ) : (
@@ -320,7 +341,8 @@ export default function AdminUsers() {
             <SheetHeader>
               <SheetTitle className="flex items-center gap-2">
                 <div className={`h-3 w-3 rounded-full ${isOnline(detailUser?.last_seen) ? 'bg-green-500' : 'bg-muted-foreground/30'}`} />
-                {detailUser?.full_name || detailUser?.phone}
+                <span>{detailUser?.full_name || detailUser?.phone}</span>
+                {detailUser?.is_verified && <VerifiedBadge size="sm" />}
               </SheetTitle>
             </SheetHeader>
             {detailUser && (
