@@ -25,6 +25,7 @@ interface Profile {
   updated_at: string;
   device_fingerprint?: string | null;
   restrictions?: Restrictions;
+  is_verified?: boolean;
 }
 
 interface AuthContextType {
