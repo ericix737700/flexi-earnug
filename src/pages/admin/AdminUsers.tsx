@@ -312,6 +312,10 @@ export default function AdminUsers() {
                             <DropdownMenuItem onClick={() => { setDetailUser(profile); loadAuthEmail(profile.user_id); }}><Eye className="mr-2 h-4 w-4" />View Details</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => { setSelectedUser(profile); setAdjustType("add"); setIsAdjustOpen(true); }}><Plus className="mr-2 h-4 w-4" />Top Up</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => { setSelectedUser(profile); setAdjustType("deduct"); setIsAdjustOpen(true); }}><Minus className="mr-2 h-4 w-4" />Deduct</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => toggleVerifiedMutation.mutate({ userId: profile.user_id, verified: !profile.is_verified })}>
+                              <BadgeCheck className="mr-2 h-4 w-4 text-[hsl(210_100%_50%)]" />
+                              {profile.is_verified ? "Remove Verification" : "Verify User"}
+                            </DropdownMenuItem>
                             {profile.status === "active" ? (
                               <DropdownMenuItem onClick={() => updateStatusMutation.mutate({ userId: profile.user_id, status: "suspended" })}><UserX className="mr-2 h-4 w-4" />Suspend</DropdownMenuItem>
                             ) : (
