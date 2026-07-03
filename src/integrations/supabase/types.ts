@@ -121,6 +121,48 @@ export type Database = {
         }
         Relationships: []
       }
+      login_audit: {
+        Row: {
+          city: string | null
+          country: string | null
+          created_at: string
+          device_fingerprint: string | null
+          event_type: string
+          id: string
+          ip_address: string | null
+          isp: string | null
+          region: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          device_fingerprint?: string | null
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          isp?: string | null
+          region?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          device_fingerprint?: string | null
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          isp?: string | null
+          region?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
@@ -187,6 +229,7 @@ export type Database = {
           is_verified: boolean
           last_checkin_date: string | null
           last_seen: string | null
+          network_provider: string | null
           phone: string
           referral_code: string
           referred_by: string | null
@@ -207,6 +250,7 @@ export type Database = {
           is_verified?: boolean
           last_checkin_date?: string | null
           last_seen?: string | null
+          network_provider?: string | null
           phone: string
           referral_code?: string
           referred_by?: string | null
@@ -227,6 +271,7 @@ export type Database = {
           is_verified?: boolean
           last_checkin_date?: string | null
           last_seen?: string | null
+          network_provider?: string | null
           phone?: string
           referral_code?: string
           referred_by?: string | null
