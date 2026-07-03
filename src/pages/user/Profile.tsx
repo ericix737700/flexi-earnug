@@ -24,6 +24,7 @@ import { EmailPrompt } from "@/components/user/EmailPrompt";
 import { EditProfileDialog } from "@/components/user/EditProfileDialog";
 import { useTheme, type Theme } from "@/hooks/useTheme";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { NetworkBadge } from "@/components/NetworkBadge";
 
 
 type RowProps = {
@@ -116,15 +117,22 @@ export default function Profile() {
         <div className="flex items-center gap-3 rounded-2xl border bg-card p-4">
           <PlatformLogo size="lg" className="ring-2 ring-primary/20" />
           <div className="min-w-0 flex-1">
-            <p className="truncate text-base font-semibold flex items-center gap-1">
+            <p className="truncate text-base font-semibold flex items-center gap-1.5">
               <span className="truncate">{profile?.full_name || "User"}</span>
-              {profile?.is_verified && <VerifiedBadge size="sm" label="Verified by FlexiEarn — this is a trusted account" />}
+              {profile?.is_verified && <VerifiedBadge size="md" label="Verified by FlexiEarn — this is a trusted account" />}
             </p>
             <p className="truncate text-xs text-muted-foreground">{profile?.email || profile?.phone}</p>
-            <Badge className={`mt-1.5 border text-[10px] ${getStatusColor(profile?.status || "pending")}`} variant="outline">
-              {profile?.status?.toUpperCase()}
-            </Badge>
+            <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+              <Badge className={`border text-[10px] ${getStatusColor(profile?.status || "pending")}`} variant="outline">
+                {profile?.status?.toUpperCase()}
+              </Badge>
+              <NetworkBadge phone={profile?.phone} override={(profile as any)?.network_provider} size="sm" />
+            </div>
           </div>
+          <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => setEditOpen(true)} aria-label="Edit profile">
+            <Pencil className="h-4 w-4" />
+          </Button>
+        </div>
           <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => setEditOpen(true)} aria-label="Edit profile">
             <Pencil className="h-4 w-4" />
           </Button>
