@@ -133,10 +133,8 @@ export default function Profile() {
             <Pencil className="h-4 w-4" />
           </Button>
         </div>
-          <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => setEditOpen(true)} aria-label="Edit profile">
-            <Pencil className="h-4 w-4" />
-          </Button>
-        </div>
+
+
 
         {/* Balance + quick actions */}
         <div className="rounded-2xl border bg-card p-4">
