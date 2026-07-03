@@ -105,6 +105,34 @@ export default function AdminSettings() {
         {/* System Controls (Maintenance / Emergency / Kill Switches / Withdrawal Mode) */}
         <SystemControlsCard settings={settings} onSave={handleSave} />
 
+        {/* Status Page Override */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Zap className="h-5 w-5 text-primary" />
+              Status Page Override
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Controls what /status shows. "Auto" uses real-time health + system controls. Use overrides to announce planned work.
+            </p>
+            <Select
+              value={settings?.status_override || "auto"}
+              onValueChange={(v) => handleSave("status_override", v)}
+            >
+              <SelectTrigger className="w-full md:w-72"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="auto">Auto (real health)</SelectItem>
+                <SelectItem value="operational">Force Operational (all green)</SelectItem>
+                <SelectItem value="degraded">Force Degraded (yellow)</SelectItem>
+                <SelectItem value="down">Force Outage (red)</SelectItem>
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
+
+
         {/* Logo Upload */}
         <LogoUploadCard settings={settings} onSave={handleSave} />
 

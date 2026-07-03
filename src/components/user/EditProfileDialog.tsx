@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { detectNetwork, NETWORK_LABEL, type NetworkProvider } from "@/lib/network";
 
 interface Props {
   open: boolean;
@@ -18,6 +19,7 @@ export function EditProfileDialog({ open, onOpenChange }: Props) {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     full_name: "", phone: "", email: "", password: "", confirmPassword: "",
+    network_provider: "" as "" | NetworkProvider,
   });
 
   useEffect(() => {
@@ -28,9 +30,12 @@ export function EditProfileDialog({ open, onOpenChange }: Props) {
         email: profile.email || "",
         password: "",
         confirmPassword: "",
+        network_provider: (profile.network_provider as NetworkProvider) || "",
       });
     }
   }, [open, profile]);
+
+  const autoNetwork = detectNetwork(form.phone);
 
   const handleSave = async () => {
     if (form.password && form.password !== form.confirmPassword) {
@@ -48,15 +53,25 @@ export function EditProfileDialog({ open, onOpenChange }: Props) {
       if (form.email !== (profile?.email || "")) payload.email = form.email;
       if (form.password) payload.password = form.password;
 
-      if (Object.keys(payload).length === 0) {
+      const desiredNetwork = form.network_provider || null;
+      const currentNetwork = profile?.network_provider || null;
+      const networkChanged = desiredNetwork !== currentNetwork;
+
+      if (Object.keys(payload).length === 0 && !networkChanged) {
         toast.info("Nothing to update");
         setLoading(false);
         return;
       }
 
-      const { data, error } = await supabase.functions.invoke("update-account", { body: payload });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
+      if (Object.keys(payload).length > 0) {
+        const { data, error } = await supabase.functions.invoke("update-account", { body: payload });
+        if (error) throw error;
+        if (data?.error) throw new Error(data.error);
+      }
+
+      if (networkChanged && profile?.user_id) {
+        await supabase.from("profiles").update({ network_provider: desiredNetwork } as any).eq("user_id", profile.user_id);
+      }
 
       toast.success("Profile updated successfully");
       if (refreshProfile) await refreshProfile();
@@ -99,6 +114,28 @@ export function EditProfileDialog({ open, onOpenChange }: Props) {
               <Input type="password" value={form.confirmPassword} onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })} />
             </div>
           )}
+          <div className="space-y-1.5">
+            <Label>Mobile Network</Label>
+            <div className="flex flex-wrap gap-2">
+              {(["", "mtn", "airtel", "utl", "lycamobile"] as const).map((opt) => {
+                const active = form.network_provider === opt;
+                const label = opt === "" ? `Auto (${NETWORK_LABEL[autoNetwork]})` : NETWORK_LABEL[opt];
+                return (
+                  <button
+                    key={opt || "auto"}
+                    type="button"
+                    onClick={() => setForm({ ...form, network_provider: opt })}
+                    className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                      active ? "border-primary bg-primary/10 text-primary" : "border-border bg-card hover:bg-muted"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-xs text-muted-foreground">Auto-detected from your phone number. Choose to override.</p>
+          </div>
           <Button className="w-full gradient-primary border-0 text-primary-foreground" onClick={handleSave} disabled={loading}>
             {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</> : "Save Changes"}
           </Button>

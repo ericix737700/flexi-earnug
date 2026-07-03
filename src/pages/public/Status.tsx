@@ -33,26 +33,33 @@ export default function Status() {
     (async () => {
       try {
         const start = Date.now();
-        const { error } = await supabase.from("platform_settings").select("key").limit(1);
+        const timeout = new Promise<{ error: any }>((resolve) =>
+          setTimeout(() => resolve({ error: { message: "timeout" } }), 5000),
+        );
+        const query = supabase.from("platform_settings").select("setting_key").limit(1);
+        const { error } = (await Promise.race([query, timeout])) as any;
         const ms = Date.now() - start;
-        if (error) setDbHealth("down");
-        else if (ms > 2000) setDbHealth("degraded");
+        if (error) setDbHealth("degraded");
+        else if (ms > 2500) setDbHealth("degraded");
         else setDbHealth("operational");
       } catch {
-        setDbHealth("down");
+        setDbHealth("degraded");
       }
     })();
   }, []);
 
+  // Admin override — auto | operational | degraded | down
+  const override = (settings?.status_override || "auto") as "auto" | Health;
   const maintenance = settings?.maintenance_mode === "true";
   const emergency = settings?.emergency_mode === "true";
   const txKill = settings?.kill_transactions === "true";
   const tasksKill = settings?.kill_tasks === "true";
+  const forceState: Health | null = override !== "auto" ? (override as Health) : null;
 
-  const apiState: Health = emergency ? "down" : maintenance ? "degraded" : "operational";
-  const txState: Health = emergency || txKill ? "down" : maintenance ? "degraded" : "operational";
-  const tasksState: Health = emergency || tasksKill ? "down" : "operational";
-  const dbState: Health = dbHealth === "loading" ? "operational" : dbHealth;
+  const apiState: Health = forceState ?? (emergency ? "down" : maintenance ? "degraded" : "operational");
+  const txState: Health = forceState ?? (emergency || txKill ? "down" : maintenance ? "degraded" : "operational");
+  const tasksState: Health = forceState ?? (emergency || tasksKill ? "down" : "operational");
+  const dbState: Health = forceState ?? (dbHealth === "loading" ? "operational" : dbHealth);
 
   const overall: Health = [apiState, txState, tasksState, dbState].includes("down")
     ? "down"

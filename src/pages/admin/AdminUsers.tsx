@@ -28,6 +28,8 @@ import {
   Ban, AlertTriangle, Eye, Users, ListTodo, Wallet, Clock, Mail, Key, EyeOff, BadgeCheck,
 } from "lucide-react";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { UserLoginHistory } from "@/components/admin/UserLoginHistory";
+import { NetworkBadge } from "@/components/NetworkBadge";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
@@ -395,13 +397,21 @@ export default function AdminUsers() {
                 <Separator />
 
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between"><span className="text-muted-foreground">Phone</span><span>{detailUser.phone}</span></div>
+                  <div className="flex justify-between items-center"><span className="text-muted-foreground">Phone</span><span className="flex items-center gap-2">{detailUser.phone}<NetworkBadge phone={detailUser.phone} override={(detailUser as any)?.network_provider} /></span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Referral Code</span><span className="font-mono">{detailUser.referral_code}</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Registration</span><span>{detailUser.registration_paid ? "Paid" : "Unpaid"}</span></div>
                   {detailUser.device_fingerprint && (
                     <div className="flex justify-between"><span className="text-muted-foreground">Device ID</span><span className="font-mono text-xs">{detailUser.device_fingerprint}</span></div>
                   )}
                 </div>
+
+                <Separator />
+
+                <div className="space-y-3">
+                  <h3 className="font-semibold flex items-center gap-2"><Eye className="h-4 w-4" /> Login History (IP & Location)</h3>
+                  <UserLoginHistory userId={detailUser.user_id} />
+                </div>
+
 
                 <Separator />
 
