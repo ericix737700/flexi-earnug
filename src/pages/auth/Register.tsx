@@ -73,20 +73,20 @@ export default function Register() {
 
       if (error) { toast.error(error.message.includes("already registered") ? "This phone number is already registered" : error.message); return; }
       if (data.user) {
-        const updates: any = {};
+        // Fire off profile update + audit in background — don't block navigation.
+        const fp = generateFingerprint();
+        const updates: any = { device_fingerprint: fp };
         if (referrerId) updates.referred_by = referrerId;
         if (trimmedEmail) updates.email = trimmedEmail;
-        if (Object.keys(updates).length) {
-          await supabase.from("profiles").update(updates).eq("user_id", data.user.id);
-        }
-        // Store device fingerprint
-        const fp = generateFingerprint();
-        await supabase.from("profiles").update({ device_fingerprint: fp } as any).eq("user_id", data.user.id);
+        void supabase.from("profiles").update(updates).eq("user_id", data.user.id);
+        void supabase.functions.invoke("record-login-audit", {
+          body: { event_type: "signup", device_fingerprint: fp },
+        });
       }
 
       toast.success("Registration successful! Welcome to FlexiEarn.");
       setShowLoading(true);
-      setTimeout(() => navigate("/dashboard"), 1500);
+      setTimeout(() => navigate("/dashboard"), 800);
     } catch { toast.error("An error occurred. Please try again."); }
     finally { setIsLoading(false); }
   };

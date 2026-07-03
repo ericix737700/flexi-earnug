@@ -2,6 +2,7 @@ import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { MarzPayBalanceCard } from "@/components/admin/MarzPayBalanceCard";
 import {
   Users, Wallet, TrendingUp, Clock, DollarSign, UserPlus,
 } from "lucide-react";
@@ -83,6 +84,10 @@ export default function AdminDashboard() {
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground">Overview of your FlexiEarn platform</p>
         </div>
+
+        <MarzPayBalanceCard />
+
+
 
         <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {stats.map((stat) => (

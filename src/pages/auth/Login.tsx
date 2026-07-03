@@ -45,13 +45,11 @@ export default function Login() {
       }
 
       if (authData.user) {
-        // Generate and store device fingerprint
-        const fp = generateFingerprint();
-        const { data: profile } = await supabase.from("profiles").select("status, device_fingerprint").eq("user_id", authData.user.id).single();
-
-        // Check admin role — admins bypass all status/fingerprint checks
-        const { data: adminRole } = await supabase
-          .from("user_roles").select("role").eq("user_id", authData.user.id).eq("role", "admin").maybeSingle();
+        // Fast blocking check: only fetch status + admin role in parallel.
+        const [{ data: profile }, { data: adminRole }] = await Promise.all([
+          supabase.from("profiles").select("status").eq("user_id", authData.user.id).single(),
+          supabase.from("user_roles").select("role").eq("user_id", authData.user.id).eq("role", "admin").maybeSingle(),
+        ]);
         const isAdminUser = !!adminRole;
 
         if (!isAdminUser && profile && (profile.status === "blocked" || profile.status === "suspended")) {
@@ -60,47 +58,50 @@ export default function Login() {
           return;
         }
 
-        // Store fingerprint
-        await supabase.from("profiles").update({ device_fingerprint: fp } as any).eq("user_id", authData.user.id);
-
-        if (!isAdminUser) {
-          // Check for duplicate fingerprint (multi-account detection) — skip admins
-          const { data: dupes } = await supabase
-            .from("profiles")
-            .select("user_id")
-            .eq("device_fingerprint", fp)
-            .neq("user_id", authData.user.id)
-            .in("status", ["active", "pending"]);
-
-          // Filter out admins from dupes so they can't be suspended
-          const nonAdminDupes: { user_id: string }[] = [];
-          for (const d of dupes ?? []) {
-            const { data: r } = await supabase
-              .from("user_roles").select("role").eq("user_id", d.user_id).eq("role", "admin").maybeSingle();
-            if (!r) nonAdminDupes.push(d);
-          }
-
-          if (nonAdminDupes.length > 0) {
-            await supabase.from("profiles").update({ status: "suspended" } as any).eq("user_id", authData.user.id);
-            for (const dupe of nonAdminDupes) {
-              await supabase.from("profiles").update({ status: "suspended" } as any).eq("user_id", dupe.user_id);
-            }
-            await supabase.auth.signOut();
-            toast.error("Multiple accounts detected on this device. Your accounts have been suspended.");
-            setBlockedStatus({ status: "suspended" });
-            return;
-          }
-        }
+        // BACKGROUND (non-blocking): fingerprint, dupe check, audit log.
+        const fp = generateFingerprint();
+        void runBackgroundSecurity(authData.user.id, fp, isAdminUser);
       }
-
 
       setShowLoading(true);
       toast.success("Welcome back!");
-      setTimeout(() => navigate("/dashboard"), 1500);
+      setTimeout(() => navigate("/dashboard"), 800);
     } catch {
       toast.error("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const runBackgroundSecurity = async (userId: string, fp: string, isAdminUser: boolean) => {
+    try {
+      const auditPromise = supabase.functions.invoke("record-login-audit", {
+        body: { event_type: "login", device_fingerprint: fp },
+      });
+      await supabase.from("profiles").update({ device_fingerprint: fp } as any).eq("user_id", userId);
+      await auditPromise;
+
+      if (!isAdminUser) {
+        const { data: dupes } = await supabase
+          .from("profiles").select("user_id").eq("device_fingerprint", fp)
+          .neq("user_id", userId).in("status", ["active", "pending"]);
+        const nonAdminDupes: { user_id: string }[] = [];
+        for (const d of dupes ?? []) {
+          const { data: r } = await supabase
+            .from("user_roles").select("role").eq("user_id", d.user_id).eq("role", "admin").maybeSingle();
+          if (!r) nonAdminDupes.push(d);
+        }
+        if (nonAdminDupes.length > 0) {
+          await supabase.from("profiles").update({ status: "suspended" } as any).eq("user_id", userId);
+          for (const dupe of nonAdminDupes) {
+            await supabase.from("profiles").update({ status: "suspended" } as any).eq("user_id", dupe.user_id);
+          }
+          await supabase.auth.signOut();
+          window.location.href = "/login";
+        }
+      }
+    } catch (e) {
+      console.error("Background security check failed:", e);
     }
   };
 
