@@ -14,6 +14,249 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievement_claims: {
+        Row: {
+          achievement_id: string
+          claimed_at: string
+          id: string
+          reward_amount: number
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          claimed_at?: string
+          id?: string
+          reward_amount: number
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          claimed_at?: string
+          id?: string
+          reward_amount?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "achievement_claims_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      achievements: {
+        Row: {
+          achievement_type: Database["public"]["Enums"]["achievement_type"]
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean
+          key: string
+          reward_amount: number
+          sort_order: number
+          threshold: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          achievement_type: Database["public"]["Enums"]["achievement_type"]
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          key: string
+          reward_amount?: number
+          sort_order?: number
+          threshold?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          achievement_type?: Database["public"]["Enums"]["achievement_type"]
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          key?: string
+          reward_amount?: number
+          sort_order?: number
+          threshold?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ad_events: {
+        Row: {
+          ad_id: string
+          created_at: string
+          event_type: string
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          ad_id: string
+          created_at?: string
+          event_type: string
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          ad_id?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_events_ad_id_fkey"
+            columns: ["ad_id"]
+            isOneToOne: false
+            referencedRelation: "ads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_packages: {
+        Row: {
+          created_at: string
+          days: number
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          price: number
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          days: number
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          price: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          days?: number
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          price?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ads: {
+        Row: {
+          ad_type: Database["public"]["Enums"]["ad_type"]
+          click_count: number
+          cost: number
+          created_at: string
+          cta_text: string | null
+          days: number
+          description: string | null
+          end_date: string | null
+          id: string
+          impression_count: number
+          media_type: string | null
+          media_url: string | null
+          package_id: string | null
+          paid: boolean
+          payment_method:
+            | Database["public"]["Enums"]["ad_payment_method"]
+            | null
+          placement: Database["public"]["Enums"]["ad_placement"]
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          start_date: string | null
+          status: Database["public"]["Enums"]["ad_status"]
+          target_url: string | null
+          title: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          ad_type?: Database["public"]["Enums"]["ad_type"]
+          click_count?: number
+          cost?: number
+          created_at?: string
+          cta_text?: string | null
+          days: number
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          impression_count?: number
+          media_type?: string | null
+          media_url?: string | null
+          package_id?: string | null
+          paid?: boolean
+          payment_method?:
+            | Database["public"]["Enums"]["ad_payment_method"]
+            | null
+          placement?: Database["public"]["Enums"]["ad_placement"]
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["ad_status"]
+          target_url?: string | null
+          title: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          ad_type?: Database["public"]["Enums"]["ad_type"]
+          click_count?: number
+          cost?: number
+          created_at?: string
+          cta_text?: string | null
+          days?: number
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          impression_count?: number
+          media_type?: string | null
+          media_url?: string | null
+          package_id?: string | null
+          paid?: boolean
+          payment_method?:
+            | Database["public"]["Enums"]["ad_payment_method"]
+            | null
+          placement?: Database["public"]["Enums"]["ad_placement"]
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["ad_status"]
+          target_url?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ads_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "ad_packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deposits: {
         Row: {
           amount: number
@@ -485,6 +728,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_achievement: { Args: { _achievement_id: string }; Returns: Json }
       find_referrer_by_code: { Args: { _code: string }; Returns: string }
       get_own_profile_id: { Args: never; Returns: string }
       has_role: {
@@ -497,6 +741,31 @@ export type Database = {
       redeem_gift_code: { Args: { _code: string }; Returns: Json }
     }
     Enums: {
+      achievement_type:
+        | "first_task"
+        | "tasks_count"
+        | "login_streak"
+        | "referrals"
+        | "custom"
+      ad_payment_method: "balance" | "mobile_money" | "admin"
+      ad_placement: "dashboard" | "tasks" | "popup" | "ads_page" | "all"
+      ad_status:
+        | "draft"
+        | "pending_payment"
+        | "pending_review"
+        | "approved"
+        | "rejected"
+        | "active"
+        | "paused"
+        | "expired"
+      ad_type:
+        | "banner"
+        | "popup"
+        | "inline"
+        | "video"
+        | "native"
+        | "sponsored"
+        | "notification"
       app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
@@ -625,6 +894,34 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      achievement_type: [
+        "first_task",
+        "tasks_count",
+        "login_streak",
+        "referrals",
+        "custom",
+      ],
+      ad_payment_method: ["balance", "mobile_money", "admin"],
+      ad_placement: ["dashboard", "tasks", "popup", "ads_page", "all"],
+      ad_status: [
+        "draft",
+        "pending_payment",
+        "pending_review",
+        "approved",
+        "rejected",
+        "active",
+        "paused",
+        "expired",
+      ],
+      ad_type: [
+        "banner",
+        "popup",
+        "inline",
+        "video",
+        "native",
+        "sponsored",
+        "notification",
+      ],
       app_role: ["admin", "moderator", "user"],
     },
   },
