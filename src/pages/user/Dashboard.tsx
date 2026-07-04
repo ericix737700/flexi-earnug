@@ -14,7 +14,13 @@ import {
   Gift,
   HelpCircle,
   Sparkles,
+  Trophy,
+  Megaphone,
 } from "lucide-react";
+import { AdBanner } from "@/components/user/AdBanner";
+import { AdPopup } from "@/components/user/AdPopup";
+import { AchievementsSection } from "@/components/user/AchievementsSection";
+import { Link } from "react-router-dom";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -101,6 +107,8 @@ export default function Dashboard() {
     { title: "Watch Videos", icon: Play, gradient: "from-blue-500/15 to-blue-600/5", iconColor: "text-blue-600 bg-blue-500/15", description: "Earn by watching ads", href: "/tasks?type=video" },
     { title: "Surveys", icon: ClipboardList, gradient: "from-purple-500/15 to-purple-600/5", iconColor: "text-purple-600 bg-purple-500/15", description: "Complete quick surveys", href: "/tasks?type=survey" },
     { title: "Trivia", icon: HelpCircle, gradient: "from-secondary/15 to-secondary/5", iconColor: "text-secondary bg-secondary/15", description: "Answer quiz questions", href: "/tasks?type=trivia" },
+    { title: "Achievements", icon: Trophy, gradient: "from-amber-500/15 to-amber-600/5", iconColor: "text-amber-600 bg-amber-500/15", description: "Claim bonuses", href: "/achievements" },
+    { title: "Ads", icon: Megaphone, gradient: "from-rose-500/15 to-rose-600/5", iconColor: "text-rose-600 bg-rose-500/15", description: "Advertise on FlexiEarn", href: "/ads" },
     { title: "Referrals", icon: Gift, gradient: "from-primary/15 to-primary/5", iconColor: "text-primary bg-primary/15", description: "Invite friends", href: "/referrals" },
   ];
 
@@ -139,6 +147,19 @@ export default function Dashboard() {
             </div>
           </div>
         </Card>
+
+        {/* Sponsored banner */}
+        <AdBanner placement="dashboard" />
+
+        {/* Achievements teaser */}
+        <div>
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="font-bold text-foreground flex items-center gap-1.5"><Trophy className="h-4 w-4 text-secondary" />Achievements</h2>
+            <Link to="/achievements" className="text-xs text-primary font-medium">View all</Link>
+          </div>
+          <AchievementsSection compact />
+        </div>
+
 
 
         {/* Stats Grid */}
@@ -204,6 +225,7 @@ export default function Dashboard() {
           </Button>
         </div>
       </div>
+      <AdPopup />
     </UserLayout>
   );
 }

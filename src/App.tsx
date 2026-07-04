@@ -25,12 +25,16 @@ import Tasks from "./pages/user/Tasks";
 import Wallet from "./pages/user/Wallet";
 import Referrals from "./pages/user/Referrals";
 import Profile from "./pages/user/Profile";
+import Achievements from "./pages/user/Achievements";
+import Ads from "./pages/user/Ads";
 
 // Admin Pages
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminTasks from "./pages/admin/AdminTasks";
+import AdminAchievements from "./pages/admin/AdminAchievements";
+import AdminAds from "./pages/admin/AdminAds";
 import AdminDeposits from "./pages/admin/AdminDeposits";
 import AdminWithdrawals from "./pages/admin/AdminWithdrawals";
 import AdminSettings from "./pages/admin/AdminSettings";
@@ -119,11 +123,15 @@ function AppRoutes() {
       <Route path="/wallet" element={<ProtectedRoute><Wallet /></ProtectedRoute>} />
       <Route path="/referrals" element={<ProtectedRoute><Referrals /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
+      <Route path="/ads" element={<ProtectedRoute><Ads /></ProtectedRoute>} />
 
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
       <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
       <Route path="/admin/tasks" element={<AdminRoute><AdminTasks /></AdminRoute>} />
+      <Route path="/admin/achievements" element={<AdminRoute><AdminAchievements /></AdminRoute>} />
+      <Route path="/admin/ads" element={<AdminRoute><AdminAds /></AdminRoute>} />
       <Route path="/admin/deposits" element={<AdminRoute><AdminDeposits /></AdminRoute>} />
       <Route path="/admin/withdrawals" element={<AdminRoute><AdminWithdrawals /></AdminRoute>} />
       <Route path="/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
