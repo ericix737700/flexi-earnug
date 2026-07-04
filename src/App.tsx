@@ -25,12 +25,16 @@ import Tasks from "./pages/user/Tasks";
 import Wallet from "./pages/user/Wallet";
 import Referrals from "./pages/user/Referrals";
 import Profile from "./pages/user/Profile";
+import Achievements from "./pages/user/Achievements";
+import Ads from "./pages/user/Ads";
 
 // Admin Pages
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminTasks from "./pages/admin/AdminTasks";
+import AdminAchievements from "./pages/admin/AdminAchievements";
+import AdminAds from "./pages/admin/AdminAds";
 import AdminDeposits from "./pages/admin/AdminDeposits";
 import AdminWithdrawals from "./pages/admin/AdminWithdrawals";
 import AdminSettings from "./pages/admin/AdminSettings";
