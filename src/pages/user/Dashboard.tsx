@@ -14,7 +14,15 @@ import {
   Gift,
   HelpCircle,
   Sparkles,
+  Trophy,
+  Megaphone,
 } from "lucide-react";
+import { AdBanner } from "@/components/user/AdBanner";
+import { AdPopup } from "@/components/user/AdPopup";
+import { AchievementsSection } from "@/components/user/AchievementsSection";
+import { Link } from "react-router-dom";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _unused = {
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
