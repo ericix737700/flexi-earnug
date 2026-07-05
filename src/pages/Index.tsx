@@ -17,6 +17,9 @@ import {
   Zap,
   Gift,
   Star,
+  Megaphone,
+  Target,
+  Eye,
 } from "lucide-react";
 
 import heroImg from "@/assets/hero-earning.jpg";
@@ -402,7 +405,76 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Advertise with FlexiEarn */}
+      <section className="mx-auto max-w-6xl px-4 py-16">
+        <div className="relative overflow-hidden rounded-3xl border border-primary/30 bg-gradient-to-br from-primary/15 via-card to-secondary/10 p-8 md:p-12">
+          <div className="absolute -top-16 -right-16 h-52 w-52 rounded-full bg-primary/20 blur-3xl" />
+          <div className="absolute -bottom-16 -left-16 h-52 w-52 rounded-full bg-secondary/20 blur-3xl" />
+
+          <div className="relative grid items-center gap-10 md:grid-cols-2">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-primary/15 px-3 py-1 text-sm font-semibold text-primary">
+                <Megaphone className="h-4 w-4" />
+                Advertise with FlexiEarn
+              </div>
+              <h2 className="mt-4 text-3xl font-extrabold text-foreground md:text-4xl">
+                Reach thousands of Ugandans from just <span className="text-gradient-primary">UGX 5,000</span>
+              </h2>
+              <p className="mt-3 text-lg leading-relaxed text-muted-foreground">
+                Promote your business, event, product or service on FlexiEarn. Choose from banner ads,
+                popup ads, in-feed ads and sponsored placements — all shown to our active daily earners.
+              </p>
+
+              <ul className="mt-5 space-y-2.5">
+                {[
+                  "Affordable daily packages — pay by day or bundle",
+                  "Pay via Mobile Money or wallet balance",
+                  "Target dashboard, tasks, popups or dedicated Ads page",
+                  "Track impressions & clicks in real time",
+                  "Manual admin review keeps quality high",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-muted-foreground">
+                    <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <Link to="/ads" className="w-full sm:w-auto">
+                  <Button size="lg" className="w-full gap-2 gradient-primary border-0 font-bold text-primary-foreground shadow-lg shadow-primary/30 hover:opacity-90 sm:w-auto">
+                    <Megaphone className="h-5 w-5" /> Start Advertising
+                  </Button>
+                </Link>
+                <Link to="/register" className="w-full sm:w-auto">
+                  <Button size="lg" variant="outline" className="w-full border-primary/30 text-primary hover:bg-primary/5 sm:w-auto">
+                    Create Account
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { icon: Megaphone, title: "Banner Ads", desc: "Rotating banner on user dashboard", color: "text-rose-500 bg-rose-500/15" },
+                { icon: Eye, title: "Popup Ads", desc: "Full-screen modal on app open", color: "text-purple-500 bg-purple-500/15" },
+                { icon: Target, title: "In-Feed Ads", desc: "Native card between tasks", color: "text-blue-500 bg-blue-500/15" },
+                { icon: Star, title: "Sponsored", desc: "Featured on dedicated Ads page", color: "text-amber-500 bg-amber-500/15" },
+              ].map((t) => (
+                <div key={t.title} className="rounded-2xl border border-border/60 bg-card/70 p-4 backdrop-blur-sm shadow-sm">
+                  <div className={`mb-3 inline-flex rounded-xl p-2.5 ${t.color}`}>
+                    <t.icon className="h-5 w-5" />
+                  </div>
+                  <p className="font-bold text-foreground">{t.title}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{t.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+
       <section className="gradient-primary py-16">
         <div className="mx-auto max-w-3xl px-4 text-center">
           <h2 className="text-3xl font-extrabold text-primary-foreground md:text-4xl">
