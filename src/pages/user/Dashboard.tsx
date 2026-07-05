@@ -191,7 +191,7 @@ export default function Dashboard() {
             {taskCategories.map((category) => (
               <Card
                 key={category.title}
-                className={`cursor-pointer border-border/50 bg-gradient-to-br ${category.gradient} shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98]`}
+                className="cursor-pointer glass-card border-border/50 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98]"
                 onClick={() => navigate(category.href)}
               >
                 <CardContent className="py-4 text-center">
