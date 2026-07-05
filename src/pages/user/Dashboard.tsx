@@ -104,12 +104,12 @@ export default function Dashboard() {
   });
 
   const taskCategories = [
-    { title: "Watch Videos", icon: Play, gradient: "from-blue-500/15 to-blue-600/5", iconColor: "text-blue-600 bg-blue-500/15", description: "Earn by watching ads", href: "/tasks?type=video" },
-    { title: "Surveys", icon: ClipboardList, gradient: "from-purple-500/15 to-purple-600/5", iconColor: "text-purple-600 bg-purple-500/15", description: "Complete quick surveys", href: "/tasks?type=survey" },
-    { title: "Trivia", icon: HelpCircle, gradient: "from-secondary/15 to-secondary/5", iconColor: "text-secondary bg-secondary/15", description: "Answer quiz questions", href: "/tasks?type=trivia" },
-    { title: "Achievements", icon: Trophy, gradient: "from-amber-500/15 to-amber-600/5", iconColor: "text-amber-600 bg-amber-500/15", description: "Claim bonuses", href: "/achievements" },
-    { title: "Ads", icon: Megaphone, gradient: "from-rose-500/15 to-rose-600/5", iconColor: "text-rose-600 bg-rose-500/15", description: "Advertise on FlexiEarn", href: "/ads" },
-    { title: "Referrals", icon: Gift, gradient: "from-primary/15 to-primary/5", iconColor: "text-primary bg-primary/15", description: "Invite friends", href: "/referrals" },
+    { title: "Watch Videos", icon: Play, iconColor: "text-blue-500 bg-blue-500/15", description: "Earn by watching ads", href: "/tasks?type=video" },
+    { title: "Surveys", icon: ClipboardList, iconColor: "text-purple-500 bg-purple-500/15", description: "Complete quick surveys", href: "/tasks?type=survey" },
+    { title: "Trivia", icon: HelpCircle, iconColor: "text-secondary bg-secondary/15", description: "Answer quiz questions", href: "/tasks?type=trivia" },
+    { title: "Achievements", icon: Trophy, iconColor: "text-amber-500 bg-amber-500/15", description: "Claim bonuses", href: "/achievements" },
+    { title: "Ads", icon: Megaphone, iconColor: "text-rose-500 bg-rose-500/15", description: "Advertise on FlexiEarn", href: "/ads" },
+    { title: "Referrals", icon: Gift, iconColor: "text-primary bg-primary/15", description: "Invite friends", href: "/referrals" },
   ];
 
   return (
@@ -191,7 +191,7 @@ export default function Dashboard() {
             {taskCategories.map((category) => (
               <Card
                 key={category.title}
-                className={`cursor-pointer border-border/50 bg-gradient-to-br ${category.gradient} shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98]`}
+                className="cursor-pointer glass-card border-border/50 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98]"
                 onClick={() => navigate(category.href)}
               >
                 <CardContent className="py-4 text-center">
