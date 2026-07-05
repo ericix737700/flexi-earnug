@@ -170,20 +170,21 @@ export default function Tasks() {
                 filterTasks(type).map((task) => {
                   const Icon = getTaskIcon(task.task_type);
                   const isCompleted = isTaskCompletedToday(task.id);
+                  const isWatching = watchingTask?.id === task.id;
 
                   return (
-                    <Card key={task.id} className={`overflow-hidden transition-all ${isCompleted ? "opacity-60" : "hover:shadow-md"}`}>
+                    <Card key={task.id} className={`overflow-hidden transition-all ${isCompleted ? "opacity-60" : "hover:shadow-md"} ${isWatching ? "ring-2 ring-primary/40" : ""}`}>
                       <CardContent className="flex items-center justify-between py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="rounded-xl bg-primary/10 p-2.5">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="rounded-xl bg-primary/10 p-2.5 shrink-0">
                             <Icon className="h-5 w-5 text-primary" />
                           </div>
-                          <div>
-                            <p className="font-semibold text-sm">{task.title}</p>
+                          <div className="min-w-0">
+                            <p className="font-semibold text-sm truncate">{task.title}</p>
                             {task.description && (
                               <p className="text-xs text-muted-foreground line-clamp-1">{task.description}</p>
                             )}
-                            <div className="mt-1.5 flex items-center gap-2">
+                            <div className="mt-1.5 flex items-center gap-2 flex-wrap">
                               <Badge variant="secondary" className="text-xs gap-1">
                                 <Coins className="h-3 w-3" />
                                 UGX {task.reward_amount.toLocaleString()}
@@ -197,14 +198,71 @@ export default function Tasks() {
                         <Button
                           size="sm"
                           disabled={isCompleted || completeTaskMutation.isPending}
-                          onClick={() => handleStartTask(task)}
+                          onClick={() => (isWatching ? setWatchingTask(null) : handleStartTask(task))}
                           className={isCompleted ? "" : "gradient-primary border-0 text-primary-foreground"}
                         >
                           {isCompleted ? (
                             <><CheckCircle className="mr-1 h-3.5 w-3.5" />Done</>
-                          ) : "Start"}
+                          ) : isWatching ? "Close" : "Start"}
                         </Button>
                       </CardContent>
+
+                      {/* Inline video player (not floating) */}
+                      {isWatching && task.video_url && (
+                        <div className="border-t border-border/50 bg-muted/20 p-3 space-y-3 animate-in fade-in slide-in-from-top-2">
+                          <div className="aspect-video rounded-xl overflow-hidden bg-black shadow-inner">
+                            {isYouTubeUrl(task.video_url) ? (
+                              <iframe
+                                src={getYouTubeEmbedUrl(task.video_url) || ""}
+                                className="w-full h-full"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                onLoad={() => { setTimeout(() => setVideoWatched(true), 10000); }}
+                              />
+                            ) : (
+                              <video
+                                src={task.video_url}
+                                autoPlay
+                                className="w-full h-full"
+                                controlsList="nodownload nofullscreen noremoteplayback"
+                                disablePictureInPicture
+                                playsInline
+                                style={{ pointerEvents: "none" }}
+                                onEnded={() => setVideoWatched(true)}
+                                onTimeUpdate={(e) => {
+                                  const v = e.target as HTMLVideoElement;
+                                  const pct = Math.floor((v.currentTime / v.duration) * 100);
+                                  setVideoProgress(pct);
+                                  if (pct >= 80) setVideoWatched(true);
+                                }}
+                              />
+                            )}
+                          </div>
+
+                          <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-primary transition-all duration-300"
+                              style={{ width: `${videoProgress}%` }}
+                            />
+                          </div>
+
+                          <div className="flex items-center justify-between">
+                            <p className="text-xs font-medium text-muted-foreground">
+                              {videoWatched ? "✅ Video complete — claim your reward" : `Watching... ${videoProgress}%`}
+                            </p>
+                            <Button
+                              size="sm"
+                              disabled={!videoWatched || completeTaskMutation.isPending}
+                              onClick={() => completeTaskMutation.mutate(task)}
+                              className="gradient-primary border-0 text-primary-foreground"
+                            >
+                              {completeTaskMutation.isPending ? (
+                                <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Claiming...</>
+                              ) : "Claim Reward"}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </Card>
                   );
                 })
@@ -214,81 +272,7 @@ export default function Tasks() {
         </Tabs>
       </div>
 
-      {/* Video Player Dialog - No seek bar */}
-      <Dialog open={!!watchingTask} onOpenChange={(open) => { if (!open) { setWatchingTask(null); setVideoProgress(0); } }}>
-        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-2xl">
-          <div className="gradient-primary p-4">
-            <DialogHeader>
-              <DialogTitle className="text-primary-foreground">{watchingTask?.title}</DialogTitle>
-            </DialogHeader>
-            <p className="text-sm text-primary-foreground/70 mt-1">{watchingTask?.description}</p>
-          </div>
 
-          <div className="px-4 pt-2">
-            {watchingTask?.video_url && (
-              <div className="aspect-video rounded-xl overflow-hidden bg-black shadow-lg">
-                {isYouTubeUrl(watchingTask.video_url) ? (
-                  <iframe
-                    src={getYouTubeEmbedUrl(watchingTask.video_url) || ""}
-                    className="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    onLoad={() => { setTimeout(() => setVideoWatched(true), 10000); }}
-                  />
-                ) : (
-                  <video
-                    src={watchingTask.video_url}
-                    autoPlay
-                    className="w-full h-full"
-                    controlsList="nodownload nofullscreen noremoteplayback"
-                    disablePictureInPicture
-                    playsInline
-                    style={{ pointerEvents: "none" }}
-                    onEnded={() => setVideoWatched(true)}
-                    onTimeUpdate={(e) => {
-                      const v = e.target as HTMLVideoElement;
-                      const pct = Math.floor((v.currentTime / v.duration) * 100);
-                      setVideoProgress(pct);
-                      if (pct >= 80) setVideoWatched(true);
-                    }}
-                  />
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Progress & Claim */}
-          <div className="p-4 space-y-3">
-            {/* Progress bar (replaces seek bar) */}
-            <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
-              <div
-                className="h-full rounded-full bg-primary transition-all duration-300"
-                style={{ width: `${videoProgress}%` }}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">
-                  {videoWatched ? "✅ Video complete!" : `Watching... ${videoProgress}%`}
-                </p>
-                <Badge variant="secondary" className="mt-1 gap-1">
-                  <Coins className="h-3 w-3" />
-                  UGX {watchingTask?.reward_amount.toLocaleString()}
-                </Badge>
-              </div>
-              <Button
-                disabled={!videoWatched || completeTaskMutation.isPending}
-                onClick={() => watchingTask && completeTaskMutation.mutate(watchingTask)}
-                className="gradient-primary border-0 text-primary-foreground"
-              >
-                {completeTaskMutation.isPending ? (
-                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Claiming...</>
-                ) : "Claim Reward"}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Trivia */}
       <Dialog open={!!triviaTask} onOpenChange={(open) => !open && setTriviaTask(null)}>
