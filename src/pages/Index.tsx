@@ -17,6 +17,9 @@ import {
   Zap,
   Gift,
   Star,
+  Megaphone,
+  Target,
+  Eye,
 } from "lucide-react";
 
 import heroImg from "@/assets/hero-earning.jpg";
