@@ -60,13 +60,20 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Authorization: must be either admin OR the owner of the withdrawal in automatic mode.
+    // ── Server-side authorization ───────────────────────────────────────────
+    // Rule:
+    //   • withdrawal_mode = "automatic"  → the owner may trigger their own
+    //     payout immediately. Admins may also trigger.
+    //   • withdrawal_mode = "manual"     → ONLY an admin may trigger the
+    //     payout, regardless of who calls this function.
+    // ────────────────────────────────────────────────────────────────────────
     const { data: roleData } = await adminClient
       .from("user_roles")
       .select("role")
       .eq("user_id", userId)
       .eq("role", "admin")
       .maybeSingle();
+    const isAdmin = !!roleData;
 
     const { data: withdrawal } = await adminClient
       .from("withdrawals")
@@ -81,23 +88,37 @@ Deno.serve(async (req) => {
       });
     }
 
-    const isAdmin = !!roleData;
     const isOwner = withdrawal.user_id === userId;
 
-    if (!isAdmin) {
-      // Non-admin: only allowed when withdrawal_mode = automatic AND owner
-      const { data: modeSetting } = await adminClient
-        .from("platform_settings")
-        .select("setting_value")
-        .eq("setting_key", "withdrawal_mode")
-        .maybeSingle();
-      const mode = modeSetting?.setting_value || "manual";
-      if (mode !== "automatic" || !isOwner) {
-        return new Response(JSON.stringify({ error: "Not authorized" }), {
-          status: 403,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+    const { data: modeSetting } = await adminClient
+      .from("platform_settings")
+      .select("setting_value")
+      .eq("setting_key", "withdrawal_mode")
+      .maybeSingle();
+    const mode = (modeSetting?.setting_value || "manual").toLowerCase();
+    const isAutomatic = mode === "automatic";
+
+    console.log("marzpay-send authorization", {
+      withdrawal_id, userId, isAdmin, isOwner, mode,
+    });
+
+    if (isAdmin) {
+      // Admins may always trigger a payout.
+    } else if (isAutomatic && isOwner) {
+      // Owner-initiated automatic payout — allowed.
+    } else if (!isAutomatic) {
+      return new Response(
+        JSON.stringify({
+          error:
+            "Manual withdrawal mode: this payout must be approved by an admin.",
+        }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    } else {
+      return new Response(
+        JSON.stringify({ error: "Not authorized to trigger this payout." }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     if (withdrawal.status !== "pending") {
