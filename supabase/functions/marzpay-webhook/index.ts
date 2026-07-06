@@ -150,33 +150,35 @@ Deno.serve(async (req) => {
         .eq("user_id", deposit.user_id)
         .single();
 
-      const newBalance = Number(profile?.balance || 0) + Number(deposit.amount);
-
       // Check if this is a registration fee payment (user hasn't paid yet)
       const isRegistrationPayment = !profile?.registration_paid;
 
-      const profileUpdate: Record<string, any> = { balance: newBalance };
+      // Activation fee is a pure fee — do NOT credit user balance and do NOT
+      // create a transaction history entry for it. For all other deposits,
+      // credit the balance and record the transaction as usual.
+      let newBalance = Number(profile?.balance || 0);
+
       if (isRegistrationPayment) {
-        profileUpdate.registration_paid = true;
-        profileUpdate.status = "active";
+        await supabase
+          .from("profiles")
+          .update({ registration_paid: true, status: "active" })
+          .eq("user_id", deposit.user_id);
+      } else {
+        newBalance = Number(profile?.balance || 0) + Number(deposit.amount);
+        await supabase
+          .from("profiles")
+          .update({ balance: newBalance })
+          .eq("user_id", deposit.user_id);
+
+        await supabase.from("transactions").insert({
+          user_id: deposit.user_id,
+          transaction_type: "deposit",
+          amount: deposit.amount,
+          balance_after: newBalance,
+          description: "Mobile Money deposit via MarzPay",
+          reference_id: deposit.id,
+        });
       }
-
-      await supabase
-        .from("profiles")
-        .update(profileUpdate)
-        .eq("user_id", deposit.user_id);
-
-      // Record transaction
-      await supabase.from("transactions").insert({
-        user_id: deposit.user_id,
-        transaction_type: isRegistrationPayment ? "registration_fee" : "deposit",
-        amount: deposit.amount,
-        balance_after: newBalance,
-        description: isRegistrationPayment
-          ? "Registration fee paid via Mobile Money"
-          : "Mobile Money deposit via MarzPay",
-        reference_id: deposit.id,
-      });
 
       // Handle referral bonus for registration payments
       if (isRegistrationPayment) {
