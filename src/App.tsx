@@ -27,6 +27,7 @@ import Referrals from "./pages/user/Referrals";
 import Profile from "./pages/user/Profile";
 import Achievements from "./pages/user/Achievements";
 import Ads from "./pages/user/Ads";
+import Machines from "./pages/user/Machines";
 
 // Admin Pages
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -40,6 +41,8 @@ import AdminWithdrawals from "./pages/admin/AdminWithdrawals";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminGiftCodes from "./pages/admin/AdminGiftCodes";
+import AdminMachines from "./pages/admin/AdminMachines";
+import AdminInvestments from "./pages/admin/AdminInvestments";
 
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -125,6 +128,7 @@ function AppRoutes() {
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
       <Route path="/ads" element={<ProtectedRoute><Ads /></ProtectedRoute>} />
+      <Route path="/machines" element={<ProtectedRoute><Machines /></ProtectedRoute>} />
 
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
@@ -137,6 +141,8 @@ function AppRoutes() {
       <Route path="/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
       <Route path="/admin/notifications" element={<AdminRoute><AdminNotifications /></AdminRoute>} />
       <Route path="/admin/gift-codes" element={<AdminRoute><AdminGiftCodes /></AdminRoute>} />
+      <Route path="/admin/machines" element={<AdminRoute><AdminMachines /></AdminRoute>} />
+      <Route path="/admin/investments" element={<AdminRoute><AdminInvestments /></AdminRoute>} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>

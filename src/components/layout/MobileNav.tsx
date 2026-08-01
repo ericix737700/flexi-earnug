@@ -57,6 +57,9 @@ export function MobileNav() {
                 {isActive && (
                   <span className="absolute -top-1 right-1 h-1.5 w-1.5 rounded-full bg-secondary animate-pulse-glow" />
                 )}
+                {"isNew" in item && (item as { isNew?: boolean }).isNew && !isActive && (
+                  <span className="absolute -top-0.5 right-0.5 h-2 w-2 rounded-full bg-destructive" aria-label="New feature" />
+                )}
               </div>
               <span className={cn("transition-opacity", isActive ? "opacity-100" : "opacity-80")}>
                 {item.label}
