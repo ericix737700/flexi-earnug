@@ -17,6 +17,8 @@ import {
   Gift,
   Trophy,
   Megaphone,
+  Cpu,
+  LineChart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -32,6 +34,8 @@ const navItems = [
   { href: "/admin/tasks", icon: ListTodo, label: "Tasks" },
   { href: "/admin/achievements", icon: Trophy, label: "Achievements" },
   { href: "/admin/ads", icon: Megaphone, label: "Ads" },
+  { href: "/admin/machines", icon: Cpu, label: "Machines" },
+  { href: "/admin/investments", icon: LineChart, label: "Investments" },
   { href: "/admin/deposits", icon: ArrowDownToLine, label: "Deposits" },
   { href: "/admin/withdrawals", icon: Wallet, label: "Withdrawals" },
    { href: "/admin/notifications", icon: Bell, label: "Notifications" },

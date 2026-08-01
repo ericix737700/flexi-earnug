@@ -1,8 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, ListTodo, Wallet, Users, User } from "lucide-react";
+import { LayoutDashboard, ListTodo, Wallet, Users, User, Cpu } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useMachinesFeature } from "@/hooks/useMachinesFeature";
 
-const navItems = [
+const baseItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Home" },
   { href: "/tasks", icon: ListTodo, label: "Tasks" },
   { href: "/wallet", icon: Wallet, label: "Wallet" },
@@ -12,6 +13,15 @@ const navItems = [
 
 export function MobileNav() {
   const location = useLocation();
+  const machines = useMachinesFeature();
+
+  const navItems = machines.isVisible
+    ? [
+        ...baseItems.slice(0, 2),
+        { href: "/machines", icon: Cpu, label: "Machines", isNew: machines.showNewBadge },
+        ...baseItems.slice(2),
+      ]
+    : baseItems;
 
   return (
     <nav
@@ -46,6 +56,9 @@ export function MobileNav() {
                 <item.icon className={cn("h-5 w-5 transition-transform", isActive && "stroke-[2.5]")} />
                 {isActive && (
                   <span className="absolute -top-1 right-1 h-1.5 w-1.5 rounded-full bg-secondary animate-pulse-glow" />
+                )}
+                {"isNew" in item && (item as { isNew?: boolean }).isNew && !isActive && (
+                  <span className="absolute -top-0.5 right-0.5 h-2 w-2 rounded-full bg-destructive" aria-label="New feature" />
                 )}
               </div>
               <span className={cn("transition-opacity", isActive ? "opacity-100" : "opacity-80")}>

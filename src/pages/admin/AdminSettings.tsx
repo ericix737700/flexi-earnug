@@ -12,7 +12,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   Save, Loader2, DollarSign, Gift, Wallet, Calendar, Bell,
   Store, MessageCircle, ImageIcon, Upload, Trash2, Send, Lock, Hand, Info, Users,
-  ShieldAlert, AlertTriangle, Power, Zap,
+  ShieldAlert, AlertTriangle, Power, Zap, Cpu,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -132,6 +132,62 @@ export default function AdminSettings() {
           </CardContent>
         </Card>
 
+
+        {/* Feature Management: Investment Machines */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Cpu className="h-5 w-5 text-primary" />
+              Feature: Investment Machines
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Control availability of the Investment Machines module. Activating it notifies all users and shows a NEW badge.
+            </p>
+            <Select
+              value={settings?.feature_machines_status || "coming_soon"}
+              onValueChange={async (v) => {
+                await handleSave("feature_machines_status", v);
+                if (v === "active") {
+                  await handleSave("feature_machines_activated_at", new Date().toISOString());
+                  await supabase.from("notifications").insert({
+                    user_id: null,
+                    title: "Investment Machines are live",
+                    message: "Buy an investment machine and earn an automatic reward when it matures.",
+                    notification_type: "investment",
+                  });
+                  await supabase.functions.invoke("send-push", {
+                    body: {
+                      broadcast: true,
+                      title: "Investment Machines are live",
+                      body: "Invest today and earn automatic rewards on FlexiEarn.",
+                      url: "/machines",
+                    },
+                  });
+                  toast.success("Feature activated and users notified");
+                }
+              }}
+            >
+              <SelectTrigger className="w-full md:w-72"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="coming_soon">Coming Soon (visible teaser)</SelectItem>
+                <SelectItem value="active">Active (live)</SelectItem>
+                <SelectItem value="disabled">Disabled (hidden)</SelectItem>
+              </SelectContent>
+            </Select>
+            <div className="max-w-xs">
+              <Label>NEW badge duration (days)</Label>
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  defaultValue={settings?.feature_machines_new_badge_days || "7"}
+                  onBlur={(e) => handleSave("feature_machines_new_badge_days", e.target.value)}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Logo Upload */}
         <LogoUploadCard settings={settings} onSave={handleSave} />
