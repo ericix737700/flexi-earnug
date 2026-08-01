@@ -364,6 +364,93 @@ export type Database = {
         }
         Relationships: []
       }
+      investment_audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          details: Json
+          id: string
+          investment_id: string | null
+          machine_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+          investment_id?: string | null
+          machine_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+          investment_id?: string | null
+          machine_id?: string | null
+        }
+        Relationships: []
+      }
+      investment_machines: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_hours: number
+          id: string
+          image_url: string | null
+          is_visible: boolean
+          max_per_user: number
+          max_total: number
+          name: string
+          price: number
+          purchases_count: number
+          reward_amount: number
+          series: string | null
+          sort_order: number
+          status: Database["public"]["Enums"]["machine_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_hours?: number
+          id?: string
+          image_url?: string | null
+          is_visible?: boolean
+          max_per_user?: number
+          max_total?: number
+          name: string
+          price?: number
+          purchases_count?: number
+          reward_amount?: number
+          series?: string | null
+          sort_order?: number
+          status?: Database["public"]["Enums"]["machine_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_hours?: number
+          id?: string
+          image_url?: string | null
+          is_visible?: boolean
+          max_per_user?: number
+          max_total?: number
+          name?: string
+          price?: number
+          purchases_count?: number
+          reward_amount?: number
+          series?: string | null
+          sort_order?: number
+          status?: Database["public"]["Enums"]["machine_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       login_audit: {
         Row: {
           city: string | null
@@ -660,6 +747,59 @@ export type Database = {
         }
         Relationships: []
       }
+      user_investments: {
+        Row: {
+          amount_paid: number
+          completed_at: string | null
+          created_at: string
+          id: string
+          machine_id: string
+          machine_name: string
+          matures_at: string
+          reward_amount: number
+          starts_at: string
+          status: Database["public"]["Enums"]["investment_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_paid: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          machine_id: string
+          machine_name: string
+          matures_at: string
+          reward_amount: number
+          starts_at?: string
+          status?: Database["public"]["Enums"]["investment_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_paid?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          machine_id?: string
+          machine_name?: string
+          matures_at?: string
+          reward_amount?: number
+          starts_at?: string
+          status?: Database["public"]["Enums"]["investment_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_investments_machine_id_fkey"
+            columns: ["machine_id"]
+            isOneToOne: false
+            referencedRelation: "investment_machines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
@@ -767,6 +907,8 @@ export type Database = {
         | "sponsored"
         | "notification"
       app_role: "admin" | "moderator" | "user"
+      investment_status: "active" | "completed" | "cancelled" | "refunded"
+      machine_status: "active" | "coming_soon" | "sold_out" | "disabled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -923,6 +1065,8 @@ export const Constants = {
         "notification",
       ],
       app_role: ["admin", "moderator", "user"],
+      investment_status: ["active", "completed", "cancelled", "refunded"],
+      machine_status: ["active", "coming_soon", "sold_out", "disabled"],
     },
   },
 } as const
