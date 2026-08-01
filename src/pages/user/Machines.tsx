@@ -204,7 +204,7 @@ export default function Machines() {
                   <Loader2 className="h-6 w-6 animate-spin text-primary" />
                 </div>
               ) : (machines || []).length === 0 ? (
-                <EmptyState icon={Cpu} title="No machines yet" description="Check back soon for new investment plans." />
+                <EmptyState icon={<Cpu className="h-8 w-8" />} title="No machines yet" description="Check back soon for new investment plans." />
               ) : (
                 (machines || []).map((m) => {
                   const soldOut =
@@ -274,7 +274,7 @@ export default function Machines() {
 
             <TabsContent value="mine" className="mt-4 space-y-3">
               {activeInvestments.length === 0 && pastInvestments.length === 0 ? (
-                <EmptyState icon={Wallet} title="No investments yet" description="Pick a machine to start earning." />
+                <EmptyState icon={<Wallet className="h-8 w-8" />} title="No investments yet" description="Pick a machine to start earning." />
               ) : null}
 
               {activeInvestments.map((inv) => {

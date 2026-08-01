@@ -156,10 +156,20 @@ export default function AdminMachines() {
   };
 
   const duplicate = async (m: Record<string, unknown>) => {
-    const { id, created_at, updated_at, purchases_count, ...rest } = m as Record<string, unknown>;
-    const { error } = await supabase
-      .from("investment_machines")
-      .insert({ ...(rest as never), name: `${m.name as string} (Copy)`, status: "coming_soon" });
+    const { error } = await supabase.from("investment_machines").insert({
+      name: `${m.name as string} (Copy)`,
+      series: (m.series as string) ?? null,
+      description: (m.description as string) ?? null,
+      image_url: (m.image_url as string) ?? null,
+      price: Number(m.price),
+      reward_amount: Number(m.reward_amount),
+      duration_hours: Number(m.duration_hours),
+      max_per_user: Number(m.max_per_user),
+      max_total: Number(m.max_total),
+      sort_order: Number(m.sort_order),
+      is_visible: Boolean(m.is_visible),
+      status: "coming_soon" as const,
+    });
     if (error) { toast.error("Duplicate failed"); return; }
     toast.success("Machine duplicated");
     refresh();
