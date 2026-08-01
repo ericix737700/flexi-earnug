@@ -1,8 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, ListTodo, Wallet, Users, User } from "lucide-react";
+import { LayoutDashboard, ListTodo, Wallet, Users, User, Cpu } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useMachinesFeature } from "@/hooks/useMachinesFeature";
 
-const navItems = [
+const baseItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Home" },
   { href: "/tasks", icon: ListTodo, label: "Tasks" },
   { href: "/wallet", icon: Wallet, label: "Wallet" },
@@ -12,6 +13,15 @@ const navItems = [
 
 export function MobileNav() {
   const location = useLocation();
+  const machines = useMachinesFeature();
+
+  const navItems = machines.isVisible
+    ? [
+        ...baseItems.slice(0, 2),
+        { href: "/machines", icon: Cpu, label: "Machines", isNew: machines.showNewBadge },
+        ...baseItems.slice(2),
+      ]
+    : baseItems;
 
   return (
     <nav
