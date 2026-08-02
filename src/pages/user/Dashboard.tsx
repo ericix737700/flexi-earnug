@@ -206,24 +206,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-3">
-          <Button
-            variant="outline"
-            className="h-auto py-3.5 border-primary/20 hover:bg-primary/5 font-semibold"
-            onClick={() => navigate("/wallet")}
-          >
-            <Wallet className="mr-2 h-4 w-4 text-primary" />
-            Withdraw
-          </Button>
-          <Button
-            className="h-auto py-3.5 gradient-primary border-0 text-primary-foreground font-semibold hover:opacity-90"
-            onClick={() => navigate("/referrals")}
-          >
-            <Users className="mr-2 h-4 w-4" />
-            Invite Friends
-          </Button>
-        </div>
       </div>
       <AdPopup />
     </UserLayout>
