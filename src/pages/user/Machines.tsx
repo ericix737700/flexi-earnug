@@ -158,6 +158,9 @@ export default function Machines() {
   const balance = Number(profile?.balance || 0);
   const canAfford = selected ? balance >= Number(selected.price) : false;
 
+  const totalInvested = activeInvestments.reduce((s, i) => s + Number(i.amount_paid), 0);
+  const expectedReturns = activeInvestments.reduce((s, i) => s + Number(i.reward_amount), 0);
+
   return (
     <UserLayout>
       <SEO
@@ -165,19 +168,45 @@ export default function Machines() {
         description="Buy an investment machine with your FlexiEarn wallet and earn an automatic reward when it matures."
       />
       <div className="space-y-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="flex items-center gap-2 text-xl font-bold">
-              <Cpu className="h-5 w-5 text-primary" />
-              Investment Machines
-            </h1>
-            <p className="text-sm text-muted-foreground">Invest, wait, get rewarded automatically.</p>
+        {/* Hero */}
+        <Card className="relative overflow-hidden border-0 shadow-md glow-primary">
+          <div className="relative gradient-primary p-4">
+            <div aria-hidden className="absolute -top-12 -right-10 h-36 w-36 rounded-full bg-secondary/30 blur-2xl" />
+            <div aria-hidden className="absolute -bottom-12 -left-8 h-32 w-32 rounded-full bg-primary-foreground/10 blur-2xl" />
+            <div className="relative">
+              <div className="flex items-center gap-2">
+                <div className="rounded-xl bg-primary-foreground/20 p-2 backdrop-blur">
+                  <Cpu className="h-5 w-5 text-primary-foreground" />
+                </div>
+                <div>
+                  <h1 className="text-lg font-bold text-primary-foreground">Investment Machines</h1>
+                  <p className="text-xs text-primary-foreground/80">
+                    Invest once. Your reward is credited automatically at maturity.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-primary-foreground/12 p-2.5 text-center backdrop-blur border border-primary-foreground/15">
+                <div>
+                  <p className="text-[10px] text-primary-foreground/70">Running</p>
+                  <p className="text-sm font-bold text-primary-foreground">{activeInvestments.length}</p>
+                </div>
+                <div className="border-x border-primary-foreground/20">
+                  <p className="text-[10px] text-primary-foreground/70">Invested</p>
+                  <p className="text-sm font-bold text-primary-foreground">
+                    UGX {totalInvested.toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-primary-foreground/70">Expected</p>
+                  <p className="text-sm font-bold text-primary-foreground">
+                    UGX {expectedReturns.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="rounded-xl bg-primary/10 px-3 py-2 text-right">
-            <p className="text-[10px] text-muted-foreground">Balance</p>
-            <p className="text-sm font-bold text-primary">UGX {balance.toLocaleString()}</p>
-          </div>
-        </div>
+        </Card>
 
         {feature.isComingSoon ? (
           <Card className="glass-card border-0">
@@ -213,41 +242,61 @@ export default function Machines() {
                   const roi = Number(m.price) > 0
                     ? Math.round(((Number(m.reward_amount) - Number(m.price)) / Number(m.price)) * 100)
                     : 0;
+                  const soldPct = m.max_total > 0
+                    ? Math.min(100, Math.round((m.purchases_count / m.max_total) * 100))
+                    : 0;
                   return (
-                    <Card key={m.id} className={`glass-card border-0 ${buyable ? "" : "opacity-60"}`}>
-                      <CardContent className="p-4">
-                        <div className="flex gap-3">
-                          <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-primary/10">
-                            {m.image_url ? (
-                              <img src={m.image_url} alt={`${m.name} investment machine`} loading="lazy" className="h-full w-full object-cover" />
-                            ) : (
-                              <Cpu className="h-7 w-7 text-primary" />
-                            )}
+                    <Card
+                      key={m.id}
+                      className={`overflow-hidden glass-card border-0 transition-all ${
+                        buyable ? "hover:shadow-lg hover:-translate-y-0.5" : "opacity-60"
+                      }`}
+                    >
+                      {/* Media */}
+                      <div className="relative h-32 w-full overflow-hidden bg-primary/10">
+                        {m.image_url ? (
+                          <img
+                            src={m.image_url}
+                            alt={`${m.name} investment machine`}
+                            loading="lazy"
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center gradient-primary">
+                            <Cpu className="h-10 w-10 text-primary-foreground/80" />
                           </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-start justify-between gap-2">
-                              <div>
-                                <p className="font-bold leading-tight">{m.name}</p>
-                                {m.series && (
-                                  <Badge variant="secondary" className="mt-1 text-[10px]">{m.series}</Badge>
-                                )}
-                              </div>
-                              <Badge variant={buyable ? "default" : "outline"} className="shrink-0 text-[10px]">
-                                {soldOut ? "Sold Out" : statusLabel[m.status]}
-                              </Badge>
-                            </div>
-                            {m.description && (
-                              <p className="mt-1.5 text-xs text-muted-foreground">{m.description}</p>
-                            )}
-                          </div>
+                        )}
+                        <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-background/85 via-background/10 to-transparent" />
+                        {m.series && (
+                          <Badge className="absolute left-3 top-3 bg-secondary text-secondary-foreground text-[10px] shadow">
+                            {m.series}
+                          </Badge>
+                        )}
+                        <Badge
+                          variant={buyable ? "default" : "outline"}
+                          className="absolute right-3 top-3 text-[10px] shadow backdrop-blur"
+                        >
+                          {soldOut ? "Sold Out" : statusLabel[m.status]}
+                        </Badge>
+                        <div className="absolute bottom-2 left-3 right-3 flex items-end justify-between gap-2">
+                          <p className="text-base font-bold leading-tight">{m.name}</p>
+                          <span className="flex shrink-0 items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-semibold text-success">
+                            <TrendingUp className="h-3 w-3" /> +{roi}%
+                          </span>
                         </div>
+                      </div>
+
+                      <CardContent className="p-4">
+                        {m.description && (
+                          <p className="text-xs leading-relaxed text-muted-foreground">{m.description}</p>
+                        )}
 
                         <div className="mt-3 grid grid-cols-3 gap-2 rounded-xl bg-muted/40 p-2.5 text-center">
                           <div>
                             <p className="text-[10px] text-muted-foreground">Price</p>
                             <p className="text-xs font-bold">UGX {Number(m.price).toLocaleString()}</p>
                           </div>
-                          <div>
+                          <div className="border-x border-border/50">
                             <p className="text-[10px] text-muted-foreground">Duration</p>
                             <p className="text-xs font-bold">{formatDuration(m.duration_hours)}</p>
                           </div>
@@ -257,20 +306,37 @@ export default function Machines() {
                           </div>
                         </div>
 
-                        <div className="mt-3 flex items-center justify-between">
-                          <span className="flex items-center gap-1 text-xs font-medium text-success">
-                            <TrendingUp className="h-3.5 w-3.5" /> +{roi}% return
-                          </span>
-                          <Button size="sm" disabled={!buyable} onClick={() => setSelected(m)} className="tap-pop">
-                            {buyable ? "Invest" : statusLabel[soldOut ? "sold_out" : m.status]}
-                          </Button>
-                        </div>
+                        {m.max_total > 0 && (
+                          <div className="mt-3">
+                            <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                              <span>Availability</span>
+                              <span className="font-medium">
+                                {m.purchases_count} of {m.max_total} taken
+                              </span>
+                            </div>
+                            <Progress value={soldPct} className="mt-1 h-1.5" />
+                          </div>
+                        )}
+
+                        <Button
+                          disabled={!buyable}
+                          onClick={() => setSelected(m)}
+                          className="mt-3 w-full rounded-xl tap-pop"
+                        >
+                          {buyable ? `Invest UGX ${Number(m.price).toLocaleString()}` : statusLabel[soldOut ? "sold_out" : m.status]}
+                        </Button>
+
+                        <p className="mt-2 flex items-center justify-center gap-1 text-[10px] text-muted-foreground">
+                          <ShieldCheck className="h-3 w-3 text-primary" />
+                          Rewards are credited automatically at maturity
+                        </p>
                       </CardContent>
                     </Card>
                   );
                 })
               )}
             </TabsContent>
+
 
             <TabsContent value="mine" className="mt-4 space-y-3">
               {activeInvestments.length === 0 && pastInvestments.length === 0 ? (
