@@ -129,7 +129,7 @@ export default function Wallet() {
         .select("*")
         .eq("user_id", profile.user_id)
         .order("created_at", { ascending: false })
-        .limit(20);
+        .limit(5);
 
       if (error) throw error;
       return data as Transaction[];
