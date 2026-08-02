@@ -112,9 +112,35 @@ export default function Dashboard() {
     { title: "Referrals", icon: Gift, iconColor: "text-primary bg-primary/15", description: "Invite friends", href: "/referrals" },
   ];
 
+  const welcomeMessage =
+    settings?.welcome_message?.trim() ||
+    "Welcome to FlexiEarn. Introducing Investment Machines — invest once and your reward is credited automatically the moment your machine matures. Secure, transparent and fully managed for you.";
+
   return (
-    <UserLayout>
+    <UserLayout showAnnouncement>
       <div className="space-y-5">
+        {/* Welcome message */}
+        <Card className="relative overflow-hidden border-0 glass-card">
+          <div aria-hidden className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-primary/20 blur-2xl" />
+          <CardContent className="relative flex gap-3 py-4">
+            <div className="h-fit rounded-xl bg-primary/15 p-2">
+              <Sparkles className="h-4.5 w-4.5 text-primary" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-bold">
+                Hello{profile?.full_name ? `, ${profile.full_name.split(" ")[0]}` : ""} 👋
+              </p>
+              <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{welcomeMessage}</p>
+              <Link
+                to="/machines"
+                className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary"
+              >
+                Explore Investment Machines →
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Daily Check-in Card */}
         <Card className="relative overflow-hidden border-0 shadow-md glow-primary">
           <div className="relative gradient-primary p-4">
@@ -206,24 +232,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-3">
-          <Button
-            variant="outline"
-            className="h-auto py-3.5 border-primary/20 hover:bg-primary/5 font-semibold"
-            onClick={() => navigate("/wallet")}
-          >
-            <Wallet className="mr-2 h-4 w-4 text-primary" />
-            Withdraw
-          </Button>
-          <Button
-            className="h-auto py-3.5 gradient-primary border-0 text-primary-foreground font-semibold hover:opacity-90"
-            onClick={() => navigate("/referrals")}
-          >
-            <Users className="mr-2 h-4 w-4" />
-            Invite Friends
-          </Button>
-        </div>
       </div>
       <AdPopup />
     </UserLayout>

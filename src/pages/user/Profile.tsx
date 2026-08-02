@@ -157,6 +157,7 @@ export default function Profile() {
         {/* Account */}
         <Group title="Account">
           <Row icon={User} label="Manage Profile" onClick={() => setEditOpen(true)} />
+          <Row icon={FileText} label="Statement" value="All transactions" onClick={() => navigate("/statement")} iconClass="text-primary" />
           <Row icon={Phone} label="Phone" value={profile?.phone} showChevron={false} />
           <Row icon={Mail} label="Email" value={profile?.email || "Not set"} showChevron={false} />
           <Row icon={Shield} label="Referral Code" value={

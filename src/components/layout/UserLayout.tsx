@@ -9,15 +9,17 @@ import { toast } from "sonner";
 
 interface UserLayoutProps {
   children: ReactNode;
+  /** Announcement banner is only shown where explicitly enabled (home page). */
+  showAnnouncement?: boolean;
 }
 
-export function UserLayout({ children }: UserLayoutProps) {
+export function UserLayout({ children, showAnnouncement = false }: UserLayoutProps) {
   const { profile, refreshProfile } = useAuth();
   const { data: settings } = usePlatformSettings();
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const announcement = settings?.platform_announcement;
+  const announcement = showAnnouncement ? settings?.platform_announcement : "";
 
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);

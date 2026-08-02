@@ -29,7 +29,10 @@ import {
   Clock,
   CheckCircle,
   XCircle,
+  FileText,
 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { transactionLabel } from "@/lib/transactions";
 import { GiftCodeRedeem } from "@/components/user/GiftCodeRedeem";
 
 interface Transaction {
@@ -129,7 +132,7 @@ export default function Wallet() {
         .select("*")
         .eq("user_id", profile.user_id)
         .order("created_at", { ascending: false })
-        .limit(20);
+        .limit(5);
 
       if (error) throw error;
       return data as Transaction[];
@@ -479,66 +482,14 @@ function TransactionHistory({
   isLoading: boolean;
   formatDate: (d: string) => string;
 }) {
-  const [filter, setFilter] = useState<"all" | "in" | "out">("all");
-
-  const filtered = transactions.filter((t) => {
-    if (filter === "in") return t.amount > 0;
-    if (filter === "out") return t.amount < 0;
-    return true;
-  });
-
-  // Group by date label
-  const groups = filtered.reduce<Record<string, Transaction[]>>((acc, t) => {
-    const d = new Date(t.created_at);
-    const today = new Date();
-    const yesterday = new Date(Date.now() - 86400000);
-    let label = d.toLocaleDateString("en-UG", { day: "numeric", month: "long", year: "numeric" });
-    if (d.toDateString() === today.toDateString()) label = "Today";
-    else if (d.toDateString() === yesterday.toDateString()) label = "Yesterday";
-    (acc[label] ||= []).push(t);
-    return acc;
-  }, {});
-
-  const totalIn = transactions.filter((t) => t.amount > 0).reduce((s, t) => s + t.amount, 0);
-  const totalOut = transactions.filter((t) => t.amount < 0).reduce((s, t) => s + Math.abs(t.amount), 0);
-
-  const typeLabel = (t: Transaction) => {
-    const map: Record<string, string> = {
-      earning: "Earning",
-      withdrawal: "Withdrawal",
-      deposit: "Deposit",
-      gift_code: "Gift Code",
-      achievement: "Achievement",
-      referral: "Referral",
-      ad_payment: "Ad Payment",
-    };
-    return map[t.transaction_type] || t.transaction_type.replace(/_/g, " ");
-  };
-
   return (
     <Card className="glass-card border-0">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base">Transaction History</CardTitle>
-          <div className="text-right text-[11px]">
-            <p className="text-success font-semibold">+UGX {totalIn.toLocaleString()}</p>
-            <p className="text-destructive font-semibold">−UGX {totalOut.toLocaleString()}</p>
-          </div>
-        </div>
-        <div className="mt-2 flex gap-1 rounded-lg bg-muted p-1">
-          {(["all", "in", "out"] as const).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`flex-1 rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
-                filter === f
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {f === "all" ? "All" : f === "in" ? "Money In" : "Money Out"}
-            </button>
-          ))}
+          <CardTitle className="text-base">Recent Transactions</CardTitle>
+          <Link to="/statement" className="text-xs font-semibold text-primary">
+            View full statement
+          </Link>
         </div>
       </CardHeader>
       <CardContent>
@@ -546,7 +497,7 @@ function TransactionHistory({
           <div className="flex justify-center py-6">
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
-        ) : filtered.length === 0 ? (
+        ) : transactions.length === 0 ? (
           <div className="py-8 text-center">
             <div className="mx-auto mb-2 w-fit rounded-full bg-muted p-3">
               <WalletIcon className="h-5 w-5 text-muted-foreground" />
@@ -554,65 +505,55 @@ function TransactionHistory({
             <p className="text-sm text-muted-foreground">No transactions yet</p>
           </div>
         ) : (
-          <div className="space-y-4">
-            {Object.entries(groups).map(([label, items]) => (
-              <div key={label}>
-                <p className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  {label}
-                </p>
-                <div className="space-y-1">
-                  {items.map((transaction) => {
-                    const isIn = transaction.amount > 0;
-                    return (
-                      <div
-                        key={transaction.id}
-                        className="flex items-center justify-between rounded-xl border border-border/40 bg-card/40 p-3 hover:bg-accent/40 transition-colors"
-                      >
-                        <div className="flex min-w-0 items-center gap-3">
-                          <div
-                            className={`rounded-full p-2 ${
-                              isIn ? "bg-success/15" : "bg-destructive/15"
-                            }`}
-                          >
-                            {isIn ? (
-                              <ArrowDownLeft className="h-4 w-4 text-success" />
-                            ) : (
-                              <ArrowUpRight className="h-4 w-4 text-destructive" />
-                            )}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="truncate text-sm font-medium">
-                              {transaction.description || typeLabel(transaction)}
-                            </p>
-                            <div className="mt-0.5 flex items-center gap-2">
-                              <Badge variant="outline" className="h-4 px-1.5 text-[10px] font-normal">
-                                {typeLabel(transaction)}
-                              </Badge>
-                              <p className="text-[11px] text-muted-foreground">
-                                {formatDate(transaction.created_at)}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p
-                            className={`font-bold text-sm ${
-                              isIn ? "text-success" : "text-destructive"
-                            }`}
-                          >
-                            {isIn ? "+" : "−"}UGX{" "}
-                            {Math.abs(transaction.amount).toLocaleString()}
-                          </p>
-                          <p className="text-[10px] text-muted-foreground">
-                            Bal UGX {Number(transaction.balance_after).toLocaleString()}
-                          </p>
-                        </div>
+          <div className="space-y-1">
+            {transactions.map((transaction) => {
+              const isIn = transaction.amount > 0;
+              return (
+                <div
+                  key={transaction.id}
+                  className="flex items-center justify-between rounded-xl border border-border/40 bg-card/40 p-3 transition-colors hover:bg-accent/40"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className={`rounded-full p-2 ${isIn ? "bg-success/15" : "bg-destructive/15"}`}>
+                      {isIn ? (
+                        <ArrowDownLeft className="h-4 w-4 text-success" />
+                      ) : (
+                        <ArrowUpRight className="h-4 w-4 text-destructive" />
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium">
+                        {transaction.description ||
+                          transactionLabel(transaction.transaction_type, transaction.amount)}
+                      </p>
+                      <div className="mt-0.5 flex items-center gap-2">
+                        <Badge variant="outline" className="h-4 px-1.5 text-[10px] font-normal">
+                          {transactionLabel(transaction.transaction_type, transaction.amount)}
+                        </Badge>
+                        <p className="text-[11px] text-muted-foreground">
+                          {formatDate(transaction.created_at)}
+                        </p>
                       </div>
-                    );
-                  })}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className={`text-sm font-bold ${isIn ? "text-success" : "text-destructive"}`}>
+                      {isIn ? "+" : "−"}UGX {Math.abs(transaction.amount).toLocaleString()}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">
+                      Bal UGX {Number(transaction.balance_after).toLocaleString()}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
+
+            <Button asChild variant="outline" className="mt-3 w-full rounded-xl">
+              <Link to="/statement">
+                <FileText className="mr-2 h-4 w-4" />
+                View full statement
+              </Link>
+            </Button>
           </div>
         )}
       </CardContent>

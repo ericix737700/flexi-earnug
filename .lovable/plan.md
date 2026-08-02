@@ -1,50 +1,33 @@
-# Investment Machines
+## Goal
+Polish the user experience: professional Machines page, a full Statement section in Profile, a leaner Wallet, a configurable welcome message on the home screen, and scoped announcements.
 
-Adds a self-contained investment module: users buy a "machine" with wallet balance, it runs for a set duration, then the reward is auto-credited. Admin fully controls machines, investments, payouts, and feature availability. Nothing in the existing task/wallet/ads flow changes.
+## 1. Machines page (`src/pages/user/Machines.tsx`)
+- Remove the balance chip in the header (balance already shows in the app header).
+- Replace the plain header with a premium hero: gradient/glass banner with title, one-line value proposition, and 3 quick stats (Active investments, Total invested, Expected returns) computed from the user's investments.
+- Upgrade machine cards: larger media area, series ribbon, clearer price / duration / reward metric strip, ROI pill, availability meter ("X of Y sold") when `max_total > 0`, and a trust footnote ("Rewards are credited automatically at maturity").
+- My Investments tab: cleaner running cards with progress ring/bar, countdown, maturity date and payout summary; grouped "Completed" history list.
+- Keep purchase dialog logic unchanged (insufficient-balance hint still links to Wallet).
 
-## Navigation
-- Bottom nav gets a 6th item **Machines** (`/machines`, Cpu icon), sitting between Tasks and Wallet. Item is hidden when the feature flag is off, and shows a **NEW** dot while the badge window is active.
-- Admin sidebar gets **Machines** (management) and **Investments** (monitoring) entries.
+## 2. Home screen (`src/pages/user/Dashboard.tsx`)
+- Remove the bottom "Withdraw" and "Invite Friends" quick-action buttons (both are still reachable from nav/task tiles).
+- Add a professional welcome card at the top of the home screen rendering the admin-configured `welcome_message`, falling back to a polished default that highlights Investment Machines. Only rendered on the dashboard.
 
-## Database (new tables)
-- `investment_machines` — name, series, description, image_url, price, reward_amount, duration_hours, status (`active` | `coming_soon` | `sold_out` | `disabled`), max_per_user, max_total, purchases_count, sort_order, is_visible, sort/timestamps.
-- `user_investments` — user_id, machine_id, amount_paid, reward_amount, status (`active` | `completed` | `cancelled` | `refunded`), starts_at, matures_at, completed_at, timestamps.
-- `investment_audit_log` — actor, action, investment/machine id, details jsonb.
+## 3. Welcome message in Admin (`src/pages/admin/AdminSettings.tsx`)
+- The `welcome_message` setting already exists in Admin Settings but is not shown anywhere in the app; it will now drive the dashboard card. Improve the field with a machines-focused placeholder/default text and helper copy noting it appears on the user home screen.
 
-Access rules in plain English:
-- Anyone signed in can see visible machines; only admins can create, edit, or delete them.
-- Users can see only their own investments; admins can see all.
-- Users cannot insert or modify investments directly — purchases go through the server so balance and limits are enforced.
-- Audit log is admin-read only, written by the server.
+## 4. Announcement scoping (`src/components/layout/UserLayout.tsx`)
+- Add an optional `showAnnouncement` prop (default `false`); only the Dashboard passes `true`, so the announcement banner no longer appears on Profile, Wallet, Machines, etc.
 
-A `machines` storage bucket (public) holds machine images.
+## 5. Wallet = recent transactions only (`src/pages/user/Wallet.tsx`)
+- Limit the list to the 5 most recent transactions, retitle the card "Recent Transactions", drop the All/In/Out filter tabs and date grouping there, and add a "View full statement" link to the new Statement page.
 
-## Server logic (edge functions)
-1. `invest-purchase` — validates auth, feature flag on, machine active/visible, not sold out, per-user and total limits, sufficient balance. Then atomically: deducts balance, writes a `transactions` row (`investment`, negative), creates `user_investments` with `matures_at = now() + duration`, increments purchases_count, logs audit, sends notification + push.
-2. `invest-mature` — scheduled via cron every 5 minutes. Skips when admin has paused reward processing. For every active investment past `matures_at`: credits reward to balance, writes a `transactions` row, marks completed, notifies user (in-app + push), logs audit. Idempotent per investment.
-3. `invest-admin-action` — admin-only: cancel + refund, force-complete (pay now), adjust reward on an active investment, all audit-logged. Timers (`starts_at`/`matures_at`) are immutable — DB rule blocks changing them on active rows.
-
-All amounts and durations are computed server-side; the client only sends a machine id.
-
-## User page `/machines`
-- Card grid: image, name, series badge, description, price, duration, estimated reward, ROI %, status pill. Disabled/sold-out/coming-soon cards are visually muted and non-clickable.
-- Purchase dialog with a confirmation summary (machine, amount, duration, reward, expected completion date), balance check and insufficient-funds link to deposit.
-- **My Investments** tab: live countdown per active investment with progress bar, plus completed history. Realtime subscription so a matured reward appears instantly.
-- If feature flag is `coming_soon`, the page renders a teaser state instead of the grid.
-
-## Admin
-- `/admin/machines` — table + create/edit sheet with every field (name, series, description, image upload, price, reward, duration, max per user, max total, sort order, visibility, status). Row actions: enable/disable, mark coming soon, mark sold out, duplicate, delete.
-- `/admin/investments` — stats cards (total invested, total rewards paid, active/completed/cancelled counts), search by user, filter by status/machine, per-row actions (complete now, cancel & refund, adjust reward), and a global **Pause / Resume reward processing** switch.
-- Announcement composer reuses the existing notifications + push infrastructure to notify users about new machines/plans.
-
-## Feature management
-Stored in `platform_settings`:
-- `feature_machines_status` — `coming_soon` (default) | `active` | `disabled`
-- `feature_machines_activated_at`, `feature_machines_new_badge_days` (default 7)
-
-Toggled from Admin → Settings. On activation the server sends an in-app notification + push broadcast and creates an announcement; the NEW badge auto-expires once the configured days elapse.
+## 6. New Statement section (Profile)
+- New page `src/pages/user/Statement.tsx` at route `/statement`, added to `App.tsx` as a protected route.
+- Linked from Profile under the Account group ("Statement").
+- Shows every transaction (paged/infinite, newest first) with: date & time, description, mapped category label (Deposit, Machine Maturity, Machine Purchase, Withdrawal, Task Earning, Referral, Gift Code, Achievement, Admin Top-up, Deduction), amount in/out, **balance before** (derived as `balance_after - amount`) and **balance after**.
+- Filters by type and date range (All / Today / This week / This month), plus totals in/out summary header, CSV-style empty and loading states.
 
 ## Technical notes
-- Balance mutation happens only in security-definer database functions called by edge functions, so RLS-bypassing client writes are impossible.
-- Cron scheduling uses `pg_cron` + `pg_net` against the `invest-mature` function.
-- Transaction types added: `investment` (debit) and `investment_reward` (credit) — both surface in the existing wallet history filters automatically.
+- No database changes; balance-before is derived from existing `transactions.balance_after` and `amount`.
+- Transaction category mapping is centralised in a small helper reused by Wallet and Statement.
+- All styling uses existing semantic tokens (`glass-card`, `gradient-primary`, `text-success`, etc.).

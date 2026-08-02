@@ -28,6 +28,7 @@ import Profile from "./pages/user/Profile";
 import Achievements from "./pages/user/Achievements";
 import Ads from "./pages/user/Ads";
 import Machines from "./pages/user/Machines";
+import Statement from "./pages/user/Statement";
 
 // Admin Pages
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -129,6 +130,7 @@ function AppRoutes() {
       <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
       <Route path="/ads" element={<ProtectedRoute><Ads /></ProtectedRoute>} />
       <Route path="/machines" element={<ProtectedRoute><Machines /></ProtectedRoute>} />
+      <Route path="/statement" element={<ProtectedRoute><Statement /></ProtectedRoute>} />
 
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
