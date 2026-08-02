@@ -350,22 +350,28 @@ export default function Machines() {
                 return (
                   <Card key={inv.id} className="glass-card border-0">
                     <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <p className="font-bold">{inv.machine_name}</p>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="truncate font-bold">{inv.machine_name}</p>
                           <p className="text-xs text-muted-foreground">
-                            Invested UGX {Number(inv.amount_paid).toLocaleString()}
+                            Invested UGX {Number(inv.amount_paid).toLocaleString()} · matures{" "}
+                            {new Date(inv.matures_at).toLocaleDateString("en-UG", {
+                              day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
+                            })}
                           </p>
                         </div>
-                        <Badge className="bg-primary/15 text-primary">Running</Badge>
+                        <Badge className="shrink-0 bg-primary/15 text-primary">Running</Badge>
                       </div>
                       <Progress value={pct} className="mt-3 h-2" />
-                      <div className="mt-2 flex items-center justify-between text-xs">
+                      <div className="mt-1 text-right text-[10px] text-muted-foreground">
+                        {Math.round(pct)}% complete
+                      </div>
+                      <div className="mt-2 flex items-center justify-between rounded-xl bg-muted/40 px-3 py-2 text-xs">
                         <span className="flex items-center gap-1 text-muted-foreground">
                           <Clock className="h-3.5 w-3.5" /> <Countdown to={inv.matures_at} />
                         </span>
                         <span className="font-semibold text-success">
-                          +UGX {Number(inv.reward_amount).toLocaleString()}
+                          Payout +UGX {Number(inv.reward_amount).toLocaleString()}
                         </span>
                       </div>
                     </CardContent>
@@ -373,23 +379,36 @@ export default function Machines() {
                 );
               })}
 
-              {pastInvestments.map((inv) => (
-                <Card key={inv.id} className="border-border/50">
-                  <CardContent className="flex items-center justify-between p-4">
-                    <div>
-                      <p className="font-semibold">{inv.machine_name}</p>
-                      <p className="text-xs text-muted-foreground capitalize">
-                        {inv.status} · {inv.completed_at ? new Date(inv.completed_at).toLocaleDateString() : ""}
-                      </p>
-                    </div>
-                    <p className={`text-sm font-bold ${inv.status === "completed" ? "text-success" : "text-muted-foreground"}`}>
-                      {inv.status === "completed"
-                        ? `+UGX ${Number(inv.reward_amount).toLocaleString()}`
-                        : `UGX ${Number(inv.amount_paid).toLocaleString()}`}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
+              {pastInvestments.length > 0 && (
+                <>
+                  <p className="pt-2 px-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    History
+                  </p>
+                  <div className="overflow-hidden rounded-2xl border bg-card divide-y">
+                    {pastInvestments.map((inv) => (
+                      <div key={inv.id} className="flex items-center justify-between gap-3 p-3.5">
+                        <div className="flex min-w-0 items-center gap-3">
+                          <div className={`rounded-full p-2 ${inv.status === "completed" ? "bg-success/15" : "bg-muted"}`}>
+                            <CheckCircle2 className={`h-4 w-4 ${inv.status === "completed" ? "text-success" : "text-muted-foreground"}`} />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold">{inv.machine_name}</p>
+                            <p className="text-[11px] capitalize text-muted-foreground">
+                              {inv.status}
+                              {inv.completed_at ? ` · ${new Date(inv.completed_at).toLocaleDateString()}` : ""}
+                            </p>
+                          </div>
+                        </div>
+                        <p className={`shrink-0 text-sm font-bold ${inv.status === "completed" ? "text-success" : "text-muted-foreground"}`}>
+                          {inv.status === "completed"
+                            ? `+UGX ${Number(inv.reward_amount).toLocaleString()}`
+                            : `UGX ${Number(inv.amount_paid).toLocaleString()}`}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
             </TabsContent>
           </Tabs>
         )}
