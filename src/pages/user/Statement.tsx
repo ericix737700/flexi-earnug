@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserLayout } from "@/components/layout/UserLayout";
@@ -9,8 +9,10 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, ArrowDownLeft, ArrowUpRight, FileText, Loader2 } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, ChevronDown, Copy, FileText, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 import { SEO } from "@/components/SEO";
 import { EmptyState } from "@/components/EmptyState";
 import { transactionLabel } from "@/lib/transactions";
@@ -21,6 +23,7 @@ interface Transaction {
   amount: number;
   balance_after: number;
   description: string | null;
+  reference_id?: string | null;
   created_at: string;
 }
 
@@ -40,12 +43,41 @@ function rangeStart(key: RangeKey): Date | null {
   return null;
 }
 
+function fullStamp(iso: string) {
+  const d = new Date(iso);
+  const time = d.toLocaleTimeString("en-UG", { hour: "numeric", minute: "2-digit", hour12: true }).toLowerCase();
+  const date = d.toLocaleDateString("en-GB", { weekday: "short", day: "2-digit", month: "2-digit", year: "numeric" });
+  return `${time}, ${date}`;
+}
+
 export default function Statement() {
   const { profile } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [range, setRange] = useState<RangeKey>("all");
   const [type, setType] = useState<string>("all");
   const [limit, setLimit] = useState(PAGE_SIZE);
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  // Live updates
+  useEffect(() => {
+    if (!profile?.user_id) return;
+    const channel = supabase
+      .channel("statement-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "transactions", filter: `user_id=eq.${profile.user_id}` },
+        () => queryClient.invalidateQueries({ queryKey: ["statement"] })
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [profile?.user_id, queryClient]);
+
+  const copyId = (id: string) => {
+    navigator.clipboard.writeText(id);
+    toast.success("Transaction ID copied");
+  };
+
 
   const { data: transactions, isLoading } = useQuery({
     queryKey: ["statement", profile?.user_id, range, limit],
@@ -172,60 +204,89 @@ export default function Statement() {
                 <p className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                   {label}
                 </p>
-                <div className="overflow-hidden rounded-2xl border bg-card divide-y">
+                <div className="space-y-2">
                   {items.map((t) => {
                     const amount = Number(t.amount);
                     const isIn = amount > 0;
                     const after = Number(t.balance_after);
                     const before = after - amount;
+                    const isOpen = expanded === t.id;
                     return (
-                      <div key={t.id} className="p-3">
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex min-w-0 items-start gap-3">
-                            <div className={`mt-0.5 rounded-full p-2 ${isIn ? "bg-success/15" : "bg-destructive/15"}`}>
-                              {isIn ? (
-                                <ArrowDownLeft className="h-4 w-4 text-success" />
-                              ) : (
-                                <ArrowUpRight className="h-4 w-4 text-destructive" />
-                              )}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="truncate text-sm font-medium">
-                                {t.description || transactionLabel(t.transaction_type, amount)}
+                      <div key={t.id} className="overflow-hidden rounded-2xl border bg-card">
+                        <button
+                          type="button"
+                          onClick={() => setExpanded(isOpen ? null : t.id)}
+                          aria-expanded={isOpen}
+                          className="flex w-full items-start gap-2 p-3 text-left transition-colors hover:bg-muted/40"
+                        >
+                          <ChevronDown
+                            className={cn(
+                              "mt-0.5 h-4 w-4 shrink-0 text-muted-foreground transition-transform",
+                              isOpen && "rotate-180"
+                            )}
+                          />
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-start justify-between gap-3">
+                              <p className="truncate text-sm font-semibold">
+                                {transactionLabel(t.transaction_type, amount)}
                               </p>
-                              <div className="mt-1 flex flex-wrap items-center gap-2">
-                                <Badge variant="outline" className="h-4 px-1.5 text-[10px] font-normal">
-                                  {transactionLabel(t.transaction_type, amount)}
-                                </Badge>
-                                <span className="text-[11px] text-muted-foreground">
-                                  {new Date(t.created_at).toLocaleString("en-UG", {
-                                    day: "numeric", month: "short", year: "numeric",
-                                    hour: "2-digit", minute: "2-digit",
-                                  })}
-                                </span>
+                              <p className={cn("shrink-0 text-sm font-bold", isIn ? "text-success" : "text-destructive")}>
+                                {isIn ? "+ " : "− "}UGX {Math.abs(amount).toLocaleString()}
+                              </p>
+                            </div>
+                            <div className="mt-1 flex items-end justify-between gap-3">
+                              <span className="text-[11px] text-muted-foreground">{fullStamp(t.created_at)}</span>
+                              <span className="shrink-0 text-[11px] text-muted-foreground">
+                                Balance: <span className="font-semibold text-foreground">UGX {after.toLocaleString()}</span>
+                              </span>
+                            </div>
+                          </div>
+                        </button>
+
+                        {isOpen && (
+                          <div className="animate-fade-in border-t bg-muted/30 px-3 py-3 text-xs">
+                            {t.description && (
+                              <p className="mb-2 text-muted-foreground">{t.description}</p>
+                            )}
+                            <div className="mb-2 flex flex-wrap items-center gap-2">
+                              <Badge variant="outline" className="h-5 px-1.5 text-[10px] font-normal">
+                                {transactionLabel(t.transaction_type, amount)}
+                              </Badge>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 rounded-xl bg-background/60 px-3 py-2">
+                              <div>
+                                <p className="text-[10px] text-muted-foreground">Balance before</p>
+                                <p className="font-semibold">UGX {before.toLocaleString()}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-[10px] text-muted-foreground">Balance after</p>
+                                <p className="font-semibold">UGX {after.toLocaleString()}</p>
                               </div>
                             </div>
+                            <div className="mt-2 flex items-center justify-between gap-2 rounded-xl bg-background/60 px-3 py-2">
+                              <div className="min-w-0">
+                                <p className="text-[10px] text-muted-foreground">Transaction ID</p>
+                                <p className="truncate font-mono text-[11px]">{t.reference_id || t.id}</p>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 shrink-0"
+                                onClick={() => copyId(t.reference_id || t.id)}
+                                aria-label="Copy transaction ID"
+                              >
+                                <Copy className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
                           </div>
-                          <p className={`shrink-0 text-sm font-bold ${isIn ? "text-success" : "text-destructive"}`}>
-                            {isIn ? "+" : "−"}UGX {Math.abs(amount).toLocaleString()}
-                          </p>
-                        </div>
-                        <div className="mt-2 grid grid-cols-2 gap-2 rounded-xl bg-muted/40 px-3 py-2">
-                          <div>
-                            <p className="text-[10px] text-muted-foreground">Balance before</p>
-                            <p className="text-xs font-semibold">UGX {before.toLocaleString()}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-[10px] text-muted-foreground">Balance after</p>
-                            <p className="text-xs font-semibold">UGX {after.toLocaleString()}</p>
-                          </div>
-                        </div>
+                        )}
                       </div>
                     );
                   })}
                 </div>
               </div>
             ))}
+
 
             {(transactions || []).length >= limit && (
               <Button variant="outline" className="w-full rounded-xl" onClick={() => setLimit((l) => l + PAGE_SIZE)}>

@@ -66,14 +66,22 @@ export default function Wallet() {
       .channel('wallet-realtime')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions', filter: `user_id=eq.${profile.user_id}` }, () => {
         queryClient.invalidateQueries({ queryKey: ["transactions"] });
+        queryClient.invalidateQueries({ queryKey: ["statement"] });
+        refreshProfile();
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'withdrawals', filter: `user_id=eq.${profile.user_id}` }, () => {
         queryClient.invalidateQueries({ queryKey: ["pending-withdrawals"] });
+        refreshProfile();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'deposits', filter: `user_id=eq.${profile.user_id}` }, () => {
+        queryClient.invalidateQueries({ queryKey: ["transactions"] });
+        refreshProfile();
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles', filter: `user_id=eq.${profile.user_id}` }, () => {
         refreshProfile();
       })
       .subscribe();
+
 
     return () => { supabase.removeChannel(channel); };
   }, [profile?.user_id]);
