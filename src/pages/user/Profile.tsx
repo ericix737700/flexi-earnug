@@ -137,20 +137,25 @@ export default function Profile() {
 
 
         {/* Balance + quick actions */}
-        <div className="rounded-2xl border bg-card p-4">
+        <div className="rounded-2xl border bg-card p-4 text-center">
           <p className="text-xs text-muted-foreground">Wallet Balance</p>
-          <p className="mt-0.5 text-2xl font-bold text-primary">
+          <p className="mt-1 text-3xl font-bold tracking-tight">
             UGX {Number(profile?.balance || 0).toLocaleString()}
           </p>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <Button variant="outline" className="h-10 justify-start gap-2 rounded-xl" onClick={() => setDepositOpen(true)}>
-              <ArrowDownToLine className="h-4 w-4 text-green-600" /> Deposit
+          <div className="mt-2 flex items-center justify-center gap-2">
+            <NetworkBadge phone={profile?.phone} override={(profile as any)?.network_provider} size="sm" />
+            <span className="text-sm text-muted-foreground">{profile?.phone}</span>
+          </div>
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <Button variant="outline" className="h-11 rounded-xl font-semibold uppercase tracking-wide" onClick={() => navigate("/wallet")}>
+              Withdraw
             </Button>
-            <Button variant="outline" className="h-10 justify-start gap-2 rounded-xl" onClick={() => navigate("/wallet")}>
-              <ArrowUpFromLine className="h-4 w-4 text-primary" /> Withdraw
+            <Button className="h-11 rounded-xl font-semibold uppercase tracking-wide" onClick={() => setDepositOpen(true)}>
+              Deposit
             </Button>
           </div>
         </div>
+
 
         <EmailPrompt variant="card" />
 
