@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserLayout } from "@/components/layout/UserLayout";
@@ -9,8 +9,10 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, ArrowDownLeft, ArrowUpRight, FileText, Loader2 } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, ChevronDown, Copy, FileText, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 import { SEO } from "@/components/SEO";
 import { EmptyState } from "@/components/EmptyState";
 import { transactionLabel } from "@/lib/transactions";
@@ -21,6 +23,7 @@ interface Transaction {
   amount: number;
   balance_after: number;
   description: string | null;
+  reference_id?: string | null;
   created_at: string;
 }
 
@@ -40,12 +43,41 @@ function rangeStart(key: RangeKey): Date | null {
   return null;
 }
 
+function fullStamp(iso: string) {
+  const d = new Date(iso);
+  const time = d.toLocaleTimeString("en-UG", { hour: "numeric", minute: "2-digit", hour12: true }).toLowerCase();
+  const date = d.toLocaleDateString("en-GB", { weekday: "short", day: "2-digit", month: "2-digit", year: "numeric" });
+  return `${time}, ${date}`;
+}
+
 export default function Statement() {
   const { profile } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [range, setRange] = useState<RangeKey>("all");
   const [type, setType] = useState<string>("all");
   const [limit, setLimit] = useState(PAGE_SIZE);
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  // Live updates
+  useEffect(() => {
+    if (!profile?.user_id) return;
+    const channel = supabase
+      .channel("statement-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "transactions", filter: `user_id=eq.${profile.user_id}` },
+        () => queryClient.invalidateQueries({ queryKey: ["statement"] })
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [profile?.user_id, queryClient]);
+
+  const copyId = (id: string) => {
+    navigator.clipboard.writeText(id);
+    toast.success("Transaction ID copied");
+  };
+
 
   const { data: transactions, isLoading } = useQuery({
     queryKey: ["statement", profile?.user_id, range, limit],
