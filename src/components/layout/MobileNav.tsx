@@ -1,22 +1,20 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, User, Wallet, Smartphone, Wifi } from "lucide-react";
+import { LayoutDashboard, User, Wallet, ListTodo, Signal } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 
 type Item = {
-  href?: string;
+  href: string;
   icon: React.ElementType;
   label: string;
-  soon?: boolean;
 };
 
 const leftItems: Item[] = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Home" },
-  { icon: Smartphone, label: "Airtime", soon: true },
+  { href: "/tasks", icon: ListTodo, label: "Tasks" },
 ];
 
 const rightItems: Item[] = [
-  { icon: Wifi, label: "Data", soon: true },
+  { href: "/airtime-data", icon: Signal, label: "Airtime" },
   { href: "/profile", icon: User, label: "Profile" },
 ];
 
@@ -24,9 +22,16 @@ export function MobileNav() {
   const location = useLocation();
 
   const renderItem = (item: Item) => {
-    const isActive = item.href ? location.pathname === item.href : false;
-    const content = (
-      <>
+    const isActive = location.pathname === item.href;
+    return (
+      <Link
+        key={item.label}
+        to={item.href}
+        className={cn(
+          "group relative flex flex-1 flex-col items-center gap-0.5 px-2 py-1 text-[10px] font-medium tap-pop",
+          isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
+        )}
+      >
         <div
           className={cn(
             "relative flex items-center justify-center rounded-2xl p-2 transition-all duration-300",
@@ -34,41 +39,8 @@ export function MobileNav() {
           )}
         >
           <item.icon className={cn("h-5 w-5 transition-transform", isActive && "stroke-[2.5]")} />
-          {item.soon && (
-            <span className="absolute -top-1 -right-1 rounded-full bg-muted px-1 text-[7px] font-bold uppercase tracking-wide text-muted-foreground">
-              soon
-            </span>
-          )}
         </div>
         <span className={cn("transition-opacity", isActive ? "opacity-100" : "opacity-80")}>{item.label}</span>
-      </>
-    );
-
-    const className = cn(
-      "group relative flex flex-1 flex-col items-center gap-0.5 px-2 py-1 text-[10px] font-medium tap-pop",
-      item.soon
-        ? "text-muted-foreground/60"
-        : isActive
-        ? "text-primary"
-        : "text-muted-foreground hover:text-foreground"
-    );
-
-    if (item.soon) {
-      return (
-        <button
-          key={item.label}
-          type="button"
-          onClick={() => toast.info(`${item.label} is coming soon`)}
-          className={className}
-        >
-          {content}
-        </button>
-      );
-    }
-
-    return (
-      <Link key={item.label} to={item.href!} className={className}>
-        {content}
       </Link>
     );
   };
