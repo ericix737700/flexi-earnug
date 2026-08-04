@@ -36,6 +36,8 @@ const navItems = [
   { href: "/admin/ads", icon: Megaphone, label: "Ads" },
   { href: "/admin/machines", icon: Cpu, label: "Machines" },
   { href: "/admin/investments", icon: LineChart, label: "Investments" },
+  { href: "/admin/airtime-data", icon: Signal, label: "Airtime & Data" },
+
   { href: "/admin/deposits", icon: ArrowDownToLine, label: "Deposits" },
   { href: "/admin/withdrawals", icon: Wallet, label: "Withdrawals" },
    { href: "/admin/notifications", icon: Bell, label: "Notifications" },
