@@ -106,6 +106,8 @@ export default function Dashboard() {
   const taskCategories = [
     { title: "Watch Videos", icon: Play, iconColor: "text-blue-500 bg-blue-500/15", description: "Earn by watching ads", href: "/tasks?type=video" },
     { title: "Surveys", icon: ClipboardList, iconColor: "text-purple-500 bg-purple-500/15", description: "Complete quick surveys", href: "/tasks?type=survey" },
+    { title: "Machines", icon: Cpu, iconColor: "text-emerald-500 bg-emerald-500/15", description: "Invest & earn rewards", href: "/machines" },
+    { title: "Airtime & Data", icon: Signal, iconColor: "text-cyan-500 bg-cyan-500/15", description: "Top up any line", href: "/airtime-data" },
     { title: "Trivia", icon: HelpCircle, iconColor: "text-secondary bg-secondary/15", description: "Answer quiz questions", href: "/tasks?type=trivia" },
     { title: "Achievements", icon: Trophy, iconColor: "text-amber-500 bg-amber-500/15", description: "Claim bonuses", href: "/achievements" },
     { title: "Ads", icon: Megaphone, iconColor: "text-rose-500 bg-rose-500/15", description: "Advertise on FlexiEarn", href: "/ads" },
@@ -116,11 +118,21 @@ export default function Dashboard() {
     settings?.welcome_message?.trim() ||
     "Welcome to FlexiEarn. Introducing Investment Machines — invest once and your reward is credited automatically the moment your machine matures. Secure, transparent and fully managed for you.";
 
+  // Optional activation window set by admins
+  const now = Date.now();
+  const startsAt = settings?.welcome_message_start ? new Date(settings.welcome_message_start).getTime() : null;
+  const endsAt = settings?.welcome_message_end ? new Date(settings.welcome_message_end).getTime() : null;
+  const welcomeVisible =
+    (!startsAt || Number.isNaN(startsAt) || now >= startsAt) &&
+    (!endsAt || Number.isNaN(endsAt) || now <= endsAt);
+
   return (
     <UserLayout showAnnouncement>
       <div className="space-y-5">
         {/* Welcome message */}
+        {welcomeVisible && (
         <Card className="relative overflow-hidden border-0 glass-card">
+
           <div aria-hidden className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-primary/20 blur-2xl" />
           <CardContent className="relative flex gap-3 py-4">
             <div className="h-fit rounded-xl bg-primary/15 p-2">
