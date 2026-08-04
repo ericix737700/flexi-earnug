@@ -16,7 +16,10 @@ import {
   Sparkles,
   Trophy,
   Megaphone,
+  Cpu,
+  Signal,
 } from "lucide-react";
+
 import { AdBanner } from "@/components/user/AdBanner";
 import { AdPopup } from "@/components/user/AdPopup";
 import { AchievementsSection } from "@/components/user/AchievementsSection";
