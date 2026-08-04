@@ -1,4 +1,4 @@
-import { usePlatformLogo } from "@/hooks/usePlatformLogo";
+import logo from "@/assets/logo.png";
 
 interface PlatformLogoProps {
   className?: string;
@@ -12,33 +12,16 @@ const sizeMap = {
   lg: "h-16 w-16",
 };
 
-const textSizeMap = {
-  sm: "text-sm",
-  md: "text-lg",
-  lg: "text-2xl",
-};
-
-export function PlatformLogo({ className = "", fallbackText = "FE", size = "md" }: PlatformLogoProps) {
-  const logoUrl = usePlatformLogo();
-
-  if (logoUrl) {
-    return (
-      <img
-        src={`${logoUrl}?t=${Date.now()}`}
-        alt="Platform Logo"
-        className={`${sizeMap[size]} rounded-full object-cover ${className}`}
-        crossOrigin="anonymous"
-      />
-    );
-  }
-
+/** Permanent brand mark — same asset used for the favicon and app icons. */
+export function PlatformLogo({ className = "", size = "md" }: PlatformLogoProps) {
   return (
-    <div
-      className={`${sizeMap[size]} flex items-center justify-center rounded-full bg-primary ${className}`}
-    >
-      <span className={`${textSizeMap[size]} font-bold text-primary-foreground`}>
-        {fallbackText}
-      </span>
-    </div>
+    <img
+      src={logo}
+      alt="FlexiEarn logo"
+      width={1024}
+      height={1024}
+      loading="lazy"
+      className={`${sizeMap[size]} rounded-full object-contain ${className}`}
+    />
   );
 }

@@ -14,7 +14,10 @@ import {
   FileText, ArrowDownToLine, ArrowUpFromLine,
   Copy, Lock, Users, MessageCircle, Mail, Pencil, Bell, Wallet as WalletIcon,
   Sun, Moon, Monitor, Palette,
+  Cpu,
+  Signal,
 } from "lucide-react";
+
 import { toast } from "sonner";
 import { NotificationsSection } from "@/components/user/NotificationsSection";
 import { PushNotificationToggle } from "@/components/user/PushNotificationToggle";
@@ -158,6 +161,13 @@ export default function Profile() {
 
 
         <EmailPrompt variant="card" />
+
+        {/* Services */}
+        <Group title="Services">
+          <Row icon={Cpu} label="Investment Machines" value="Invest & earn" onClick={() => navigate("/machines")} iconClass="text-emerald-500" />
+          <Row icon={Signal} label="Airtime & Data" value="Buy instantly" onClick={() => navigate("/airtime-data")} iconClass="text-cyan-500" />
+        </Group>
+
 
         {/* Account */}
         <Group title="Account">
