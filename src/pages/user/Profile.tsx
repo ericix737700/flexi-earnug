@@ -14,7 +14,10 @@ import {
   FileText, ArrowDownToLine, ArrowUpFromLine,
   Copy, Lock, Users, MessageCircle, Mail, Pencil, Bell, Wallet as WalletIcon,
   Sun, Moon, Monitor, Palette,
+  Cpu,
+  Signal,
 } from "lucide-react";
+
 import { toast } from "sonner";
 import { NotificationsSection } from "@/components/user/NotificationsSection";
 import { PushNotificationToggle } from "@/components/user/PushNotificationToggle";
