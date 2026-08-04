@@ -152,6 +152,9 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
+        )}
+
+
 
         {/* Daily Check-in Card */}
         <Card className="relative overflow-hidden border-0 shadow-md glow-primary">
