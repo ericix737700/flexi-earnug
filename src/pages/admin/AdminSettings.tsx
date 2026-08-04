@@ -15,6 +15,8 @@ import {
   ShieldAlert, AlertTriangle, Power, Zap, Cpu,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { WelcomeMessageDialog } from "@/components/admin/WelcomeMessageDialog";
+
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
