@@ -46,6 +46,8 @@ import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminGiftCodes from "./pages/admin/AdminGiftCodes";
 import AdminMachines from "./pages/admin/AdminMachines";
 import AdminInvestments from "./pages/admin/AdminInvestments";
+import AdminAirtimeData from "./pages/admin/AdminAirtimeData";
+
 
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
