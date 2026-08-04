@@ -378,39 +378,7 @@ function SettingCard({ icon: Icon, iconColor, title, label, value, onChange, onS
   );
 }
 
-function LogoUploadCard({ settings, onSave }: { settings: Record<string, string> | undefined; onSave: (key: string, value: string) => Promise<void> }) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const currentLogo = settings?.platform_logo || "";
-
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/")) { toast.error("Please select an image file"); return; }
-    if (file.size > 2 * 1024 * 1024) { toast.error("Image must be under 2MB"); return; }
-
-    setIsUploading(true);
-    try {
-      const ext = file.name.split(".").pop();
-      const fileName = `logo-${Date.now()}.${ext}`;
-      const { error: uploadError } = await supabase.storage.from("branding").upload(fileName, file, { upsert: true });
-      if (uploadError) throw uploadError;
-      const { data: urlData } = supabase.storage.from("branding").getPublicUrl(fileName);
-      await onSave("platform_logo", urlData.publicUrl);
-      toast.success("Logo uploaded successfully!");
-    } catch (error) {
-      console.error("Upload error:", error);
-      toast.error("Failed to upload logo");
-    } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
-  };
-
-  const handleRemove = async () => {
-    try { await onSave("platform_logo", ""); toast.success("Logo removed"); } catch { toast.error("Failed to remove logo"); }
-  };
-
+function LogoUploadCard(_props: { settings: Record<string, string> | undefined; onSave: (key: string, value: string) => Promise<void> }) {
   return (
     <Card>
       <CardHeader>
@@ -419,29 +387,17 @@ function LogoUploadCard({ settings, onSave }: { settings: Record<string, string>
           Platform Logo
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-sm text-muted-foreground">Upload a logo displayed across the platform</p>
-        {currentLogo && (
-          <div className="flex items-center gap-4">
-            <img src={currentLogo} alt="Current logo" className="h-16 w-16 rounded-full object-cover border-2 border-primary" />
-            <Button variant="destructive" size="sm" onClick={handleRemove}>
-              <Trash2 className="mr-2 h-4 w-4" />
-              Remove Logo
-            </Button>
-          </div>
-        )}
-        <div>
-          <input ref={fileInputRef} type="file" accept="image/*" onChange={handleUpload} className="hidden" />
-          <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
-            {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-            {isUploading ? "Uploading..." : "Upload Logo"}
-          </Button>
-          <p className="mt-1 text-xs text-muted-foreground">Recommended: Square image, max 2MB (PNG or JPG)</p>
-        </div>
+      <CardContent className="flex items-center gap-4">
+        <PlatformLogo size="lg" />
+        <p className="text-sm text-muted-foreground">
+          The FlexiEarn logo is now a permanent brand asset used across the app, the browser favicon
+          and the installed app icon. It can no longer be replaced from the panel.
+        </p>
       </CardContent>
     </Card>
   );
 }
+
 
 function SystemControlsCard({
   settings,
