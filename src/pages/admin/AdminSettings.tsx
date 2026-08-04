@@ -297,25 +297,14 @@ export default function AdminSettings() {
               Welcome Message
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Message shown on the user home screen</Label>
-              <Textarea
-                placeholder="Welcome to FlexiEarn. Introducing Investment Machines — invest once, and your reward is credited automatically the moment your machine matures. Secure, transparent, and fully managed for you."
-                value={formData.welcome_message}
-                onChange={(e) => setFormData({ ...formData, welcome_message: e.target.value })}
-                rows={4}
-              />
-              <p className="text-xs text-muted-foreground">
-                Appears in the welcome card at the top of the user home screen. Leave empty to use the default message.
-              </p>
-            </div>
-            <Button onClick={() => handleSave("welcome_message", formData.welcome_message)} disabled={updateSetting.isPending}>
-              {updateSetting.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-              Save Welcome Message
-            </Button>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Write the message, schedule an activation window and preview it before publishing.
+            </p>
+            <WelcomeMessageDialog settings={settings} onSave={handleSave} />
           </CardContent>
         </Card>
+
 
         {/* Announcement */}
         <Card>
