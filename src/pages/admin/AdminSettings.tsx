@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { WelcomeMessageDialog } from "@/components/admin/WelcomeMessageDialog";
+import { PlatformLogo } from "@/components/PlatformLogo";
+
 
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
