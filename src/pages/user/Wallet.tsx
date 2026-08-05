@@ -34,6 +34,9 @@ import {
 import { Link } from "react-router-dom";
 import { transactionLabel } from "@/lib/transactions";
 import { GiftCodeRedeem } from "@/components/user/GiftCodeRedeem";
+import { useWithdrawalFee } from "@/hooks/useWithdrawalFee";
+import { Info } from "lucide-react";
+
 
 interface Transaction {
   id: string;
@@ -126,9 +129,15 @@ export default function Wallet() {
     }
   };
 
+  const fee = useWithdrawalFee();
+  const requestedAmount = Number(withdrawAmount) || 0;
+  const feeAmount = fee.calculate(requestedAmount);
+  const totalDeducted = requestedAmount + feeAmount;
+
   const minimumWithdrawal = settings?.minimum_withdrawal
     ? Number(settings.minimum_withdrawal)
     : 5000;
+
 
   // Fetch transactions
   const { data: transactions, isLoading: transactionsLoading } = useQuery({
@@ -181,8 +190,11 @@ export default function Wallet() {
         throw new Error(`Minimum withdrawal is UGX ${minimumWithdrawal.toLocaleString()}`);
       }
 
-      if (amount > Number(profile.balance)) {
-        throw new Error("Insufficient balance");
+      const feeAmount = fee.calculate(amount);
+      const totalDebit = amount + feeAmount;
+
+      if (totalDebit > Number(profile.balance)) {
+        throw new Error("Insufficient balance to cover the amount and processing fee");
       }
 
       // Create withdrawal request
@@ -195,8 +207,8 @@ export default function Wallet() {
 
       if (error) throw error;
 
-      // Deduct from balance
-      const newBalance = Number(profile.balance) - amount;
+      // Deduct from balance (amount + processing fee)
+      const newBalance = Number(profile.balance) - totalDebit;
       await supabase
         .from("profiles")
         .update({ balance: newBalance })
@@ -206,10 +218,13 @@ export default function Wallet() {
       await supabase.from("transactions").insert({
         user_id: profile.user_id,
         transaction_type: "withdrawal",
-        amount: -amount,
+        amount: -totalDebit,
         balance_after: newBalance,
-        description: `Withdrawal to ${recipientName} (${withdrawNetwork} ${withdrawPhone})`,
+        description:
+          `Withdrawal to ${recipientName} (${withdrawNetwork} ${withdrawPhone})` +
+          (feeAmount > 0 ? ` — incl. UGX ${feeAmount.toLocaleString()} processing fee` : ""),
       });
+
 
       // Automatic mode: trigger MarzPay send immediately
       const isAutomatic = settings?.withdrawal_mode === "automatic";
