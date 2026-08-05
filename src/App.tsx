@@ -44,6 +44,8 @@ import AdminWithdrawals from "./pages/admin/AdminWithdrawals";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminGiftCodes from "./pages/admin/AdminGiftCodes";
+import AdminTransactions from "./pages/admin/AdminTransactions";
+import AdminNews from "./pages/admin/AdminNews";
 import AdminMachines from "./pages/admin/AdminMachines";
 import AdminInvestments from "./pages/admin/AdminInvestments";
 import AdminAirtimeData from "./pages/admin/AdminAirtimeData";
@@ -149,6 +151,8 @@ function AppRoutes() {
       <Route path="/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
       <Route path="/admin/notifications" element={<AdminRoute><AdminNotifications /></AdminRoute>} />
       <Route path="/admin/gift-codes" element={<AdminRoute><AdminGiftCodes /></AdminRoute>} />
+      <Route path="/admin/transactions" element={<AdminRoute><AdminTransactions /></AdminRoute>} />
+      <Route path="/admin/news" element={<AdminRoute><AdminNews /></AdminRoute>} />
       <Route path="/admin/machines" element={<AdminRoute><AdminMachines /></AdminRoute>} />
       <Route path="/admin/investments" element={<AdminRoute><AdminInvestments /></AdminRoute>} />
       <Route path="/admin/airtime-data" element={<AdminRoute><AdminAirtimeData /></AdminRoute>} />

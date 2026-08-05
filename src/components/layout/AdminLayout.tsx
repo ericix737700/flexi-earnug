@@ -20,7 +20,7 @@ import {
   Cpu,
   LineChart,
   Signal,
-
+, Receipt, Newspaper
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -44,6 +44,8 @@ const navItems = [
   { href: "/admin/withdrawals", icon: Wallet, label: "Withdrawals" },
    { href: "/admin/notifications", icon: Bell, label: "Notifications" },
   { href: "/admin/gift-codes", icon: Gift, label: "Gift Codes" },
+  { href: "/admin/transactions", icon: Receipt, label: "Transactions" },
+  { href: "/admin/news", icon: Newspaper, label: "News" },
   { href: "/admin/settings", icon: Settings, label: "Settings" },
 ];
 
