@@ -3,7 +3,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
-const VAPID_PUBLIC_KEY =
+// Fallback only — the live key is fetched from the backend so it always matches
+// the key the push sender signs with.
+const FALLBACK_VAPID_KEY =
   "BB1wRTiWUmJOddQCrMuKK7UF9bqgOwrkrgB7HfNuOhVDxsKQBbIYipr1eqcPBpNm_7lZ2M-qUzvaXzpKFwj0Lfg";
 const PUSH_SW_URL = "/push-sw.js";
 const PUSH_SW_SCOPE = "/push-scope/";
@@ -25,15 +27,23 @@ function bufToB64(buf: ArrayBuffer | null) {
   return btoa(s);
 }
 
-async function getPushRegistration(): Promise<ServiceWorkerRegistration | null> {
-  if (!("serviceWorker" in navigator)) return null;
+async function getServerVapidKey(): Promise<string> {
   try {
-    const existing = await navigator.serviceWorker.getRegistration(PUSH_SW_SCOPE);
-    if (existing) return existing;
-    return await navigator.serviceWorker.register(PUSH_SW_URL, { scope: PUSH_SW_SCOPE });
+    const { data } = await supabase.functions.invoke("get-vapid-key");
+    if (data?.publicKey) return data.publicKey as string;
   } catch {
-    return null;
+    /* fall through */
   }
+  return FALLBACK_VAPID_KEY;
+}
+
+async function getPushRegistration(): Promise<ServiceWorkerRegistration> {
+  if (!("serviceWorker" in navigator)) {
+    throw new Error("Service workers are not supported on this browser");
+  }
+  const existing = await navigator.serviceWorker.getRegistration(PUSH_SW_SCOPE);
+  if (existing) return existing;
+  return await navigator.serviceWorker.register(PUSH_SW_URL, { scope: PUSH_SW_SCOPE });
 }
 
 export function usePushNotifications() {
@@ -42,6 +52,7 @@ export function usePushNotifications() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [permission, setPermission] = useState<NotificationPermission>("default");
   const [isLoading, setIsLoading] = useState(false);
+  const [lastError, setLastError] = useState<string | null>(null);
 
   useEffect(() => {
     const supported =
@@ -57,7 +68,7 @@ export function usePushNotifications() {
     if (!user || !isSupported) return;
     try {
       const reg = await getPushRegistration();
-      const sub = await reg?.pushManager.getSubscription();
+      const sub = await reg.pushManager.getSubscription();
       setIsSubscribed(!!sub);
     } catch {
       setIsSubscribed(false);
@@ -74,25 +85,40 @@ export function usePushNotifications() {
       return;
     }
     setIsLoading(true);
+    setLastError(null);
     try {
+      if (!window.isSecureContext) {
+        throw new Error("Push needs a secure (https) connection");
+      }
       const perm = await Notification.requestPermission();
       setPermission(perm);
       if (perm !== "granted") {
-        toast.error("Notification permission denied");
-        return;
+        throw new Error("Notification permission was not granted");
       }
+
       const reg = await getPushRegistration();
-      if (!reg) {
-        toast.error("Service worker unavailable");
-        return;
-      }
+      await navigator.serviceWorker.ready.catch(() => undefined);
+
+      const vapidKey = await getServerVapidKey();
       let sub = await reg.pushManager.getSubscription();
+
+      if (sub) {
+        // If the stored subscription used a different key, replace it.
+        const current = bufToB64(sub.options?.applicationServerKey ?? null);
+        const wanted = bufToB64(urlBase64ToUint8Array(vapidKey).buffer as ArrayBuffer);
+        if (current && wanted && current !== wanted) {
+          await sub.unsubscribe().catch(() => undefined);
+          sub = null;
+        }
+      }
+
       if (!sub) {
         sub = await reg.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+          applicationServerKey: urlBase64ToUint8Array(vapidKey),
         });
       }
+
       const p256dh = bufToB64(sub.getKey("p256dh"));
       const auth = bufToB64(sub.getKey("auth"));
 
@@ -105,12 +131,15 @@ export function usePushNotifications() {
         },
         { onConflict: "endpoint" }
       );
-      if (error) throw error;
+      if (error) throw new Error(error.message);
+
       setIsSubscribed(true);
       toast.success("Push notifications enabled");
     } catch (err) {
-      console.error(err);
-      toast.error("Failed to enable notifications");
+      const message = err instanceof Error ? err.message : "Failed to enable notifications";
+      console.error("Push subscribe failed:", err);
+      setLastError(message);
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -120,7 +149,7 @@ export function usePushNotifications() {
     setIsLoading(true);
     try {
       const reg = await getPushRegistration();
-      const sub = await reg?.pushManager.getSubscription();
+      const sub = await reg.pushManager.getSubscription();
       if (sub) {
         const endpoint = sub.endpoint;
         await sub.unsubscribe();
@@ -136,12 +165,12 @@ export function usePushNotifications() {
       }
       setIsSubscribed(false);
       toast.success("Push notifications disabled");
-    } catch {
-      toast.error("Failed to disable notifications");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to disable notifications");
     } finally {
       setIsLoading(false);
     }
   };
 
-  return { isSupported, isSubscribed, permission, isLoading, subscribe, unsubscribe };
+  return { isSupported, isSubscribed, permission, isLoading, lastError, subscribe, unsubscribe };
 }
