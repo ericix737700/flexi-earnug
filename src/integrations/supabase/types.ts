@@ -493,6 +493,84 @@ export type Database = {
         }
         Relationships: []
       }
+      news_items: {
+        Row: {
+          body: string | null
+          category: string
+          created_at: string
+          created_by: string | null
+          id: string
+          image_url: string | null
+          is_published: boolean
+          link_url: string | null
+          pinned: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_url?: string | null
+          is_published?: boolean
+          link_url?: string | null
+          pinned?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_url?: string | null
+          is_published?: boolean
+          link_url?: string | null
+          pinned?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      notification_preferences: {
+        Row: {
+          created_at: string
+          id: string
+          investment_maturity: boolean
+          promotions: boolean
+          push_enabled: boolean
+          reward_credits: boolean
+          updated_at: string
+          user_id: string
+          wallet_deductions: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          investment_maturity?: boolean
+          promotions?: boolean
+          push_enabled?: boolean
+          reward_credits?: boolean
+          updated_at?: string
+          user_id: string
+          wallet_deductions?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          investment_maturity?: boolean
+          promotions?: boolean
+          push_enabled?: boolean
+          reward_credits?: boolean
+          updated_at?: string
+          user_id?: string
+          wallet_deductions?: boolean
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
@@ -549,6 +627,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_id: string
           balance: number
           created_at: string
           daily_checkin_streak: number
@@ -570,6 +649,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          account_id?: string
           balance?: number
           created_at?: string
           daily_checkin_streak?: number
@@ -591,6 +671,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          account_id?: string
           balance?: number
           created_at?: string
           daily_checkin_streak?: number
@@ -870,7 +951,16 @@ export type Database = {
     Functions: {
       claim_achievement: { Args: { _achievement_id: string }; Returns: Json }
       find_referrer_by_code: { Args: { _code: string }; Returns: string }
+      generate_account_id: { Args: never; Returns: string }
       get_own_profile_id: { Args: never; Returns: string }
+      get_referrer_preview: {
+        Args: { _code: string }
+        Returns: {
+          account_id: string
+          full_name: string
+          is_verified: boolean
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
