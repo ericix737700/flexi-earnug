@@ -585,3 +585,86 @@ function SystemControlsCard({
     </Card>
   );
 }
+
+function WithdrawalFeeCard({
+  settings,
+  onSave,
+}: {
+  settings: Record<string, string> | undefined;
+  onSave: (key: string, value: string) => Promise<void>;
+}) {
+  const [enabled, setEnabled] = useState(settings?.withdrawal_fee_enabled === "true");
+  const [percent, setPercent] = useState(settings?.withdrawal_fee_percent || "2");
+  const [minFee, setMinFee] = useState(settings?.withdrawal_fee_min || "0");
+  const [note, setNote] = useState(settings?.withdrawal_fee_note || "");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!settings) return;
+    setEnabled(settings.withdrawal_fee_enabled === "true");
+    setPercent(settings.withdrawal_fee_percent || "2");
+    setMinFee(settings.withdrawal_fee_min || "0");
+    setNote(settings.withdrawal_fee_note || "");
+  }, [settings]);
+
+  const toggle = async (value: boolean) => {
+    setEnabled(value);
+    await onSave("withdrawal_fee_enabled", String(value));
+  };
+
+  const saveAll = async () => {
+    setSaving(true);
+    await onSave("withdrawal_fee_percent", percent);
+    await onSave("withdrawal_fee_min", minFee);
+    await onSave("withdrawal_fee_note", note);
+    setSaving(false);
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <DollarSign className="h-5 w-5 text-primary" />
+          Withdrawal Processing Fee
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-center justify-between rounded-lg border p-3">
+          <div>
+            <p className="text-sm font-medium">Charge a withdrawal fee</p>
+            <p className="text-xs text-muted-foreground">
+              Deducted on top of the amount the user receives
+            </p>
+          </div>
+          <Switch checked={enabled} onCheckedChange={toggle} />
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label>Fee percentage (%)</Label>
+            <Input type="number" value={percent} onChange={(e) => setPercent(e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label>Minimum fee (UGX)</Label>
+            <Input type="number" value={minFee} onChange={(e) => setMinFee(e.target.value)} />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Message shown to users</Label>
+          <Textarea
+            rows={3}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Explain why the fee is charged (telecom charges, platform upkeep, etc.)"
+          />
+        </div>
+
+        <Button onClick={saveAll} disabled={saving}>
+          {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+          Save fee settings
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
