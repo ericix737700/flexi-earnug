@@ -429,6 +429,32 @@ export default function Wallet() {
                     </RadioGroup>
                   </div>
 
+                  {requestedAmount > 0 && (
+                    <div className="space-y-2 rounded-xl border bg-muted/40 p-3 text-sm">
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">You receive</span>
+                        <span className="font-semibold">UGX {requestedAmount.toLocaleString()}</span>
+                      </div>
+                      {fee.enabled && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-muted-foreground">Processing fee ({fee.percent}%)</span>
+                          <span className="font-semibold">UGX {feeAmount.toLocaleString()}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between border-t pt-2">
+                        <span className="font-medium">Deducted from wallet</span>
+                        <span className="font-bold text-primary">UGX {totalDeducted.toLocaleString()}</span>
+                      </div>
+                      {fee.enabled && feeAmount > 0 && (
+                        <p className="flex items-start gap-1.5 pt-1 text-[11px] text-muted-foreground">
+                          <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                          {fee.note}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+
                   <Button
                     className="w-full"
                     onClick={() => withdrawMutation.mutate()}
