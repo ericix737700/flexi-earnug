@@ -1,15 +1,19 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { UserLayout } from "@/components/layout/UserLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
-import { Loader2, Signal, Smartphone, Wifi, BadgeCheck, ShieldCheck, RefreshCw } from "lucide-react";
+import {
+  Loader2, Signal, Smartphone, Wifi, BadgeCheck, ShieldCheck, RefreshCw,
+  CheckCircle2, XCircle, Clock, RotateCcw, Zap,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -26,7 +30,20 @@ type Bundle = {
   price: number;
 };
 
+type OrderStatus = "submitted" | "pending" | "completed" | "refunded" | "timeout";
+
+interface Order {
+  reference: string;
+  label: string;
+  amount: number;
+  msisdn: string;
+  status: OrderStatus;
+  message?: string;
+}
+
 const QUICK_AIRTIME = [500, 1000, 2000, 5000, 10000, 20000];
+const POLL_INTERVAL = 3000;
+const MAX_POLLS = 40; // ~2 minutes
 
 export default function AirtimeData() {
   const { profile, refreshProfile } = useAuth();
@@ -38,6 +55,9 @@ export default function AirtimeData() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [mode, setMode] = useState<"airtime" | "bundle">("airtime");
   const [submitting, setSubmitting] = useState(false);
+  const [order, setOrder] = useState<Order | null>(null);
+  const [pollCount, setPollCount] = useState(0);
+  const pollRef = useRef<number | null>(null);
 
   const network = detectNetwork(phone);
 
@@ -58,6 +78,68 @@ export default function AirtimeData() {
     return [...(catalog.bundles.mtn || []), ...(catalog.bundles.airtel || [])];
   }, [catalog, network]);
 
+  const groupedBundles = useMemo(() => {
+    const groups = new Map<string, Bundle[]>();
+    for (const b of bundles) {
+      const key = b.group || "Bundles";
+      groups.set(key, [...(groups.get(key) || []), b]);
+    }
+    return [...groups.entries()];
+  }, [bundles]);
+
+  // ---- Status polling ------------------------------------------------------
+  const stopPolling = () => {
+    if (pollRef.current) {
+      window.clearInterval(pollRef.current);
+      pollRef.current = null;
+    }
+  };
+
+  const checkStatus = async (reference: string) => {
+    const { data, error } = await supabase.functions.invoke("marzpay-airtime-status", {
+      body: { reference },
+    });
+    if (error || !data?.success) return;
+
+    if (data.status === "completed") {
+      stopPolling();
+      setOrder((o) => (o ? { ...o, status: "completed" } : o));
+      toast.success("Delivered successfully");
+      refreshProfile();
+    } else if (data.status === "refunded") {
+      stopPolling();
+      setOrder((o) =>
+        o ? { ...o, status: "refunded", message: data.message || "Purchase failed — you were refunded" } : o
+      );
+      toast.error("Purchase failed — your balance was refunded");
+      refreshProfile();
+    }
+  };
+
+  useEffect(() => {
+    if (!order || (order.status !== "submitted" && order.status !== "pending")) return;
+    setPollCount(0);
+    let count = 0;
+    pollRef.current = window.setInterval(() => {
+      count += 1;
+      setPollCount(count);
+      if (count > MAX_POLLS) {
+        stopPolling();
+        setOrder((o) => (o ? { ...o, status: "timeout" } : o));
+        return;
+      }
+      checkStatus(order.reference);
+    }, POLL_INTERVAL);
+    return stopPolling;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [order?.reference, order?.status === "submitted" || order?.status === "pending"]);
+
+  const retryStatus = () => {
+    if (!order) return;
+    setOrder({ ...order, status: "pending" });
+  };
+
+  // ---- Actions -------------------------------------------------------------
   const handlePhoneChange = (v: string) => {
     setPhone(v);
     setVerifiedName(null);
@@ -81,8 +163,8 @@ export default function AirtimeData() {
       } else {
         toast.error(data?.error || "Could not verify this number");
       }
-    } catch (e: any) {
-      toast.error(e?.message || "Verification failed");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Verification failed");
     } finally {
       setVerifying(false);
     }
@@ -127,30 +209,112 @@ export default function AirtimeData() {
         toast.error(data?.error || "Purchase failed");
         return;
       }
-      toast.success(data.pending ? "Purchase submitted — delivery in progress" : "Purchase successful!");
+
+      setOrder({
+        reference: data.reference,
+        label: mode === "airtime" ? `Airtime UGX ${Number(amount).toLocaleString()}` : selected?.name || "Data bundle",
+        amount: price,
+        msisdn: phone,
+        status: data.pending ? "submitted" : "completed",
+      });
       setConfirmOpen(false);
       setAmount("");
       setSelected(null);
       refreshProfile();
-    } catch (e: any) {
-      toast.error(e?.message || "Purchase failed");
+      if (!data.pending) toast.success("Purchase successful!");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Purchase failed");
     } finally {
       setSubmitting(false);
     }
   };
 
+  const isPending = order?.status === "submitted" || order?.status === "pending";
+  const progressValue = order
+    ? order.status === "completed" || order.status === "refunded"
+      ? 100
+      : Math.min(90, 20 + pollCount * 4)
+    : 0;
+
   return (
     <UserLayout>
       <div className="space-y-5">
-        <div className="flex items-center gap-2">
-          <div className="rounded-xl bg-primary/15 p-2">
-            <Signal className="h-5 w-5 text-primary" />
+        {/* Header */}
+        <div className="relative overflow-hidden rounded-2xl border-0 gradient-primary p-5 text-primary-foreground">
+          <div aria-hidden className="absolute -right-10 -top-12 h-36 w-36 rounded-full bg-primary-foreground/10 blur-2xl" />
+          <div className="relative flex items-center gap-3">
+            <div className="rounded-xl bg-primary-foreground/15 p-2.5">
+              <Signal className="h-6 w-6" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold">Airtime & Data</h1>
+              <p className="text-xs opacity-90">Instant MTN & Airtel top-ups, paid from your wallet</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-lg font-bold">Airtime & Data</h1>
-            <p className="text-xs text-muted-foreground">Top up any MTN, Airtel or Lyca line instantly</p>
+          <div className="relative mt-4 flex items-center gap-2 text-xs">
+            <Zap className="h-3.5 w-3.5" />
+            <span className="opacity-90">Balance</span>
+            <span className="font-bold">UGX {Number(profile?.balance || 0).toLocaleString()}</span>
           </div>
         </div>
+
+        {/* Order status */}
+        {order && (
+          <Card className="glass-card border-0 animate-in fade-in slide-in-from-top-2">
+            <CardContent className="space-y-3 py-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold">{order.label}</p>
+                  <p className="truncate text-[11px] text-muted-foreground">
+                    {order.msisdn} · UGX {order.amount.toLocaleString()}
+                  </p>
+                </div>
+                <StatusPill status={order.status} />
+              </div>
+
+              <Progress value={progressValue} className="h-1.5" />
+
+              <div className="grid grid-cols-3 gap-1 text-center text-[10px]">
+                <Step label="Submitted" done />
+                <Step label="Processing" done={order.status !== "submitted"} active={isPending} />
+                <Step
+                  label={order.status === "refunded" ? "Refunded" : "Delivered"}
+                  done={order.status === "completed" || order.status === "refunded"}
+                />
+              </div>
+
+              {order.status === "timeout" && (
+                <div className="space-y-2 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs">
+                  <p>
+                    This is taking longer than usual. Airtel bundles can take a few minutes — check again or contact
+                    support with reference <span className="font-mono">{order.reference.slice(0, 8)}</span>.
+                  </p>
+                  <Button size="sm" variant="outline" onClick={retryStatus}>
+                    <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Check again
+                  </Button>
+                </div>
+              )}
+
+              {order.status === "refunded" && (
+                <p className="rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive">
+                  {order.message} Your wallet has been credited back in full.
+                </p>
+              )}
+
+              {order.status === "completed" && (
+                <p className="rounded-xl border border-success/30 bg-success/10 p-3 text-xs text-success">
+                  Delivered to {order.msisdn}. Thank you!
+                </p>
+              )}
+
+              {!isPending && (
+                <Button variant="ghost" size="sm" className="w-full" onClick={() => setOrder(null)}>
+                  Dismiss
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Recipient */}
         <Card className="glass-card border-0">
@@ -199,22 +363,32 @@ export default function AirtimeData() {
                   onChange={(e) => setAmount(e.target.value.replace(/\D/g, ""))}
                   placeholder="1000"
                   inputMode="numeric"
+                  className="h-12 text-lg font-semibold"
                 />
                 <div className="grid grid-cols-3 gap-2">
                   {QUICK_AIRTIME.map((a) => (
-                    <Button key={a} type="button" variant="outline" size="sm" onClick={() => setAmount(String(a))}>
+                    <button
+                      key={a}
+                      type="button"
+                      onClick={() => setAmount(String(a))}
+                      className={`rounded-xl border px-2 py-2.5 text-sm font-semibold transition-all tap-pop ${
+                        amount === String(a)
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border bg-card hover:bg-muted"
+                      }`}
+                    >
                       {a.toLocaleString()}
-                    </Button>
+                    </button>
                   ))}
                 </div>
-                <Button className="w-full" onClick={() => openConfirm("airtime")}>
+                <Button className="h-11 w-full rounded-xl font-semibold" onClick={() => openConfirm("airtime")}>
                   Buy Airtime
                 </Button>
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="data" className="mt-4 space-y-3">
+          <TabsContent value="data" className="mt-4 space-y-4">
             <div className="flex items-center justify-between">
               <p className="text-xs text-muted-foreground">
                 {network === "unknown" ? "All available bundles" : `${NETWORK_LABEL[network]} bundles`}
@@ -233,26 +407,36 @@ export default function AirtimeData() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-2">
-                {bundles.map((b) => (
-                  <Card key={b.bundle_id} className="glass-card border-0 tap-pop">
-                    <CardContent className="flex items-center justify-between gap-3 py-3">
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold">{b.name}</p>
-                        <p className="truncate text-[11px] text-muted-foreground">
-                          {[b.group, b.validity, b.description].filter(Boolean).join(" · ")}
-                        </p>
-                      </div>
-                      <div className="shrink-0 text-right">
-                        <p className="text-sm font-bold text-primary">UGX {Number(b.price).toLocaleString()}</p>
-                        <Button size="sm" className="mt-1 h-7 px-3 text-xs" onClick={() => openConfirm("bundle", b)}>
-                          Buy
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+              groupedBundles.map(([group, items]) => (
+                <div key={group} className="space-y-2">
+                  <p className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{group}</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {items.map((b) => (
+                      <button
+                        key={b.bundle_id}
+                        type="button"
+                        onClick={() => openConfirm("bundle", b)}
+                        className="flex h-full flex-col justify-between rounded-2xl border bg-card p-3 text-left transition-all tap-pop hover:border-primary/50 hover:bg-muted/50"
+                      >
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-bold">{b.name}</p>
+                          <p className="truncate text-[11px] text-muted-foreground">
+                            {b.validity || b.description || "Data bundle"}
+                          </p>
+                        </div>
+                        <div className="mt-3 flex items-center justify-between">
+                          <span className="text-sm font-extrabold text-primary">
+                            UGX {Number(b.price).toLocaleString()}
+                          </span>
+                          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                            Buy
+                          </span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))
             )}
           </TabsContent>
         </Tabs>
@@ -281,6 +465,30 @@ export default function AirtimeData() {
         </DialogContent>
       </Dialog>
     </UserLayout>
+  );
+}
+
+function StatusPill({ status }: { status: OrderStatus }) {
+  const map: Record<OrderStatus, { label: string; className: string; Icon: React.ElementType }> = {
+    submitted: { label: "Submitted", className: "bg-amber-500/15 text-amber-600", Icon: Clock },
+    pending: { label: "Processing", className: "bg-amber-500/15 text-amber-600", Icon: Loader2 },
+    completed: { label: "Delivered", className: "bg-success/15 text-success", Icon: CheckCircle2 },
+    refunded: { label: "Refunded", className: "bg-destructive/15 text-destructive", Icon: XCircle },
+    timeout: { label: "Still pending", className: "bg-muted text-muted-foreground", Icon: Clock },
+  };
+  const { label, className, Icon } = map[status];
+  return (
+    <span className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold ${className}`}>
+      <Icon className={`h-3 w-3 ${status === "pending" ? "animate-spin" : ""}`} /> {label}
+    </span>
+  );
+}
+
+function Step({ label, done, active }: { label: string; done?: boolean; active?: boolean }) {
+  return (
+    <div className={`rounded-lg py-1 ${done ? "text-primary font-semibold" : active ? "text-foreground" : "text-muted-foreground"}`}>
+      {label}
+    </div>
   );
 }
 
