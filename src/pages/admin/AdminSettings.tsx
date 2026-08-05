@@ -203,6 +203,10 @@ export default function AdminSettings() {
           <SettingCard icon={Calendar} iconColor="text-green-600" title="Daily Check-in Reward" label="Amount (UGX)" value={formData.daily_checkin_reward} onChange={(v) => setFormData({ ...formData, daily_checkin_reward: v })} onSave={() => handleSave("daily_checkin_reward", formData.daily_checkin_reward)} isPending={updateSetting.isPending} type="number" />
         </div>
 
+        {/* Withdrawal Fees */}
+        <WithdrawalFeeCard settings={settings} onSave={handleSave} />
+
+
         {/* Merchant Settings */}
         <Card>
           <CardHeader>
