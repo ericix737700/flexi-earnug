@@ -18,7 +18,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
     const body = await req.json();
-    const { user_id, user_ids, broadcast, title, body: msgBody, url, tag } = body || {};
+    const { user_id, user_ids, broadcast, title, body: msgBody, url, tag, category } = body || {};
 
     if (!title || !msgBody) {
       return json({ success: false, error: "title and body required" }, 400);
@@ -62,8 +62,31 @@ Deno.serve(async (req) => {
       return json({ success: false, error: "Specify user_id, user_ids, or broadcast" }, 400);
     }
 
-    const { data: subs, error } = await query;
+    let { data: subs, error } = await query;
     if (error) throw error;
+
+    // Respect per-user notification preferences when a category is supplied.
+    const CATEGORY_COLUMN: Record<string, string> = {
+      wallet_deduction: "wallet_deductions",
+      reward_credit: "reward_credits",
+      investment_maturity: "investment_maturity",
+      promotion: "promotions",
+    };
+    const prefColumn = category ? CATEGORY_COLUMN[String(category)] : undefined;
+    if (prefColumn && subs?.length) {
+      const targetIds = [...new Set(subs.map((s: any) => s.user_id))];
+      const { data: prefs } = await admin
+        .from("notification_preferences")
+        .select(`user_id, push_enabled, ${prefColumn}`)
+        .in("user_id", targetIds);
+      const blocked = new Set(
+        (prefs || [])
+          .filter((p: any) => p.push_enabled === false || p[prefColumn] === false)
+          .map((p: any) => p.user_id),
+      );
+      subs = subs.filter((s: any) => !blocked.has(s.user_id));
+    }
+
 
     const payload = JSON.stringify({ title, body: msgBody, url, tag, icon: "/icon-192.png" });
     let sent = 0;
