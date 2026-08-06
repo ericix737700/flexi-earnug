@@ -16,6 +16,7 @@ import {
   Sun, Moon, Monitor, Palette,
   Cpu,
   Signal,
+  Newspaper, Trophy, Download,
 } from "lucide-react";
 
 import { toast } from "sonner";
@@ -78,6 +79,13 @@ export default function Profile() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const { data: settings } = usePlatformSettings();
   const { theme, setTheme } = useTheme();
+
+  const appDownloadUrl = settings?.android_app_url || "";
+  const isStandalone =
+    typeof window !== "undefined" &&
+    (window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as any).standalone === true);
+
 
 
 
