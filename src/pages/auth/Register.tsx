@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,24 @@ export default function Register() {
   const [showLoading, setShowLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [referrer, setReferrer] = useState<{ full_name: string | null; account_id: string | null; is_verified: boolean } | null>(null);
+  const [referrerLoading, setReferrerLoading] = useState(false);
+
+  // Look up the referrer so the invited user sees who referred them.
+  useEffect(() => {
+    const code = formData.referralCode.trim();
+    if (!code) { setReferrer(null); return; }
+    let cancelled = false;
+    setReferrerLoading(true);
+    const t = setTimeout(async () => {
+      const { data, error } = await supabase.rpc("get_referrer_preview" as any, { _code: code });
+      if (cancelled) return;
+      const row = Array.isArray(data) ? data[0] : data;
+      setReferrer(error || !row ? null : (row as any));
+      setReferrerLoading(false);
+    }, 400);
+    return () => { cancelled = true; clearTimeout(t); setReferrerLoading(false); };
+  }, [formData.referralCode]);
 
   const registrationFee = settings?.registration_fee ? Number(settings.registration_fee) : 5000;
 
