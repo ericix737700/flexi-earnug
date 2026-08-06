@@ -64,61 +64,76 @@ const Index = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 gradient-hero opacity-[0.07]" />
-        <div className="absolute top-20 -left-32 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute bottom-10 -right-32 h-64 w-64 rounded-full bg-secondary/10 blur-3xl" />
-        <div className="relative mx-auto max-w-6xl px-4 py-14 md:py-24">
-          <div className="grid items-center gap-10 md:grid-cols-2">
-            <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary">
-                <Zap className="h-4 w-4" />
-                Uganda's #1 Earning Platform
+      <section className="relative overflow-hidden border-b border-border/40 bg-gradient-to-b from-primary/[0.07] via-background to-background">
+        <div className="absolute -top-24 left-1/2 h-72 w-[36rem] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute bottom-0 -right-24 h-64 w-64 rounded-full bg-secondary/10 blur-3xl" />
+        <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
+          <div className="grid items-center gap-12 md:grid-cols-2">
+            <div className="space-y-7">
+              <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3.5 py-1.5 text-xs font-semibold text-primary">
+                <Zap className="h-3.5 w-3.5" />
+                Trusted by 10,000+ Ugandans
               </div>
-              <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-foreground md:text-5xl lg:text-6xl">
-                Turn Your Phone Into a{" "}
-                <span className="text-gradient-primary">Money Machine</span>
+              <h1 className="text-[2.5rem] font-extrabold leading-[1.05] tracking-tight text-foreground md:text-6xl">
+                Earning, investments, and everything in between.
               </h1>
-              <p className="max-w-lg text-lg leading-relaxed text-muted-foreground">
-                Join thousands of Ugandans earning real money daily by completing simple tasks,
-                watching videos, answering trivia, and referring friends. Withdraw straight to
-                your Mobile Money!
+              <p className="max-w-lg text-base leading-relaxed text-muted-foreground md:text-lg">
+                One account to complete tasks, invest in machines, buy airtime and data, and cash out
+                instantly to MTN or Airtel Mobile Money — built for Uganda.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row">
-                <Link to="/register">
-                  <Button size="lg" className="w-full gap-2 gradient-primary border-0 text-base font-bold text-primary-foreground shadow-lg shadow-primary/30 hover:opacity-90 sm:w-auto">
-                    Start Earning Now <ArrowRight className="h-5 w-5" />
+                <Link to="/register" className="sm:w-auto">
+                  <Button size="lg" className="h-12 w-full gap-2 gradient-primary border-0 px-7 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/25 hover:opacity-90 sm:w-auto">
+                    Get started <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link to="/login">
-                  <Button size="lg" variant="outline" className="w-full text-base border-primary/30 text-primary hover:bg-primary/5 sm:w-auto">
-                    I Have an Account
+                <Link to="/login" className="sm:w-auto">
+                  <Button size="lg" variant="outline" className="h-12 w-full border-border px-7 text-base font-medium sm:w-auto">
+                    Log in
                   </Button>
                 </Link>
               </div>
-              <div className="flex items-center gap-6 pt-2 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1.5">
-                  <CheckCircle className="h-4 w-4 text-primary" />
-                  Instant MTN/Airtel payouts
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <CheckCircle className="h-4 w-4 text-primary" />
-                  24/7 support
-                </div>
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-1 text-sm text-muted-foreground">
+                {["Instant MTN & Airtel payouts", "Bank-grade security", "24/7 support"].map((t) => (
+                  <div key={t} className="flex items-center gap-1.5">
+                    <CheckCircle className="h-4 w-4 text-primary" />
+                    {t}
+                  </div>
+                ))}
               </div>
             </div>
+
             <div className="relative">
-              <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-primary/20 via-secondary/10 to-primary/5 blur-2xl" />
-              <img
-                src={heroImg}
-                alt="Happy Ugandans earning money on their phones"
-                className="relative rounded-2xl shadow-2xl ring-1 ring-primary/10"
-                loading="lazy"
-              />
+              <div className="absolute -inset-6 rounded-[2rem] bg-gradient-to-br from-primary/15 via-secondary/10 to-transparent blur-2xl" />
+              <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card shadow-2xl">
+                <img
+                  src={heroImg}
+                  alt="Ugandans earning and sending money on their phones with FlexiEarn"
+                  className="h-64 w-full object-cover md:h-80"
+                  loading="lazy"
+                />
+                <div className="grid grid-cols-2 divide-x divide-border/60 border-t border-border/60">
+                  <div className="p-4">
+                    <p className="text-xs text-muted-foreground">Payout status</p>
+                    <p className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-primary">
+                      <CheckCircle className="h-4 w-4" /> Completed
+                    </p>
+                  </div>
+                  <div className="p-4">
+                    <p className="text-xs text-muted-foreground">Average payout time</p>
+                    <p className="mt-1 text-sm font-semibold text-foreground">Under 2 minutes</p>
+                  </div>
+                </div>
+              </div>
+              <div className="absolute -bottom-5 -left-3 hidden rounded-2xl border border-border/60 bg-card px-4 py-3 shadow-xl sm:block">
+                <p className="text-[11px] text-muted-foreground">Withdrawal sent</p>
+                <p className="text-sm font-bold text-foreground">UGX 45,000 → MTN</p>
+              </div>
             </div>
           </div>
         </div>
       </section>
+
 
       {/* Stats Bar */}
       <section className="border-y border-border/50 bg-card">
