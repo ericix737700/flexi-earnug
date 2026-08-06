@@ -26,7 +26,7 @@ interface NewsItem {
   created_at: string;
 }
 
-const CATEGORIES = ["news", "promotion", "achievement", "announcement"];
+const CATEGORIES = ["news", "high_earner", "promotion", "achievement", "announcement"];
 
 export default function AdminNews() {
   const queryClient = useQueryClient();

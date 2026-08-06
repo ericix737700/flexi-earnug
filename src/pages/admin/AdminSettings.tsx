@@ -44,6 +44,7 @@ export default function AdminSettings() {
     community_whatsapp: "",
     app_version: "",
     powered_by: "",
+    android_app_url: "",
   });
 
   useEffect(() => {
@@ -64,6 +65,7 @@ export default function AdminSettings() {
         community_whatsapp: settings.community_whatsapp || "",
         app_version: settings.app_version || "1.0.0",
         powered_by: settings.powered_by || "Veltrix Technologies Ltd",
+        android_app_url: settings.android_app_url || "",
       });
     }
   }, [settings]);
