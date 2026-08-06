@@ -44,6 +44,7 @@ export default function AdminSettings() {
     community_whatsapp: "",
     app_version: "",
     powered_by: "",
+    android_app_url: "",
   });
 
   useEffect(() => {
@@ -64,6 +65,7 @@ export default function AdminSettings() {
         community_whatsapp: settings.community_whatsapp || "",
         app_version: settings.app_version || "1.0.0",
         powered_by: settings.powered_by || "Veltrix Technologies Ltd",
+        android_app_url: settings.android_app_url || "",
       });
     }
   }, [settings]);
@@ -287,9 +289,15 @@ export default function AdminSettings() {
                 <Input placeholder="Veltrix Technologies Ltd" value={formData.powered_by} onChange={(e) => setFormData({ ...formData, powered_by: e.target.value })} />
               </div>
             </div>
+            <div className="space-y-2">
+              <Label>Android App Download URL</Label>
+              <Input placeholder="https://.../flexiearn.apk" value={formData.android_app_url} onChange={(e) => setFormData({ ...formData, android_app_url: e.target.value })} />
+              <p className="text-xs text-muted-foreground">Shown as "Download Android App" in the profile — hidden automatically when users are already in the installed app.</p>
+            </div>
             <Button onClick={async () => {
               await handleSave("app_version", formData.app_version);
               await handleSave("powered_by", formData.powered_by);
+              await handleSave("android_app_url", formData.android_app_url);
             }} disabled={updateSetting.isPending}>
               {updateSetting.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
               Save App Info

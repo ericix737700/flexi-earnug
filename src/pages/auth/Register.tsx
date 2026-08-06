@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Loader2, Phone, Lock, User, Users, Mail, Eye, EyeOff } from "lucide-react";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { PasswordStrength, evaluatePassword } from "@/components/PasswordStrength";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -26,6 +27,24 @@ export default function Register() {
   const [showLoading, setShowLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [referrer, setReferrer] = useState<{ full_name: string | null; account_id: string | null; is_verified: boolean } | null>(null);
+  const [referrerLoading, setReferrerLoading] = useState(false);
+
+  // Look up the referrer so the invited user sees who referred them.
+  useEffect(() => {
+    const code = formData.referralCode.trim();
+    if (!code) { setReferrer(null); return; }
+    let cancelled = false;
+    setReferrerLoading(true);
+    const t = setTimeout(async () => {
+      const { data, error } = await supabase.rpc("get_referrer_preview" as any, { _code: code });
+      if (cancelled) return;
+      const row = Array.isArray(data) ? data[0] : data;
+      setReferrer(error || !row ? null : (row as any));
+      setReferrerLoading(false);
+    }, 400);
+    return () => { cancelled = true; clearTimeout(t); setReferrerLoading(false); };
+  }, [formData.referralCode]);
 
   const registrationFee = settings?.registration_fee ? Number(settings.registration_fee) : 5000;
 
@@ -180,6 +199,31 @@ export default function Register() {
                 <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input name="referralCode" placeholder="Enter referral code" value={formData.referralCode} onChange={handleChange} className="pl-10 h-11 uppercase" />
               </div>
+              {formData.referralCode.trim() && (
+                referrerLoading ? (
+                  <div className="flex items-center gap-2 rounded-xl border border-border/60 bg-muted/40 p-3 text-xs text-muted-foreground">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" /> Checking referral code…
+                  </div>
+                ) : referrer ? (
+                  <div className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 p-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-bold text-primary">
+                      {(referrer.full_name || "U").charAt(0).toUpperCase()}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold flex items-center gap-1.5">
+                        {referrer.full_name || "FlexiEarn Member"}
+                        {referrer.is_verified && <VerifiedBadge size="sm" label="Verified account" />}
+                      </p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        Referral ID: <span className="font-mono">{referrer.account_id || formData.referralCode.trim().toUpperCase()}</span>
+                      </p>
+                    </div>
+                    <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-primary">Referred you</span>
+                  </div>
+                ) : (
+                  <p className="text-xs text-destructive">We couldn't find that referral code.</p>
+                )
+              )}
             </div>
             <Button type="submit" className="w-full h-11 font-semibold gradient-primary border-0 text-primary-foreground hover:opacity-90" disabled={isLoading}>
               {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Creating Account...</> : "Create Account"}

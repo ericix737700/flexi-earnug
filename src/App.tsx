@@ -29,6 +29,7 @@ import Achievements from "./pages/user/Achievements";
 import Ads from "./pages/user/Ads";
 import Machines from "./pages/user/Machines";
 import Statement from "./pages/user/Statement";
+import News from "./pages/user/News";
 import AirtimeData from "./pages/user/AirtimeData";
 
 
@@ -137,6 +138,7 @@ function AppRoutes() {
       <Route path="/ads" element={<ProtectedRoute><Ads /></ProtectedRoute>} />
       <Route path="/machines" element={<ProtectedRoute><Machines /></ProtectedRoute>} />
       <Route path="/statement" element={<ProtectedRoute><Statement /></ProtectedRoute>} />
+      <Route path="/news" element={<ProtectedRoute><News /></ProtectedRoute>} />
       <Route path="/airtime-data" element={<ProtectedRoute><AirtimeData /></ProtectedRoute>} />
 
 

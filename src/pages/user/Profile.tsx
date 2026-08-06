@@ -16,6 +16,7 @@ import {
   Sun, Moon, Monitor, Palette,
   Cpu,
   Signal,
+  Newspaper, Trophy, Download,
 } from "lucide-react";
 
 import { toast } from "sonner";
@@ -78,6 +79,13 @@ export default function Profile() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const { data: settings } = usePlatformSettings();
   const { theme, setTheme } = useTheme();
+
+  const appDownloadUrl = settings?.android_app_url || "";
+  const isStandalone =
+    typeof window !== "undefined" &&
+    (window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as any).standalone === true);
+
 
 
 
@@ -162,11 +170,21 @@ export default function Profile() {
 
         <EmailPrompt variant="card" />
 
+        {/* News & Highlights */}
+        <Group title="News & Highlights">
+          <Row icon={Newspaper} label="News, Earners & Promotions" value="What's new" onClick={() => navigate("/news")} iconClass="text-primary" />
+          <Row icon={Trophy} label="Achievements Unlocked" value="Your badges" onClick={() => navigate("/achievements")} iconClass="text-secondary" />
+        </Group>
+
         {/* Services */}
         <Group title="Services">
           <Row icon={Cpu} label="Investment Machines" value="Invest & earn" onClick={() => navigate("/machines")} iconClass="text-emerald-500" />
           <Row icon={Signal} label="Airtime & Data" value="Buy instantly" onClick={() => navigate("/airtime-data")} iconClass="text-cyan-500" />
+          {!isStandalone && appDownloadUrl && (
+            <Row icon={Download} label="Download Android App" value="Get the APK" onClick={() => window.open(appDownloadUrl, "_blank", "noopener")} iconClass="text-green-600" />
+          )}
         </Group>
+
 
 
         {/* Account */}
