@@ -50,7 +50,7 @@ function NewsList({ category, emptyText }: { category: string; emptyText: string
   }
 
   if (!data?.length) {
-    return <EmptyState icon={Newspaper} title="Nothing yet" description={emptyText} />;
+    return <EmptyState icon={<Newspaper className="h-7 w-7" />} title="Nothing yet" description={emptyText} />;
   }
 
   return (
