@@ -108,7 +108,7 @@ function UnlockedAchievements() {
   if (!data?.length) {
     return (
       <EmptyState
-        icon={Trophy}
+        icon={<Trophy className="h-7 w-7" />}
         title="No achievements unlocked yet"
         description="Complete tasks, keep your login streak and invite friends to unlock bonus rewards."
       />
