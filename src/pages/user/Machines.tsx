@@ -227,115 +227,119 @@ export default function Machines() {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="machines" className="mt-4 space-y-3">
+            <TabsContent value="machines" className="mt-4">
               {isLoading ? (
-                <div className="flex justify-center py-10">
-                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                <div className="grid grid-cols-2 gap-3">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="overflow-hidden rounded-2xl border bg-card">
+                      <Skeleton className="aspect-square w-full rounded-none" />
+                      <div className="space-y-2 p-3">
+                        <Skeleton className="h-3.5 w-3/4" />
+                        <Skeleton className="h-3 w-1/2" />
+                        <Skeleton className="h-5 w-2/3" />
+                        <Skeleton className="h-9 w-full rounded-lg" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : (machines || []).length === 0 ? (
                 <EmptyState icon={<Cpu className="h-8 w-8" />} title="No machines yet" description="Check back soon for new investment plans." />
               ) : (
-                (machines || []).map((m) => {
-                  const soldOut =
-                    m.status === "sold_out" || (m.max_total > 0 && m.purchases_count >= m.max_total);
-                  const buyable = m.status === "active" && !soldOut;
-                  const roi = Number(m.price) > 0
-                    ? Math.round(((Number(m.reward_amount) - Number(m.price)) / Number(m.price)) * 100)
-                    : 0;
-                  const soldPct = m.max_total > 0
-                    ? Math.min(100, Math.round((m.purchases_count / m.max_total) * 100))
-                    : 0;
-                  return (
-                    <Card
-                      key={m.id}
-                      className={`overflow-hidden glass-card border-0 transition-all ${
-                        buyable ? "hover:shadow-lg hover:-translate-y-0.5" : "opacity-60"
-                      }`}
-                    >
-                      {/* Media */}
-                      <div className="relative h-32 w-full overflow-hidden bg-primary/10">
-                        {m.image_url ? (
-                          <img
-                            src={m.image_url}
-                            alt={`${m.name} investment machine`}
-                            loading="lazy"
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center gradient-primary">
-                            <Cpu className="h-10 w-10 text-primary-foreground/80" />
-                          </div>
-                        )}
-                        <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-background/85 via-background/10 to-transparent" />
-                        {m.series && (
-                          <Badge className="absolute left-3 top-3 bg-secondary text-secondary-foreground text-[10px] shadow">
-                            {m.series}
-                          </Badge>
-                        )}
-                        <Badge
-                          variant={buyable ? "default" : "outline"}
-                          className="absolute right-3 top-3 text-[10px] shadow backdrop-blur"
-                        >
-                          {soldOut ? "Sold Out" : statusLabel[m.status]}
-                        </Badge>
-                        <div className="absolute bottom-2 left-3 right-3 flex items-end justify-between gap-2">
-                          <p className="text-base font-bold leading-tight">{m.name}</p>
-                          <span className="flex shrink-0 items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-semibold text-success">
-                            <TrendingUp className="h-3 w-3" /> +{roi}%
+                <div className="grid grid-cols-2 gap-3">
+                  {(machines || []).map((m) => {
+                    const soldOut =
+                      m.status === "sold_out" || (m.max_total > 0 && m.purchases_count >= m.max_total);
+                    const buyable = m.status === "active" && !soldOut;
+                    const price = Number(m.price);
+                    const reward = Number(m.reward_amount);
+                    const roi = price > 0 ? Math.round(((reward - price) / price) * 100) : 0;
+                    const days = Math.max(1, Math.round(m.duration_hours / 24));
+                    const daily = Math.round(reward / days);
+                    const soldPct = m.max_total > 0
+                      ? Math.min(100, Math.round((m.purchases_count / m.max_total) * 100))
+                      : 0;
+                    return (
+                      <div
+                        key={m.id}
+                        className={`flex flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition-all ${
+                          buyable ? "hover:shadow-md active:scale-[0.99]" : "opacity-60"
+                        }`}
+                      >
+                        <div className="relative aspect-square w-full overflow-hidden bg-muted">
+                          {m.image_url ? (
+                            <img
+                              src={m.image_url}
+                              alt={`${m.name} investment machine`}
+                              loading="lazy"
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center gradient-primary">
+                              <Cpu className="h-10 w-10 text-primary-foreground/80" />
+                            </div>
+                          )}
+                          <span className="absolute left-2 top-2 rounded-md bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground shadow">
+                            {days} day{days === 1 ? "" : "s"}
                           </span>
+                          {roi > 0 && (
+                            <span className="absolute right-2 top-2 rounded-md bg-secondary px-1.5 py-0.5 text-[10px] font-bold text-secondary-foreground shadow">
+                              +{roi}%
+                            </span>
+                          )}
+                          {!buyable && (
+                            <span className="absolute bottom-2 left-2 rounded-md bg-background/90 px-1.5 py-0.5 text-[10px] font-semibold">
+                              {soldOut ? "Sold Out" : statusLabel[m.status]}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex flex-1 flex-col gap-1.5 p-3">
+                          <p className="line-clamp-2 text-sm font-semibold leading-snug">{m.name}</p>
+                          {m.series && (
+                            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{m.series}</p>
+                          )}
+                          <div className="mt-0.5 space-y-0.5 text-[11px]">
+                            <div className="flex items-center justify-between">
+                              <span className="text-muted-foreground">Daily income</span>
+                              <span className="font-semibold">{daily.toLocaleString()}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-muted-foreground">Total income</span>
+                              <span className="font-semibold text-success">{reward.toLocaleString()}</span>
+                            </div>
+                          </div>
+                          <p className="mt-1 text-base font-extrabold leading-none">
+                            UGX {price.toLocaleString()}
+                          </p>
+                          {m.max_total > 0 && (
+                            <div className="mt-0.5">
+                              <Progress value={soldPct} className="h-1" />
+                              <p className="mt-0.5 text-[10px] text-muted-foreground">
+                                {m.purchases_count}/{m.max_total} taken
+                              </p>
+                            </div>
+                          )}
+                          <Button
+                            disabled={!buyable}
+                            onClick={() => setSelected(m)}
+                            size="sm"
+                            className="mt-auto w-full rounded-lg tap-pop"
+                          >
+                            {buyable ? "Invest" : statusLabel[soldOut ? "sold_out" : m.status]}
+                          </Button>
                         </div>
                       </div>
-
-                      <CardContent className="p-4">
-                        {m.description && (
-                          <p className="text-xs leading-relaxed text-muted-foreground">{m.description}</p>
-                        )}
-
-                        <div className="mt-3 grid grid-cols-3 gap-2 rounded-xl bg-muted/40 p-2.5 text-center">
-                          <div>
-                            <p className="text-[10px] text-muted-foreground">Price</p>
-                            <p className="text-xs font-bold">UGX {Number(m.price).toLocaleString()}</p>
-                          </div>
-                          <div className="border-x border-border/50">
-                            <p className="text-[10px] text-muted-foreground">Duration</p>
-                            <p className="text-xs font-bold">{formatDuration(m.duration_hours)}</p>
-                          </div>
-                          <div>
-                            <p className="text-[10px] text-muted-foreground">Reward</p>
-                            <p className="text-xs font-bold text-success">UGX {Number(m.reward_amount).toLocaleString()}</p>
-                          </div>
-                        </div>
-
-                        {m.max_total > 0 && (
-                          <div className="mt-3">
-                            <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                              <span>Availability</span>
-                              <span className="font-medium">
-                                {m.purchases_count} of {m.max_total} taken
-                              </span>
-                            </div>
-                            <Progress value={soldPct} className="mt-1 h-1.5" />
-                          </div>
-                        )}
-
-                        <Button
-                          disabled={!buyable}
-                          onClick={() => setSelected(m)}
-                          className="mt-3 w-full rounded-xl tap-pop"
-                        >
-                          {buyable ? `Invest UGX ${Number(m.price).toLocaleString()}` : statusLabel[soldOut ? "sold_out" : m.status]}
-                        </Button>
-
-                        <p className="mt-2 flex items-center justify-center gap-1 text-[10px] text-muted-foreground">
-                          <ShieldCheck className="h-3 w-3 text-primary" />
-                          Rewards are credited automatically at maturity
-                        </p>
-                      </CardContent>
-                    </Card>
-                  );
-                })
+                    );
+                  })}
+                </div>
               )}
+
+              <p className="mt-4 flex items-center justify-center gap-1 text-[10px] text-muted-foreground">
+                <ShieldCheck className="h-3 w-3 text-primary" />
+                Rewards are credited automatically at maturity
+              </p>
             </TabsContent>
+
 
 
             <TabsContent value="mine" className="mt-4 space-y-3">
