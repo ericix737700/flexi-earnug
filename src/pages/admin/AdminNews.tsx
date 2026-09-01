@@ -61,6 +61,23 @@ export default function AdminNews() {
     queryClient.invalidateQueries({ queryKey: ["news-feed"] });
   };
 
+  const uploadImage = async (file: File) => {
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `news/${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage.from("branding").upload(path, file, { upsert: true });
+      if (error) throw error;
+      const { data } = supabase.storage.from("branding").getPublicUrl(path);
+      setImageUrl(data.publicUrl);
+      toast.success("Banner uploaded");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const create = async () => {
     if (!title.trim()) {
       toast.error("Title is required");
@@ -70,6 +87,8 @@ export default function AdminNews() {
     const { error } = await supabase.from("news_items").insert({
       title: title.trim(),
       body: body.trim() || null,
+      content: content.trim() || null,
+      image_url: imageUrl.trim() || null,
       category,
       link_url: linkUrl.trim() || null,
       pinned,
@@ -80,9 +99,10 @@ export default function AdminNews() {
       return;
     }
     toast.success("News item published");
-    setTitle(""); setBody(""); setLinkUrl(""); setPinned(false);
+    setTitle(""); setBody(""); setContent(""); setImageUrl(""); setLinkUrl(""); setPinned(false);
     refresh();
   };
+
 
   const togglePublish = async (item: NewsItem) => {
     const { error } = await supabase
