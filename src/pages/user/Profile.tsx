@@ -193,9 +193,13 @@ export default function Profile() {
           <Row icon={FileText} label="Statement" value="All transactions" onClick={() => navigate("/statement")} iconClass="text-primary" />
           <Row icon={Phone} label="Phone" value={profile?.phone} showChevron={false} />
           <Row icon={Mail} label="Email" value={profile?.email || "Not set"} showChevron={false} />
+          <Row icon={Copy} label="Account ID" value={
+            <span className="font-mono font-semibold">{(profile as any)?.account_id || "—"}</span>
+          } onClick={copyAccountId} />
           <Row icon={Shield} label="Referral Code" value={
             <span className="font-mono font-semibold text-primary">{profile?.referral_code}</span>
           } onClick={copyReferralCode} />
+
         </Group>
 
         {/* Preferences */}
