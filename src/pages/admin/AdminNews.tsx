@@ -19,6 +19,8 @@ interface NewsItem {
   id: string;
   title: string;
   body: string | null;
+  content: string | null;
+  image_url: string | null;
   category: string;
   link_url: string | null;
   is_published: boolean;
@@ -32,10 +34,14 @@ export default function AdminNews() {
   const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [content, setContent] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
   const [category, setCategory] = useState("news");
   const [linkUrl, setLinkUrl] = useState("");
   const [pinned, setPinned] = useState(false);
   const [saving, setSaving] = useState(false);
+
 
   const { data: items, isLoading } = useQuery({
     queryKey: ["admin-news"],
@@ -55,6 +61,23 @@ export default function AdminNews() {
     queryClient.invalidateQueries({ queryKey: ["news-feed"] });
   };
 
+  const uploadImage = async (file: File) => {
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `news/${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage.from("branding").upload(path, file, { upsert: true });
+      if (error) throw error;
+      const { data } = supabase.storage.from("branding").getPublicUrl(path);
+      setImageUrl(data.publicUrl);
+      toast.success("Banner uploaded");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const create = async () => {
     if (!title.trim()) {
       toast.error("Title is required");
@@ -64,6 +87,8 @@ export default function AdminNews() {
     const { error } = await supabase.from("news_items").insert({
       title: title.trim(),
       body: body.trim() || null,
+      content: content.trim() || null,
+      image_url: imageUrl.trim() || null,
       category,
       link_url: linkUrl.trim() || null,
       pinned,
@@ -74,9 +99,10 @@ export default function AdminNews() {
       return;
     }
     toast.success("News item published");
-    setTitle(""); setBody(""); setLinkUrl(""); setPinned(false);
+    setTitle(""); setBody(""); setContent(""); setImageUrl(""); setLinkUrl(""); setPinned(false);
     refresh();
   };
+
 
   const togglePublish = async (item: NewsItem) => {
     const { error } = await supabase
@@ -124,9 +150,31 @@ export default function AdminNews() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Message</Label>
-              <Textarea rows={4} value={body} onChange={(e) => setBody(e.target.value)} />
+              <Label>Banner image</Label>
+              <div className="flex items-center gap-3">
+                <Input
+                  type="file"
+                  accept="image/*"
+                  disabled={uploading}
+                  onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(f); }}
+                  className="max-w-xs"
+                />
+                {uploading && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
+              </div>
+              <Input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="Or paste an image URL" />
+              {imageUrl && (
+                <img src={imageUrl} alt="Banner preview" className="h-40 w-full rounded-xl border object-cover" />
+              )}
             </div>
+            <div className="space-y-2">
+              <Label>Teaser (shown on the card)</Label>
+              <Textarea rows={3} value={body} onChange={(e) => setBody(e.target.value)} placeholder="Short summary shown before Read more" />
+            </div>
+            <div className="space-y-2">
+              <Label>Full story (shown after Read more)</Label>
+              <Textarea rows={8} value={content} onChange={(e) => setContent(e.target.value)} placeholder="The complete article..." />
+            </div>
+
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label>Link (optional)</Label>

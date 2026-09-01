@@ -110,6 +110,15 @@ export default function Profile() {
     }
   };
 
+  const copyAccountId = () => {
+    const id = (profile as any)?.account_id;
+    if (id) {
+      navigator.clipboard.writeText(id);
+      toast.success("Account ID copied!");
+    }
+  };
+
+
   const openCommunity = () => {
     const link = settings?.community_whatsapp;
     if (link) window.open(link, "_blank");
@@ -138,7 +147,18 @@ export default function Profile() {
                 {profile?.status?.toUpperCase()}
               </Badge>
               <NetworkBadge phone={profile?.phone} override={(profile as any)?.network_provider} size="sm" />
+              {(profile as any)?.account_id && (
+                <button
+                  onClick={copyAccountId}
+                  className="flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-mono font-semibold text-muted-foreground transition-colors hover:bg-muted/70"
+                  aria-label="Copy account ID"
+                >
+                  ID {(profile as any).account_id}
+                  <Copy className="h-2.5 w-2.5" />
+                </button>
+              )}
             </div>
+
           </div>
           <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => setEditOpen(true)} aria-label="Edit profile">
             <Pencil className="h-4 w-4" />
@@ -193,9 +213,13 @@ export default function Profile() {
           <Row icon={FileText} label="Statement" value="All transactions" onClick={() => navigate("/statement")} iconClass="text-primary" />
           <Row icon={Phone} label="Phone" value={profile?.phone} showChevron={false} />
           <Row icon={Mail} label="Email" value={profile?.email || "Not set"} showChevron={false} />
+          <Row icon={Copy} label="Account ID" value={
+            <span className="font-mono font-semibold">{(profile as any)?.account_id || "—"}</span>
+          } onClick={copyAccountId} />
           <Row icon={Shield} label="Referral Code" value={
             <span className="font-mono font-semibold text-primary">{profile?.referral_code}</span>
           } onClick={copyReferralCode} />
+
         </Group>
 
         {/* Preferences */}
