@@ -17,6 +17,8 @@ import { Link } from "react-router-dom";
 import { Cpu, Clock, TrendingUp, Loader2, Sparkles, Wallet, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { EmptyState } from "@/components/EmptyState";
+import { Skeleton } from "@/components/ui/skeleton";
+
 
 type Machine = {
   id: string;
