@@ -110,6 +110,15 @@ export default function Profile() {
     }
   };
 
+  const copyAccountId = () => {
+    const id = (profile as any)?.account_id;
+    if (id) {
+      navigator.clipboard.writeText(id);
+      toast.success("Account ID copied!");
+    }
+  };
+
+
   const openCommunity = () => {
     const link = settings?.community_whatsapp;
     if (link) window.open(link, "_blank");
