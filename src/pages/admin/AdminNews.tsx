@@ -150,9 +150,31 @@ export default function AdminNews() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Message</Label>
-              <Textarea rows={4} value={body} onChange={(e) => setBody(e.target.value)} />
+              <Label>Banner image</Label>
+              <div className="flex items-center gap-3">
+                <Input
+                  type="file"
+                  accept="image/*"
+                  disabled={uploading}
+                  onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(f); }}
+                  className="max-w-xs"
+                />
+                {uploading && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
+              </div>
+              <Input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="Or paste an image URL" />
+              {imageUrl && (
+                <img src={imageUrl} alt="Banner preview" className="h-40 w-full rounded-xl border object-cover" />
+              )}
             </div>
+            <div className="space-y-2">
+              <Label>Teaser (shown on the card)</Label>
+              <Textarea rows={3} value={body} onChange={(e) => setBody(e.target.value)} placeholder="Short summary shown before Read more" />
+            </div>
+            <div className="space-y-2">
+              <Label>Full story (shown after Read more)</Label>
+              <Textarea rows={8} value={content} onChange={(e) => setContent(e.target.value)} placeholder="The complete article..." />
+            </div>
+
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label>Link (optional)</Label>
