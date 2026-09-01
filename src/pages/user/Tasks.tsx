@@ -15,6 +15,8 @@ import { toast } from "sonner";
 import { Play, ClipboardList, HelpCircle, Loader2, Clock, Coins, CheckCircle } from "lucide-react";
 import { TriviaQuiz } from "@/components/user/TriviaQuiz";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
+import { Skeleton } from "@/components/ui/skeleton";
+
 
 interface Task {
   id: string;
