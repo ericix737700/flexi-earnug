@@ -147,7 +147,18 @@ export default function Profile() {
                 {profile?.status?.toUpperCase()}
               </Badge>
               <NetworkBadge phone={profile?.phone} override={(profile as any)?.network_provider} size="sm" />
+              {(profile as any)?.account_id && (
+                <button
+                  onClick={copyAccountId}
+                  className="flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-mono font-semibold text-muted-foreground transition-colors hover:bg-muted/70"
+                  aria-label="Copy account ID"
+                >
+                  ID {(profile as any).account_id}
+                  <Copy className="h-2.5 w-2.5" />
+                </button>
+              )}
             </div>
+
           </div>
           <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => setEditOpen(true)} aria-label="Edit profile">
             <Pencil className="h-4 w-4" />
