@@ -19,6 +19,8 @@ interface NewsItem {
   id: string;
   title: string;
   body: string | null;
+  content: string | null;
+  image_url: string | null;
   category: string;
   link_url: string | null;
   is_published: boolean;
@@ -32,10 +34,14 @@ export default function AdminNews() {
   const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [content, setContent] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
   const [category, setCategory] = useState("news");
   const [linkUrl, setLinkUrl] = useState("");
   const [pinned, setPinned] = useState(false);
   const [saving, setSaving] = useState(false);
+
 
   const { data: items, isLoading } = useQuery({
     queryKey: ["admin-news"],
