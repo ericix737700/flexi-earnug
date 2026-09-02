@@ -141,6 +141,8 @@ function AppRoutes() {
       <Route path="/machines" element={<ProtectedRoute><Machines /></ProtectedRoute>} />
       <Route path="/statement" element={<ProtectedRoute><Statement /></ProtectedRoute>} />
       <Route path="/news" element={<ProtectedRoute><News /></ProtectedRoute>} />
+      <Route path="/news/:id" element={<ProtectedRoute><NewsDetail /></ProtectedRoute>} />
+
       <Route path="/airtime-data" element={<ProtectedRoute><AirtimeData /></ProtectedRoute>} />
 
 
