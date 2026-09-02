@@ -399,7 +399,14 @@ export default function AirtimeData() {
             </div>
 
             {isLoading ? (
-              <div className="flex justify-center py-10"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+              <div className="space-y-4">
+                <div className="grid grid-cols-3 gap-2">
+                  {[0, 1, 2].map((i) => <Skeleton key={i} className="h-20 rounded-2xl" />)}
+                </div>
+                <div className="space-y-2">
+                  {[0, 1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-16 w-full rounded-2xl" />)}
+                </div>
+              </div>
             ) : bundles.length === 0 ? (
               <Card className="glass-card border-0">
                 <CardContent className="py-8 text-center text-sm text-muted-foreground">
@@ -407,38 +414,69 @@ export default function AirtimeData() {
                 </CardContent>
               </Card>
             ) : (
-              groupedBundles.map(([group, items]) => (
-                <div key={group} className="space-y-2">
-                  <p className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{group}</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {items.map((b) => (
+              <>
+                {/* Category tiles */}
+                {groupedBundles.length > 1 && (
+                  <div className="grid grid-cols-3 gap-2">
+                    {groupedBundles.map(([group, items]) => (
                       <button
-                        key={b.bundle_id}
+                        key={group}
                         type="button"
-                        onClick={() => openConfirm("bundle", b)}
-                        className="flex h-full flex-col justify-between rounded-2xl border bg-card p-3 text-left transition-all tap-pop hover:border-primary/50 hover:bg-muted/50"
+                        onClick={() => setActiveGroup(group)}
+                        className={`flex flex-col items-center gap-1.5 rounded-2xl border p-3 text-center transition-all tap-pop ${
+                          activeGroup === group
+                            ? "border-primary bg-primary/10"
+                            : "border-border bg-card hover:bg-muted/60"
+                        }`}
                       >
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-bold">{b.name}</p>
-                          <p className="truncate text-[11px] text-muted-foreground">
-                            {b.validity || b.description || "Data bundle"}
-                          </p>
-                        </div>
-                        <div className="mt-3 flex items-center justify-between">
-                          <span className="text-sm font-extrabold text-primary">
-                            UGX {Number(b.price).toLocaleString()}
-                          </span>
-                          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
-                            Buy
-                          </span>
-                        </div>
+                        <span className={`flex h-9 w-9 items-center justify-center rounded-full ${
+                          activeGroup === group ? "bg-primary text-primary-foreground" : "bg-muted text-primary"
+                        }`}>
+                          <Wifi className="h-4 w-4" />
+                        </span>
+                        <span className="line-clamp-2 text-[11px] font-semibold leading-tight">{group}</span>
+                        <span className="text-[10px] text-muted-foreground">{items.length} plans</span>
                       </button>
                     ))}
                   </div>
+                )}
+
+                {/* Bundle rows */}
+                <div className="space-y-2">
+                  {visibleBundles.map((b) => (
+                    <button
+                      key={b.bundle_id}
+                      type="button"
+                      onClick={() => openConfirm("bundle", b)}
+                      className="flex w-full items-center gap-3 rounded-2xl border bg-card p-3.5 text-left shadow-sm transition-all tap-pop hover:border-primary/50 hover:shadow-md"
+                    >
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                        <Wifi className="h-5 w-5 text-primary" />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[15px] font-bold leading-tight">{b.name}</span>
+                        <span className="block truncate text-[11px] text-muted-foreground">
+                          {b.description || "Data bundle"}
+                        </span>
+                        {b.validity && (
+                          <span className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                            <Clock className="h-2.5 w-2.5" /> {b.validity}
+                          </span>
+                        )}
+                      </span>
+                      <span className="shrink-0 text-right">
+                        <span className="block text-sm font-extrabold">
+                          {Number(b.price).toLocaleString()}
+                        </span>
+                        <span className="block text-[10px] font-semibold text-muted-foreground">UGX</span>
+                      </span>
+                    </button>
+                  ))}
                 </div>
-              ))
+              </>
             )}
           </TabsContent>
+
         </Tabs>
       </div>
 
