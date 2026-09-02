@@ -420,7 +420,10 @@ const Index = () => {
         </div>
       </section>
 
+      <PublicFooter />
+
       {/* Advertise with FlexiEarn */}
+
       <section className="mx-auto max-w-6xl px-4 py-16">
         <div className="relative overflow-hidden rounded-3xl border border-primary/30 bg-gradient-to-br from-primary/15 via-card to-secondary/10 p-8 md:p-12">
           <div className="absolute -top-16 -right-16 h-52 w-52 rounded-full bg-primary/20 blur-3xl" />
@@ -510,7 +513,7 @@ const Index = () => {
         </div>
       </section>
 
-      <PublicFooter />
+      
 
     </div>
   );
