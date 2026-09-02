@@ -87,6 +87,21 @@ export default function AirtimeData() {
     return [...groups.entries()];
   }, [bundles]);
 
+  const [activeGroup, setActiveGroup] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (groupedBundles.length === 0) { setActiveGroup(null); return; }
+    if (!activeGroup || !groupedBundles.some(([g]) => g === activeGroup)) {
+      setActiveGroup(groupedBundles[0][0]);
+    }
+  }, [groupedBundles, activeGroup]);
+
+  const visibleBundles = useMemo(() => {
+    if (groupedBundles.length <= 1) return bundles;
+    return groupedBundles.find(([g]) => g === activeGroup)?.[1] || [];
+  }, [groupedBundles, activeGroup, bundles]);
+
+
   // ---- Status polling ------------------------------------------------------
   const stopPolling = () => {
     if (pollRef.current) {
