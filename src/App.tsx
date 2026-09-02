@@ -30,6 +30,8 @@ import Ads from "./pages/user/Ads";
 import Machines from "./pages/user/Machines";
 import Statement from "./pages/user/Statement";
 import News from "./pages/user/News";
+import NewsDetail from "./pages/user/NewsDetail";
+
 import AirtimeData from "./pages/user/AirtimeData";
 
 
