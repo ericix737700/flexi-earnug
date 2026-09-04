@@ -175,89 +175,8 @@ export default function Wallet() {
     enabled: !!profile?.user_id,
   });
 
-  // Withdrawal mutation
-  const withdrawMutation = useMutation({
-    mutationFn: async () => {
-      if (!profile?.user_id) throw new Error("Not authenticated");
-      if (settings?.emergency_mode === "true" || settings?.kill_withdrawals === "true") {
-        throw new Error("Withdrawals are temporarily disabled. Please try again later.");
-      }
-      if ((profile as any)?.restrictions?.no_transactions) throw new Error("Your account is restricted from making transactions");
-      if (!recipientName) throw new Error("Please verify the recipient name first");
-
-      const amount = Number(withdrawAmount);
-      if (isNaN(amount) || amount < minimumWithdrawal) {
-        throw new Error(`Minimum withdrawal is UGX ${minimumWithdrawal.toLocaleString()}`);
-      }
-
-      const feeAmount = fee.calculate(amount);
-      const totalDebit = amount + feeAmount;
-
-      if (totalDebit > Number(profile.balance)) {
-        throw new Error("Insufficient balance to cover the amount and processing fee");
-      }
-
-      // Create withdrawal request
-      const { data: withdrawalRow, error } = await supabase.from("withdrawals").insert({
-        user_id: profile.user_id,
-        amount,
-        phone_number: withdrawPhone,
-        network: withdrawNetwork,
-      }).select("id").single();
-
-      if (error) throw error;
-
-      // Deduct from balance (amount + processing fee)
-      const newBalance = Number(profile.balance) - totalDebit;
-      await supabase
-        .from("profiles")
-        .update({ balance: newBalance })
-        .eq("user_id", profile.user_id);
-
-      // Create transaction
-      await supabase.from("transactions").insert({
-        user_id: profile.user_id,
-        transaction_type: "withdrawal",
-        amount: -totalDebit,
-        balance_after: newBalance,
-        description:
-          `Withdrawal to ${recipientName} (${withdrawNetwork} ${withdrawPhone})` +
-          (feeAmount > 0 ? ` — incl. UGX ${feeAmount.toLocaleString()} processing fee` : ""),
-      });
 
 
-      // Automatic mode: trigger MarzPay send immediately
-      const isAutomatic = settings?.withdrawal_mode === "automatic";
-      let auto = false;
-      if (isAutomatic && withdrawalRow?.id) {
-        const { data: sendData, error: sendError } = await supabase.functions.invoke("marzpay-send", {
-          body: { withdrawal_id: withdrawalRow.id, amount, phone_number: withdrawPhone },
-        });
-        if (!sendError && !sendData?.error) {
-          auto = true;
-        }
-      }
-
-      return { amount, auto };
-    },
-    onSuccess: ({ amount, auto }) => {
-      toast.success(
-        auto
-          ? `Withdrawal of UGX ${amount.toLocaleString()} sent! Check your phone.`
-          : `Withdrawal of UGX ${amount.toLocaleString()} submitted for approval.`
-      );
-      setIsWithdrawOpen(false);
-      setWithdrawAmount("");
-      setRecipientName(null);
-      setLookupError(null);
-      refreshProfile();
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      queryClient.invalidateQueries({ queryKey: ["pending-withdrawals"] });
-    },
-    onError: (error: Error) => {
-      toast.error(error.message);
-    },
-  });
 
   const getTransactionIcon = (type: string, amount: number) => {
     if (amount > 0) {
