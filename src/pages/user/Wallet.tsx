@@ -287,191 +287,26 @@ export default function Wallet() {
             <p className="mt-1 text-4xl font-extrabold text-gradient-primary tracking-tight">
               UGX {Number(profile?.balance || 0).toLocaleString()}
             </p>
-            <Dialog open={isWithdrawOpen} onOpenChange={setIsWithdrawOpen}>
-              <DialogTrigger asChild>
-                <Button className="mt-5 gradient-primary border-0 text-primary-foreground shadow-md hover:opacity-95 tap-pop" size="lg">
-                  <WalletIcon className="mr-2 h-5 w-5" />
-                  Withdraw
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="glass-card border-0">
+            <div className="mt-5 grid grid-cols-2 gap-3">
+              <Button
+                variant="outline"
+                size="lg"
+                className="rounded-xl font-semibold tap-pop"
+                onClick={() => navigate("/wallet/deposit")}
+              >
+                <ArrowDownLeft className="mr-2 h-5 w-5" />
+                Deposit
+              </Button>
+              <Button
+                size="lg"
+                className="gradient-primary rounded-xl border-0 font-semibold text-primary-foreground shadow-md hover:opacity-95 tap-pop"
+                onClick={() => navigate("/wallet/withdraw")}
+              >
+                <WalletIcon className="mr-2 h-5 w-5" />
+                Withdraw
+              </Button>
+            </div>
 
-                <DialogHeader>
-                  <DialogTitle>Withdraw Funds</DialogTitle>
-                  <DialogDescription>
-                    Minimum withdrawal: UGX {minimumWithdrawal.toLocaleString()}
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <div className="space-y-2">
-                    <Label>Amount (UGX)</Label>
-                    <Input
-                      type="number"
-                      placeholder="Enter amount"
-                      value={withdrawAmount}
-                      onChange={(e) => setWithdrawAmount(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
-                      Phone Number
-                      {recipientName && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-xs font-medium text-success">
-                          <CheckCircle className="h-3 w-3" />
-                          Verified
-                        </span>
-                      )}
-                    </Label>
-                    <div className="flex gap-2">
-                      <div className="relative flex-1">
-                        <Input
-                          type="tel"
-                          placeholder="0700123456"
-                          value={withdrawPhone}
-                          onChange={(e) => setWithdrawPhone(e.target.value)}
-                          disabled={isLookingUp}
-                          className={
-                            recipientName
-                              ? "border-success pr-9 focus-visible:ring-success"
-                              : "pr-9"
-                          }
-                        />
-                        {isLookingUp && (
-                          <Loader2 className="absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
-                        )}
-                        {!isLookingUp && recipientName && (
-                          <CheckCircle className="absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-success" />
-                        )}
-                      </div>
-                      <Button
-                        type="button"
-                        variant={recipientName ? "secondary" : "outline"}
-                        onClick={verifyRecipientName}
-                        disabled={isLookingUp || !withdrawPhone || !!recipientName}
-                        className="min-w-[88px]"
-                      >
-                        {isLookingUp ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Checking
-                          </>
-                        ) : recipientName ? (
-                          "Verified"
-                        ) : (
-                          "Verify"
-                        )}
-                      </Button>
-                    </div>
-
-                    {isLookingUp && (
-                      <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-muted/40 p-3">
-                        <Skeleton className="h-4 w-4 rounded-full" />
-                        <div className="flex-1 space-y-1.5">
-                          <Skeleton className="h-3 w-24" />
-                          <Skeleton className="h-4 w-40" />
-                        </div>
-                      </div>
-                    )}
-
-                    {!isLookingUp && recipientName && (
-                      <div className="flex items-start gap-2 rounded-lg border border-success/30 bg-success/10 p-3 text-sm animate-in fade-in slide-in-from-top-1">
-                        <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-success" />
-                        <div className="flex-1">
-                          <p className="text-xs text-muted-foreground">Account holder</p>
-                          <p className="font-semibold">{recipientName}</p>
-                        </div>
-                      </div>
-                    )}
-
-                    {!isLookingUp && lookupError && (
-                      <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm animate-in fade-in slide-in-from-top-1">
-                        <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
-                        <p className="text-destructive">{lookupError}</p>
-                      </div>
-                    )}
-
-                    {!isLookingUp && !recipientName && !lookupError && (
-                      <p className="text-xs text-muted-foreground">
-                        Verify the recipient's registered name before sending.
-                      </p>
-                    )}
-                  </div>
-
-
-                  <div className="space-y-2">
-                    <Label>Network</Label>
-                    <RadioGroup
-                      value={withdrawNetwork}
-                      onValueChange={(v) => setWithdrawNetwork(v as "MTN" | "Airtel")}
-                      className="grid grid-cols-2 gap-4"
-                    >
-                      <div>
-                        <RadioGroupItem value="MTN" id="w-mtn" className="peer sr-only" />
-                        <Label
-                          htmlFor="w-mtn"
-                          className="flex cursor-pointer items-center justify-center rounded-lg border-2 border-muted p-3 hover:bg-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10"
-                        >
-                          <Smartphone className="mr-2 h-4 w-4" />
-                          MTN MoMo
-                        </Label>
-                      </div>
-                      <div>
-                        <RadioGroupItem value="Airtel" id="w-airtel" className="peer sr-only" />
-                        <Label
-                          htmlFor="w-airtel"
-                          className="flex cursor-pointer items-center justify-center rounded-lg border-2 border-muted p-3 hover:bg-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10"
-                        >
-                          <Smartphone className="mr-2 h-4 w-4" />
-                          Airtel Money
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-
-                  {requestedAmount > 0 && (
-                    <div className="space-y-2 rounded-xl border bg-muted/40 p-3 text-sm">
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">You receive</span>
-                        <span className="font-semibold">UGX {requestedAmount.toLocaleString()}</span>
-                      </div>
-                      {fee.enabled && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">Processing fee ({fee.percent}%)</span>
-                          <span className="font-semibold">UGX {feeAmount.toLocaleString()}</span>
-                        </div>
-                      )}
-                      <div className="flex items-center justify-between border-t pt-2">
-                        <span className="font-medium">Deducted from wallet</span>
-                        <span className="font-bold text-primary">UGX {totalDeducted.toLocaleString()}</span>
-                      </div>
-                      {fee.enabled && feeAmount > 0 && (
-                        <p className="flex items-start gap-1.5 pt-1 text-[11px] text-muted-foreground">
-                          <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                          {fee.note}
-                        </p>
-                      )}
-                    </div>
-                  )}
-
-
-                  <Button
-                    className="w-full"
-                    onClick={() => withdrawMutation.mutate()}
-                    disabled={withdrawMutation.isPending || !recipientName}
-                  >
-                    {withdrawMutation.isPending ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Processing...
-                      </>
-                    ) : (
-                      "Submit Withdrawal"
-                    )}
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
           </CardContent>
         </Card>
 
