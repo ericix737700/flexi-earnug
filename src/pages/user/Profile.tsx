@@ -284,20 +284,8 @@ export default function Profile() {
           <p className="text-xs text-muted-foreground">Powered by {settings?.powered_by || "Veltrix Technologies Ltd"}</p>
         </div>
 
-        <DepositDialog open={depositOpen} onOpenChange={setDepositOpen} />
-        <SupportDialog open={supportOpen} onOpenChange={setSupportOpen} />
-        <EditProfileDialog open={editOpen} onOpenChange={setEditOpen} />
 
-        <Sheet open={notificationsOpen} onOpenChange={setNotificationsOpen}>
-          <SheetContent side="right" className="glass-card border-0 overflow-y-auto w-full sm:max-w-lg">
-            <SheetHeader><SheetTitle className="text-gradient-primary">Notifications</SheetTitle></SheetHeader>
-            <div className="mt-4 space-y-3">
-              <NotificationsSection />
-              <PushNotificationToggle />
-            </div>
-            <Button className="w-full mt-6" variant="outline" onClick={() => setNotificationsOpen(false)}>Close</Button>
-          </SheetContent>
-        </Sheet>
+
 
 
 
