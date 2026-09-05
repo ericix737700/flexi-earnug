@@ -1,14 +1,8 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserLayout } from "@/components/layout/UserLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { DepositDialog } from "@/components/user/DepositDialog";
-import { SupportDialog } from "@/components/user/SupportDialog";
-import {
-  Sheet, SheetContent, SheetHeader, SheetTitle,
-} from "@/components/ui/sheet";
 import {
   User, Phone, Shield, LogOut, ChevronRight,
   FileText, ArrowDownToLine, ArrowUpFromLine,
@@ -20,15 +14,13 @@ import {
 } from "lucide-react";
 
 import { toast } from "sonner";
-import { NotificationsSection } from "@/components/user/NotificationsSection";
-import { PushNotificationToggle } from "@/components/user/PushNotificationToggle";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { PlatformLogo } from "@/components/PlatformLogo";
 import { EmailPrompt } from "@/components/user/EmailPrompt";
-import { EditProfileDialog } from "@/components/user/EditProfileDialog";
 import { useTheme, type Theme } from "@/hooks/useTheme";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { NetworkBadge } from "@/components/NetworkBadge";
+
 
 
 type RowProps = {
