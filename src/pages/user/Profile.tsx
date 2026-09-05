@@ -1,14 +1,8 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserLayout } from "@/components/layout/UserLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { DepositDialog } from "@/components/user/DepositDialog";
-import { SupportDialog } from "@/components/user/SupportDialog";
-import {
-  Sheet, SheetContent, SheetHeader, SheetTitle,
-} from "@/components/ui/sheet";
 import {
   User, Phone, Shield, LogOut, ChevronRight,
   FileText, ArrowDownToLine, ArrowUpFromLine,
@@ -20,15 +14,13 @@ import {
 } from "lucide-react";
 
 import { toast } from "sonner";
-import { NotificationsSection } from "@/components/user/NotificationsSection";
-import { PushNotificationToggle } from "@/components/user/PushNotificationToggle";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { PlatformLogo } from "@/components/PlatformLogo";
 import { EmailPrompt } from "@/components/user/EmailPrompt";
-import { EditProfileDialog } from "@/components/user/EditProfileDialog";
 import { useTheme, type Theme } from "@/hooks/useTheme";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { NetworkBadge } from "@/components/NetworkBadge";
+
 
 
 type RowProps = {
@@ -73,10 +65,6 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
 export default function Profile() {
   const { profile, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
-  const [depositOpen, setDepositOpen] = useState(false);
-  const [supportOpen, setSupportOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const { data: settings } = usePlatformSettings();
   const { theme, setTheme } = useTheme();
 
@@ -160,7 +148,7 @@ export default function Profile() {
             </div>
 
           </div>
-          <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => setEditOpen(true)} aria-label="Edit profile">
+          <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => navigate("/profile/settings")} aria-label="Edit profile">
             <Pencil className="h-4 w-4" />
           </Button>
         </div>
@@ -178,10 +166,10 @@ export default function Profile() {
             <span className="text-sm text-muted-foreground">{profile?.phone}</span>
           </div>
           <div className="mt-4 grid grid-cols-2 gap-3">
-            <Button variant="outline" className="h-11 rounded-xl font-semibold uppercase tracking-wide" onClick={() => navigate("/wallet")}>
+            <Button variant="outline" className="h-11 rounded-xl font-semibold uppercase tracking-wide" onClick={() => navigate("/wallet/withdraw")}>
               Withdraw
             </Button>
-            <Button className="h-11 rounded-xl font-semibold uppercase tracking-wide" onClick={() => setDepositOpen(true)}>
+            <Button className="h-11 rounded-xl font-semibold uppercase tracking-wide" onClick={() => navigate("/wallet/deposit")}>
               Deposit
             </Button>
           </div>
@@ -209,7 +197,7 @@ export default function Profile() {
 
         {/* Account */}
         <Group title="Account">
-          <Row icon={User} label="Manage Profile" onClick={() => setEditOpen(true)} />
+          <Row icon={User} label="Manage Profile" onClick={() => navigate("/profile/settings")} />
           <Row icon={FileText} label="Statement" value="All transactions" onClick={() => navigate("/statement")} iconClass="text-primary" />
           <Row icon={Phone} label="Phone" value={profile?.phone} showChevron={false} />
           <Row icon={Mail} label="Email" value={profile?.email || "Not set"} showChevron={false} />
@@ -224,7 +212,7 @@ export default function Profile() {
 
         {/* Preferences */}
         <Group title="Preferences">
-          <Row icon={Bell} label="Notifications" onClick={() => setNotificationsOpen(true)} />
+          <Row icon={Bell} label="Notifications" onClick={() => navigate("/notifications")} />
           <div className="px-4 py-3">
             <div className="mb-2 flex items-center gap-3">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted">
@@ -262,7 +250,7 @@ export default function Profile() {
 
         {/* Support */}
         <Group title="Support">
-          <Row icon={MessageCircle} label="Help Center" onClick={() => setSupportOpen(true)} iconClass="text-green-600" />
+          <Row icon={MessageCircle} label="Help Center" onClick={() => navigate("/support")} iconClass="text-green-600" />
           <Row icon={FileText} label="Terms & Conditions" onClick={() => navigate("/terms")} />
           <Row icon={Lock} label="Privacy Policy" onClick={() => navigate("/privacy")} />
         </Group>
@@ -284,20 +272,8 @@ export default function Profile() {
           <p className="text-xs text-muted-foreground">Powered by {settings?.powered_by || "Veltrix Technologies Ltd"}</p>
         </div>
 
-        <DepositDialog open={depositOpen} onOpenChange={setDepositOpen} />
-        <SupportDialog open={supportOpen} onOpenChange={setSupportOpen} />
-        <EditProfileDialog open={editOpen} onOpenChange={setEditOpen} />
 
-        <Sheet open={notificationsOpen} onOpenChange={setNotificationsOpen}>
-          <SheetContent side="right" className="glass-card border-0 overflow-y-auto w-full sm:max-w-lg">
-            <SheetHeader><SheetTitle className="text-gradient-primary">Notifications</SheetTitle></SheetHeader>
-            <div className="mt-4 space-y-3">
-              <NotificationsSection />
-              <PushNotificationToggle />
-            </div>
-            <Button className="w-full mt-6" variant="outline" onClick={() => setNotificationsOpen(false)}>Close</Button>
-          </SheetContent>
-        </Sheet>
+
 
 
 
