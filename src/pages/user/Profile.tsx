@@ -65,10 +65,6 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
 export default function Profile() {
   const { profile, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
-  const [depositOpen, setDepositOpen] = useState(false);
-  const [supportOpen, setSupportOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const { data: settings } = usePlatformSettings();
   const { theme, setTheme } = useTheme();
 
@@ -152,7 +148,7 @@ export default function Profile() {
             </div>
 
           </div>
-          <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => setEditOpen(true)} aria-label="Edit profile">
+          <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => navigate("/profile/settings")} aria-label="Edit profile">
             <Pencil className="h-4 w-4" />
           </Button>
         </div>
@@ -170,10 +166,10 @@ export default function Profile() {
             <span className="text-sm text-muted-foreground">{profile?.phone}</span>
           </div>
           <div className="mt-4 grid grid-cols-2 gap-3">
-            <Button variant="outline" className="h-11 rounded-xl font-semibold uppercase tracking-wide" onClick={() => navigate("/wallet")}>
+            <Button variant="outline" className="h-11 rounded-xl font-semibold uppercase tracking-wide" onClick={() => navigate("/wallet/withdraw")}>
               Withdraw
             </Button>
-            <Button className="h-11 rounded-xl font-semibold uppercase tracking-wide" onClick={() => setDepositOpen(true)}>
+            <Button className="h-11 rounded-xl font-semibold uppercase tracking-wide" onClick={() => navigate("/wallet/deposit")}>
               Deposit
             </Button>
           </div>
@@ -201,7 +197,7 @@ export default function Profile() {
 
         {/* Account */}
         <Group title="Account">
-          <Row icon={User} label="Manage Profile" onClick={() => setEditOpen(true)} />
+          <Row icon={User} label="Manage Profile" onClick={() => navigate("/profile/settings")} />
           <Row icon={FileText} label="Statement" value="All transactions" onClick={() => navigate("/statement")} iconClass="text-primary" />
           <Row icon={Phone} label="Phone" value={profile?.phone} showChevron={false} />
           <Row icon={Mail} label="Email" value={profile?.email || "Not set"} showChevron={false} />
@@ -216,7 +212,7 @@ export default function Profile() {
 
         {/* Preferences */}
         <Group title="Preferences">
-          <Row icon={Bell} label="Notifications" onClick={() => setNotificationsOpen(true)} />
+          <Row icon={Bell} label="Notifications" onClick={() => navigate("/notifications")} />
           <div className="px-4 py-3">
             <div className="mb-2 flex items-center gap-3">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted">
@@ -254,7 +250,7 @@ export default function Profile() {
 
         {/* Support */}
         <Group title="Support">
-          <Row icon={MessageCircle} label="Help Center" onClick={() => setSupportOpen(true)} iconClass="text-green-600" />
+          <Row icon={MessageCircle} label="Help Center" onClick={() => navigate("/support")} iconClass="text-green-600" />
           <Row icon={FileText} label="Terms & Conditions" onClick={() => navigate("/terms")} />
           <Row icon={Lock} label="Privacy Policy" onClick={() => navigate("/privacy")} />
         </Group>
