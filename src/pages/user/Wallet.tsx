@@ -89,54 +89,8 @@ export default function Wallet() {
     return () => { supabase.removeChannel(channel); };
   }, [profile?.user_id]);
 
-  const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
-  const [withdrawAmount, setWithdrawAmount] = useState("");
-  const [withdrawPhone, setWithdrawPhone] = useState(profile?.phone || "");
-  const [withdrawNetwork, setWithdrawNetwork] = useState<"MTN" | "Airtel">("MTN");
-  const [recipientName, setRecipientName] = useState<string | null>(null);
-  const [lookupError, setLookupError] = useState<string | null>(null);
-  const [isLookingUp, setIsLookingUp] = useState(false);
 
-  // Reset name verification when phone changes
-  useEffect(() => {
-    setRecipientName(null);
-    setLookupError(null);
-  }, [withdrawPhone]);
 
-  const verifyRecipientName = async () => {
-    if (!withdrawPhone || withdrawPhone.replace(/\D/g, "").length < 9) {
-      setLookupError("Enter a valid phone number first");
-      return;
-    }
-    setIsLookingUp(true);
-    setLookupError(null);
-    setRecipientName(null);
-    try {
-      const { data, error } = await supabase.functions.invoke("marzpay-lookup-name", {
-        body: { phone_number: withdrawPhone },
-      });
-      if (error) throw error;
-      if (data?.success && data?.name) {
-        setRecipientName(data.name);
-        toast.success(`Account verified: ${data.name}`);
-      } else {
-        setLookupError(data?.error || "Could not retrieve account name");
-      }
-    } catch (e: any) {
-      setLookupError(e.message || "Lookup failed");
-    } finally {
-      setIsLookingUp(false);
-    }
-  };
-
-  const fee = useWithdrawalFee();
-  const requestedAmount = Number(withdrawAmount) || 0;
-  const feeAmount = fee.calculate(requestedAmount);
-  const totalDeducted = requestedAmount + feeAmount;
-
-  const minimumWithdrawal = settings?.minimum_withdrawal
-    ? Number(settings.minimum_withdrawal)
-    : 5000;
 
 
   // Fetch transactions
