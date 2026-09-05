@@ -33,6 +33,11 @@ import News from "./pages/user/News";
 import NewsDetail from "./pages/user/NewsDetail";
 
 import AirtimeData from "./pages/user/AirtimeData";
+import Deposit from "./pages/user/Deposit";
+import Withdraw from "./pages/user/Withdraw";
+import ProfileSettings from "./pages/user/ProfileSettings";
+import Notifications from "./pages/user/Notifications";
+import Support from "./pages/user/Support";
 
 
 // Admin Pages
@@ -128,12 +133,17 @@ function AppRoutes() {
       <Route path="/faq" element={<FAQ />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/status" element={<Status />} />
+      <Route path="/support" element={<Support />} />
       <Route path="/offline" element={<Offline />} />
 
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
       <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
       <Route path="/wallet" element={<ProtectedRoute><Wallet /></ProtectedRoute>} />
+      <Route path="/wallet/deposit" element={<ProtectedRoute><Deposit /></ProtectedRoute>} />
+      <Route path="/wallet/withdraw" element={<ProtectedRoute><Withdraw /></ProtectedRoute>} />
+      <Route path="/profile/settings" element={<ProtectedRoute><ProfileSettings /></ProtectedRoute>} />
+      <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
       <Route path="/referrals" element={<ProtectedRoute><Referrals /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
