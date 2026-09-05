@@ -42,8 +42,9 @@ interface Withdrawal {
 
 export default function Wallet() {
   const { profile, refreshProfile } = useAuth();
-  const { data: settings } = usePlatformSettings();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
+
 
   // Realtime subscription for live updates
   useEffect(() => {
