@@ -1,41 +1,25 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserLayout } from "@/components/layout/UserLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { usePlatformSettings } from "@/hooks/usePlatformSettings";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Wallet as WalletIcon,
   ArrowUpRight,
   ArrowDownLeft,
-  Smartphone,
-  Loader2,
   Clock,
   CheckCircle,
   XCircle,
   FileText,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { transactionLabel } from "@/lib/transactions";
 import { GiftCodeRedeem } from "@/components/user/GiftCodeRedeem";
-import { useWithdrawalFee } from "@/hooks/useWithdrawalFee";
-import { Info } from "lucide-react";
+
 
 
 interface Transaction {
