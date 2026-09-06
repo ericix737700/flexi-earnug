@@ -1,335 +1,241 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FeaturePage } from "@/components/layout/FeaturePage";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { NetworkBadge } from "@/components/NetworkBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { useWithdrawalFee } from "@/hooks/useWithdrawalFee";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { CheckCircle, Info, Loader2, Smartphone, XCircle } from "lucide-react";
+import { Check, CheckCircle, ChevronRight, CircleAlert, Clock3, Loader2, LockKeyhole, ShieldCheck, UserRound } from "lucide-react";
+
+const formatMoney = (value: number) => `UGX ${value.toLocaleString()}`;
+type Network = "MTN" | "Airtel";
 
 export default function Withdraw() {
   const navigate = useNavigate();
   const { profile, refreshProfile } = useAuth();
   const { data: settings } = usePlatformSettings();
   const queryClient = useQueryClient();
-
-  const [withdrawAmount, setWithdrawAmount] = useState("");
-  const [withdrawPhone, setWithdrawPhone] = useState(profile?.phone || "");
-  const [withdrawNetwork, setWithdrawNetwork] = useState<"MTN" | "Airtel">("MTN");
+  const fee = useWithdrawalFee();
+  const [step, setStep] = useState<"details" | "review">("details");
+  const [amount, setAmount] = useState("");
+  const [phone, setPhone] = useState(profile?.phone || "");
+  const [network, setNetwork] = useState<Network>("MTN");
   const [recipientName, setRecipientName] = useState<string | null>(null);
   const [lookupError, setLookupError] = useState<string | null>(null);
   const [isLookingUp, setIsLookingUp] = useState(false);
+  const [pin, setPin] = useState("");
 
   useEffect(() => {
-    if (profile?.phone && !withdrawPhone) setWithdrawPhone(profile.phone);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile?.phone]);
+    if (profile?.phone && !phone) setPhone(profile.phone);
+  }, [profile?.phone, phone]);
 
-  // Reset name verification when phone changes
   useEffect(() => {
     setRecipientName(null);
     setLookupError(null);
-  }, [withdrawPhone]);
+  }, [phone, network]);
 
-  const verifyRecipientName = async () => {
-    if (!withdrawPhone || withdrawPhone.replace(/\D/g, "").length < 9) {
-      setLookupError("Enter a valid phone number first");
+  const pinStatus = useQuery({
+    queryKey: ["fe-pin-status"],
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke("withdrawal-security", { body: { action: "status" } });
+      if (error) throw error;
+      return Boolean(data?.configured);
+    },
+  });
+
+  const requestedAmount = Number(amount) || 0;
+  const feeAmount = fee.calculate(requestedAmount);
+  const totalDeducted = requestedAmount + feeAmount;
+  const minimumWithdrawal = Number(settings?.minimum_withdrawal || 5000);
+
+  const verifyRecipient = async () => {
+    const digits = phone.replace(/\D/g, "");
+    if (digits.length < 9 || digits.length > 12) {
+      setLookupError("Enter a valid Ugandan phone number");
       return;
     }
     setIsLookingUp(true);
     setLookupError(null);
-    setRecipientName(null);
     try {
-      const { data, error } = await supabase.functions.invoke("marzpay-lookup-name", {
-        body: { phone_number: withdrawPhone },
-      });
+      const { data, error } = await supabase.functions.invoke("marzpay-lookup-name", { body: { phone_number: phone } });
       if (error) throw error;
-      if (data?.success && data?.name) {
-        setRecipientName(data.name);
-        toast.success(`Account verified: ${data.name}`);
-      } else {
-        setLookupError(data?.error || "Could not retrieve account name");
-      }
-    } catch (e: any) {
-      setLookupError(e.message || "Lookup failed");
+      if (!data?.success || !data?.name) throw new Error(data?.error || "Could not verify this mobile money account");
+      setRecipientName(String(data.name).trim());
+      toast.success("Account holder verified");
+    } catch (error) {
+      setLookupError(error instanceof Error ? error.message : "Name verification failed");
     } finally {
       setIsLookingUp(false);
     }
   };
 
-  const fee = useWithdrawalFee();
-  const requestedAmount = Number(withdrawAmount) || 0;
-  const feeAmount = fee.calculate(requestedAmount);
-  const totalDeducted = requestedAmount + feeAmount;
-
-  const minimumWithdrawal = settings?.minimum_withdrawal ? Number(settings.minimum_withdrawal) : 5000;
+  const continueToReview = () => {
+    if (requestedAmount < minimumWithdrawal) {
+      toast.error(`Minimum withdrawal is ${formatMoney(minimumWithdrawal)}`);
+      return;
+    }
+    if (totalDeducted > Number(profile?.balance || 0)) {
+      toast.error("Insufficient balance for this withdrawal and fee");
+      return;
+    }
+    if (!recipientName) {
+      toast.error("Verify the account holder first");
+      return;
+    }
+    if (!pinStatus.data) {
+      toast.error("Set your 4-digit FE PIN in Profile Settings first");
+      navigate("/profile/settings#fe-pin");
+      return;
+    }
+    setPin("");
+    setStep("review");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const withdrawMutation = useMutation({
     mutationFn: async () => {
-      if (!profile?.user_id) throw new Error("Not authenticated");
-      if (settings?.emergency_mode === "true" || settings?.kill_withdrawals === "true") {
-        throw new Error("Withdrawals are temporarily disabled. Please try again later.");
-      }
-      if ((profile as any)?.restrictions?.no_transactions)
-        throw new Error("Your account is restricted from making transactions");
-      if (!recipientName) throw new Error("Please verify the recipient name first");
-
-      const amount = Number(withdrawAmount);
-      if (isNaN(amount) || amount < minimumWithdrawal) {
-        throw new Error(`Minimum withdrawal is UGX ${minimumWithdrawal.toLocaleString()}`);
-      }
-
-      const feeCharged = fee.calculate(amount);
-      const totalDebit = amount + feeCharged;
-
-      if (totalDebit > Number(profile.balance)) {
-        throw new Error("Insufficient balance to cover the amount and processing fee");
-      }
-
-      const { data: withdrawalRow, error } = await supabase
-        .from("withdrawals")
-        .insert({
-          user_id: profile.user_id,
-          amount,
-          phone_number: withdrawPhone,
-          network: withdrawNetwork,
-        })
-        .select("id")
-        .single();
-
-      if (error) throw error;
-
-      const newBalance = Number(profile.balance) - totalDebit;
-      await supabase.from("profiles").update({ balance: newBalance }).eq("user_id", profile.user_id);
-
-      await supabase.from("transactions").insert({
-        user_id: profile.user_id,
-        transaction_type: "withdrawal",
-        amount: -totalDebit,
-        balance_after: newBalance,
-        description:
-          `Withdrawal to ${recipientName} (${withdrawNetwork} ${withdrawPhone})` +
-          (feeCharged > 0 ? ` — incl. UGX ${feeCharged.toLocaleString()} processing fee` : ""),
+      if (pin.length !== 4) throw new Error("Enter your 4-digit FE PIN");
+      const { data, error } = await supabase.functions.invoke("withdrawal-security", {
+        body: { action: "withdraw", pin, amount: requestedAmount, phone_number: phone, network, recipient_name: recipientName },
       });
-
-      const isAutomatic = settings?.withdrawal_mode === "automatic";
-      let auto = false;
-      if (isAutomatic && withdrawalRow?.id) {
-        const { data: sendData, error: sendError } = await supabase.functions.invoke("marzpay-send", {
-          body: { withdrawal_id: withdrawalRow.id, amount, phone_number: withdrawPhone },
-        });
-        if (!sendError && !sendData?.error) auto = true;
+      if (error) {
+        const detail = await error.context?.json?.().catch?.(() => null);
+        throw new Error(detail?.error || error.message);
       }
-
-      return { amount, auto };
+      if (data?.error) throw new Error(data.error);
+      if (data?.automatic && data?.withdrawal_id) {
+        const payout = await supabase.functions.invoke("marzpay-send", { body: { withdrawal_id: data.withdrawal_id } });
+        if (payout.data?.error) return { ...data, payoutWarning: payout.data.error };
+      }
+      return data;
     },
-    onSuccess: ({ amount, auto }) => {
-      toast.success(
-        auto
-          ? `Withdrawal of UGX ${amount.toLocaleString()} sent! Check your phone.`
-          : `Withdrawal of UGX ${amount.toLocaleString()} submitted for approval.`
-      );
-      setWithdrawAmount("");
-      setRecipientName(null);
-      setLookupError(null);
-      refreshProfile();
+    onSuccess: async (data) => {
+      if (data?.payoutWarning) toast.warning(`Withdrawal saved. Payout is pending: ${data.payoutWarning}`);
+      else toast.success(data?.automatic ? "Withdrawal authorized and payout started" : "Withdrawal authorized and sent for approval");
+      await refreshProfile();
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
       queryClient.invalidateQueries({ queryKey: ["pending-withdrawals"] });
       navigate("/wallet");
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => {
+      setPin("");
+      toast.error(error.message);
+    },
   });
 
+  if (step === "review") {
+    return (
+      <FeaturePage title="Withdrawal Review" backTo="/wallet" actions={
+        <div className="flex items-center gap-1 rounded-full border bg-card px-2.5 py-1 text-[10px] font-semibold text-muted-foreground">
+          <ShieldCheck className="h-3.5 w-3.5 text-primary" /> 256-BIT
+        </div>
+      }>
+        <section className="overflow-hidden rounded-xl border bg-card p-5 text-center shadow-sm">
+          <div className="mx-auto inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase text-primary">
+            <Clock3 className="h-3.5 w-3.5" /> Instant (est. 10–45 seconds)
+          </div>
+          <p className="mt-4 text-sm text-muted-foreground">You are sending</p>
+          <p className="mt-1 text-3xl font-extrabold tracking-normal"><span className="mr-1 text-base text-primary">UGX</span>{requestedAmount.toLocaleString()}</p>
+          <div className="mx-auto mt-2 inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs">
+            <CheckCircle className="h-3.5 w-3.5 text-primary" />
+            <span className="font-semibold text-primary">{formatMoney(requestedAmount)}</span> will be credited
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <p className="px-1 text-xs font-bold uppercase text-muted-foreground">Transfer breakdown</p>
+          <div className="rounded-xl border bg-card p-5 shadow-sm">
+            <div className="flex items-center gap-3 border-b pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted"><UserRound className="h-5 w-5 text-primary" /></div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-bold">{recipientName}</p>
+                <p className="text-xs text-muted-foreground">{phone}</p>
+              </div>
+              <NetworkBadge override={network.toLowerCase()} size="md" />
+            </div>
+            <div className="space-y-3 border-b py-4 text-xs">
+              <div className="flex justify-between gap-4"><span className="text-muted-foreground">Source account</span><span className="text-right font-medium">FlexiEarn Yield Wallet<br/><span className="text-primary">Bal: {formatMoney(Number(profile?.balance || 0))}</span></span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Transfer fee</span><span className="font-semibold">{formatMoney(feeAmount)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Amount to receive</span><span className="font-semibold">{formatMoney(requestedAmount)}</span></div>
+            </div>
+            <div className="flex items-center justify-between pt-4"><span className="font-bold">Total Deducted</span><span className="text-lg font-extrabold text-primary">{formatMoney(totalDeducted)}</span></div>
+          </div>
+        </section>
+
+        <section className="rounded-xl border bg-card p-5 shadow-sm">
+          <div className="flex gap-2.5">
+            <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+            <div><h2 className="font-bold">Security Verification Required</h2><p className="mt-1 text-xs text-muted-foreground">Enter your 4-digit FE PIN to authorize this payout.</p></div>
+          </div>
+          <InputOTP maxLength={4} value={pin} onChange={setPin} inputMode="numeric" containerClassName="mt-5 justify-center">
+            <InputOTPGroup className="gap-3">
+              {[0, 1, 2, 3].map((index) => <InputOTPSlot key={index} index={index} className="h-14 w-12 rounded-xl border bg-background text-xl font-bold first:rounded-xl first:border last:rounded-xl" />)}
+            </InputOTPGroup>
+          </InputOTP>
+          <div className="mt-5 flex gap-2 rounded-lg bg-muted/60 p-3 text-xs text-muted-foreground">
+            <CircleAlert className="mt-0.5 h-4 w-4 shrink-0 text-warning" /> Transfers cannot be reversed once sent to mobile network operators.
+          </div>
+        </section>
+
+        <Button className="h-14 w-full rounded-xl font-bold" disabled={pin.length !== 4 || withdrawMutation.isPending} onClick={() => withdrawMutation.mutate()}>
+          {withdrawMutation.isPending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Authorizing…</> : <><LockKeyhole className="mr-2 h-4 w-4" />Authorize & Confirm Withdrawal</>}
+        </Button>
+        <Button variant="ghost" className="w-full" disabled={withdrawMutation.isPending} onClick={() => { setStep("details"); setPin(""); }}>Cancel & Edit</Button>
+      </FeaturePage>
+    );
+  }
+
   return (
-    <FeaturePage
-      title="Withdraw Funds"
-      description={`Minimum withdrawal: UGX ${minimumWithdrawal.toLocaleString()}`}
-      backTo="/wallet"
-    >
-      <Card className="glass-card border-0">
-        <CardContent className="py-4 text-center">
-          <p className="text-xs text-muted-foreground">Available Balance</p>
-          <p className="mt-1 text-2xl font-extrabold text-gradient-primary">
-            UGX {Number(profile?.balance || 0).toLocaleString()}
-          </p>
-        </CardContent>
-      </Card>
+    <FeaturePage title="Withdraw Funds" description={`Minimum ${formatMoney(minimumWithdrawal)}`} backTo="/wallet">
+      <section className="rounded-xl border bg-card p-5 text-center shadow-sm">
+        <p className="text-xs font-medium uppercase text-muted-foreground">Available balance</p>
+        <p className="mt-2 text-3xl font-extrabold tracking-normal">{formatMoney(Number(profile?.balance || 0))}</p>
+      </section>
 
-      <Card className="glass-card border-0">
-        <CardContent className="space-y-4 py-5">
-          <div className="space-y-2">
-            <Label htmlFor="withdraw-amount">Amount (UGX)</Label>
-            <Input
-              id="withdraw-amount"
-              type="number"
-              inputMode="numeric"
-              placeholder="Enter amount"
-              value={withdrawAmount}
-              onChange={(e) => setWithdrawAmount(e.target.value)}
-              className="h-12 text-lg font-semibold"
-            />
-          </div>
+      <section className="space-y-5 rounded-xl border bg-card p-5 shadow-sm">
+        <div className="space-y-2">
+          <Label htmlFor="withdraw-amount">Amount to send</Label>
+          <div className="relative"><span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-primary">UGX</span><Input id="withdraw-amount" type="number" inputMode="numeric" min={minimumWithdrawal} value={amount} onChange={(event) => setAmount(event.target.value)} className="h-13 pl-14 text-lg font-bold" placeholder="0" /></div>
+        </div>
 
-          <div className="space-y-2">
-            <Label className="flex items-center gap-2">
-              Phone Number
-              {recipientName && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-xs font-medium text-success">
-                  <CheckCircle className="h-3 w-3" />
-                  Verified
-                </span>
-              )}
-            </Label>
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <Input
-                  type="tel"
-                  placeholder="0700123456"
-                  value={withdrawPhone}
-                  onChange={(e) => setWithdrawPhone(e.target.value)}
-                  disabled={isLookingUp}
-                  className={recipientName ? "h-12 border-success pr-9 focus-visible:ring-success" : "h-12 pr-9"}
-                />
-                {isLookingUp && (
-                  <Loader2 className="absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
-                )}
-                {!isLookingUp && recipientName && (
-                  <CheckCircle className="absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-success" />
-                )}
-              </div>
-              <Button
-                type="button"
-                variant={recipientName ? "secondary" : "outline"}
-                onClick={verifyRecipientName}
-                disabled={isLookingUp || !withdrawPhone || !!recipientName}
-                className="h-12 min-w-[92px]"
-              >
-                {isLookingUp ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Checking
-                  </>
-                ) : recipientName ? (
-                  "Verified"
-                ) : (
-                  "Verify"
-                )}
+        <div className="space-y-2">
+          <Label>Supported network</Label>
+          <div className="grid grid-cols-2 gap-3">
+            {(["MTN", "Airtel"] as Network[]).map((item) => (
+              <Button key={item} type="button" variant="outline" onClick={() => setNetwork(item)} className={`h-14 justify-between rounded-xl ${network === item ? "border-primary bg-primary/10 ring-1 ring-primary" : ""}`}>
+                <NetworkBadge override={item.toLowerCase()} size="md" />
+                {network === item && <Check className="h-4 w-4 text-primary" />}
               </Button>
-            </div>
-
-            {isLookingUp && (
-              <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-muted/40 p-3">
-                <Skeleton className="h-4 w-4 rounded-full" />
-                <div className="flex-1 space-y-1.5">
-                  <Skeleton className="h-3 w-24" />
-                  <Skeleton className="h-4 w-40" />
-                </div>
-              </div>
-            )}
-
-            {!isLookingUp && recipientName && (
-              <div className="flex items-start gap-2 rounded-lg border border-success/30 bg-success/10 p-3 text-sm animate-in fade-in slide-in-from-top-1">
-                <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-success" />
-                <div className="flex-1">
-                  <p className="text-xs text-muted-foreground">Account holder</p>
-                  <p className="font-semibold">{recipientName}</p>
-                </div>
-              </div>
-            )}
-
-            {!isLookingUp && lookupError && (
-              <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm animate-in fade-in slide-in-from-top-1">
-                <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
-                <p className="text-destructive">{lookupError}</p>
-              </div>
-            )}
-
-            {!isLookingUp && !recipientName && !lookupError && (
-              <p className="text-xs text-muted-foreground">
-                Verify the recipient's registered name before sending.
-              </p>
-            )}
+            ))}
           </div>
+        </div>
 
-          <div className="space-y-2">
-            <Label>Network</Label>
-            <RadioGroup
-              value={withdrawNetwork}
-              onValueChange={(v) => setWithdrawNetwork(v as "MTN" | "Airtel")}
-              className="grid grid-cols-2 gap-3"
-            >
-              <div>
-                <RadioGroupItem value="MTN" id="w-mtn" className="peer sr-only" />
-                <Label
-                  htmlFor="w-mtn"
-                  className="flex cursor-pointer items-center justify-center rounded-xl border-2 border-muted p-3 hover:bg-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10"
-                >
-                  <Smartphone className="mr-2 h-4 w-4" />
-                  MTN MoMo
-                </Label>
-              </div>
-              <div>
-                <RadioGroupItem value="Airtel" id="w-airtel" className="peer sr-only" />
-                <Label
-                  htmlFor="w-airtel"
-                  className="flex cursor-pointer items-center justify-center rounded-xl border-2 border-muted p-3 hover:bg-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10"
-                >
-                  <Smartphone className="mr-2 h-4 w-4" />
-                  Airtel Money
-                </Label>
-              </div>
-            </RadioGroup>
+        <div className="space-y-2">
+          <Label htmlFor="withdraw-phone">Mobile money number</Label>
+          <div className="flex gap-2">
+            <Input id="withdraw-phone" type="tel" inputMode="tel" maxLength={16} value={phone} onChange={(event) => setPhone(event.target.value)} disabled={isLookingUp} className="h-12 flex-1" placeholder="0700 123 456" />
+            <Button type="button" variant="outline" className="h-12" onClick={verifyRecipient} disabled={isLookingUp || Boolean(recipientName)}>
+              {isLookingUp ? <Loader2 className="h-4 w-4 animate-spin" /> : recipientName ? <CheckCircle className="h-4 w-4 text-primary" /> : "Verify"}
+            </Button>
           </div>
+          {isLookingUp && <div className="flex items-center gap-3 rounded-lg bg-muted/60 p-3"><Skeleton className="h-8 w-8 rounded-full"/><div className="space-y-1.5"><Skeleton className="h-3 w-24"/><Skeleton className="h-3 w-40"/></div></div>}
+          {recipientName && <div className="flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 p-3 text-sm"><CheckCircle className="h-4 w-4 text-primary"/><span><span className="text-xs text-muted-foreground">Account holder</span><br/><strong>{recipientName}</strong></span></div>}
+          {lookupError && <p className="flex items-center gap-1.5 text-xs text-destructive"><CircleAlert className="h-3.5 w-3.5"/>{lookupError}</p>}
+        </div>
 
-          {requestedAmount > 0 && (
-            <div className="space-y-2 rounded-xl border bg-muted/40 p-3 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">You receive</span>
-                <span className="font-semibold">UGX {requestedAmount.toLocaleString()}</span>
-              </div>
-              {fee.enabled && (
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Processing fee ({fee.percent}%)</span>
-                  <span className="font-semibold">UGX {feeAmount.toLocaleString()}</span>
-                </div>
-              )}
-              <div className="flex items-center justify-between border-t pt-2">
-                <span className="font-medium">Deducted from wallet</span>
-                <span className="font-bold text-primary">UGX {totalDeducted.toLocaleString()}</span>
-              </div>
-              {fee.enabled && feeAmount > 0 && (
-                <p className="flex items-start gap-1.5 pt-1 text-[11px] text-muted-foreground">
-                  <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                  {fee.note}
-                </p>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        {requestedAmount > 0 && <div className="space-y-2 border-t pt-4 text-sm"><div className="flex justify-between text-muted-foreground"><span>Processing fee</span><span>{formatMoney(feeAmount)}</span></div><div className="flex justify-between font-bold"><span>Total deducted</span><span className="text-primary">{formatMoney(totalDeducted)}</span></div>{fee.enabled && <p className="text-[11px] text-muted-foreground">{fee.note}</p>}</div>}
+      </section>
 
-      <Button
-        className="h-12 w-full rounded-xl font-semibold"
-        onClick={() => withdrawMutation.mutate()}
-        disabled={withdrawMutation.isPending || !recipientName}
-      >
-        {withdrawMutation.isPending ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Processing...
-          </>
-        ) : (
-          "Submit Withdrawal"
-        )}
-      </Button>
+      {pinStatus.isLoading ? <Skeleton className="h-12 w-full rounded-xl" /> : !pinStatus.data ? <Button variant="outline" className="h-12 w-full justify-between rounded-xl" onClick={() => navigate("/profile/settings#fe-pin")}><span className="flex items-center gap-2"><LockKeyhole className="h-4 w-4 text-warning"/>Set up your FE PIN first</span><ChevronRight className="h-4 w-4"/></Button> : null}
+      <Button className="h-14 w-full rounded-xl font-bold" onClick={continueToReview} disabled={!recipientName || requestedAmount <= 0}>Review Withdrawal <ChevronRight className="ml-2 h-4 w-4"/></Button>
     </FeaturePage>
   );
 }

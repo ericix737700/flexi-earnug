@@ -108,8 +108,6 @@ export default function AdminWithdrawals() {
       const { data, error } = await supabase.functions.invoke("marzpay-send", {
         body: {
           withdrawal_id: withdrawal.id,
-          amount: withdrawal.amount,
-          phone_number: withdrawal.phone_number,
         },
       });
 
@@ -179,42 +177,16 @@ export default function AdminWithdrawals() {
     mutationFn: async () => {
       if (!user || !selectedWithdrawal) return;
 
-      // Refund the user's balance
-      const { data: profileData } = await supabase
-        .from("profiles")
-        .select("balance")
-        .eq("user_id", selectedWithdrawal.user_id)
-        .single();
-
-      if (profileData) {
-        const newBalance = Number(profileData.balance) + selectedWithdrawal.amount;
-        await supabase
-          .from("profiles")
-          .update({ balance: newBalance })
-          .eq("user_id", selectedWithdrawal.user_id);
-
-        // Create refund transaction
-        await supabase.from("transactions").insert({
-          user_id: selectedWithdrawal.user_id,
-          transaction_type: "adjustment",
-          amount: selectedWithdrawal.amount,
-          balance_after: newBalance,
-          description: `Withdrawal rejected: ${rejectionReason}`,
-        });
-      }
-
-      // Update withdrawal status
-      const { error } = await supabase
-        .from("withdrawals")
-        .update({
-          status: "rejected" as WithdrawalStatus,
-          rejection_reason: rejectionReason,
-          processed_by: user.id,
-          processed_at: new Date().toISOString(),
-        })
-        .eq("id", selectedWithdrawal.id);
+      const { data, error } = await supabase.functions.invoke("withdrawal-security", {
+        body: {
+          action: "reject",
+          withdrawal_id: selectedWithdrawal.id,
+          reason: rejectionReason,
+        },
+      });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
        // Create notification for user
        await supabase.from("notifications").insert({

@@ -51,9 +51,9 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const { amount, phone_number, withdrawal_id } = await req.json();
+    const { withdrawal_id } = await req.json();
 
-    if (!amount || !phone_number || !withdrawal_id) {
+    if (!withdrawal_id || typeof withdrawal_id !== "string") {
       return new Response(
         JSON.stringify({ error: "Missing required fields" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
 
     const { data: withdrawal } = await adminClient
       .from("withdrawals")
-      .select("id, user_id, status")
+      .select("id, user_id, status, amount, phone_number")
       .eq("id", withdrawal_id)
       .maybeSingle();
 
@@ -127,6 +127,9 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const amount = Number(withdrawal.amount);
+    const phone_number = String(withdrawal.phone_number);
 
     let formattedPhone = phone_number.replace(/\D/g, "");
     if (formattedPhone.startsWith("0")) {
