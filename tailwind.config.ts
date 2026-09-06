@@ -55,6 +55,22 @@ export default {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
         },
+        "network-mtn": {
+          DEFAULT: "hsl(var(--network-mtn))",
+          foreground: "hsl(var(--network-mtn-foreground))",
+        },
+        "network-airtel": {
+          DEFAULT: "hsl(var(--network-airtel))",
+          foreground: "hsl(var(--network-airtel-foreground))",
+        },
+        "network-utl": {
+          DEFAULT: "hsl(var(--network-utl))",
+          foreground: "hsl(var(--network-utl-foreground))",
+        },
+        "network-lyca": {
+          DEFAULT: "hsl(var(--network-lyca))",
+          foreground: "hsl(var(--network-lyca-foreground))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

@@ -902,16 +902,48 @@ export type Database = {
         }
         Relationships: []
       }
+      withdrawal_pins: {
+        Row: {
+          created_at: string
+          failed_attempts: number
+          locked_until: string | null
+          pin_hash: string
+          pin_salt: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          failed_attempts?: number
+          locked_until?: string | null
+          pin_hash: string
+          pin_salt: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          failed_attempts?: number
+          locked_until?: string | null
+          pin_hash?: string
+          pin_salt?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       withdrawals: {
         Row: {
           amount: number
           created_at: string
+          fee_amount: number
           id: string
           marzpay_reference: string | null
           network: string
           phone_number: string
           processed_at: string | null
           processed_by: string | null
+          recipient_name: string | null
           rejection_reason: string | null
           status: string
           transaction_id: string | null
@@ -920,12 +952,14 @@ export type Database = {
         Insert: {
           amount: number
           created_at?: string
+          fee_amount?: number
           id?: string
           marzpay_reference?: string | null
           network: string
           phone_number: string
           processed_at?: string | null
           processed_by?: string | null
+          recipient_name?: string | null
           rejection_reason?: string | null
           status?: string
           transaction_id?: string | null
@@ -934,12 +968,14 @@ export type Database = {
         Update: {
           amount?: number
           created_at?: string
+          fee_amount?: number
           id?: string
           marzpay_reference?: string | null
           network?: string
           phone_number?: string
           processed_at?: string | null
           processed_by?: string | null
+          recipient_name?: string | null
           rejection_reason?: string | null
           status?: string
           transaction_id?: string | null
@@ -953,6 +989,16 @@ export type Database = {
     }
     Functions: {
       claim_achievement: { Args: { _achievement_id: string }; Returns: Json }
+      create_secure_withdrawal: {
+        Args: {
+          _amount: number
+          _network: string
+          _phone_number: string
+          _recipient_name: string
+          _user_id: string
+        }
+        Returns: Json
+      }
       find_referrer_by_code: { Args: { _code: string }; Returns: string }
       generate_account_id: { Args: never; Returns: string }
       get_own_profile_id: { Args: never; Returns: string }
@@ -972,6 +1018,10 @@ export type Database = {
         Returns: boolean
       }
       redeem_gift_code: { Args: { _code: string }; Returns: Json }
+      reject_secure_withdrawal: {
+        Args: { _admin_id: string; _reason: string; _withdrawal_id: string }
+        Returns: Json
+      }
     }
     Enums: {
       achievement_type:

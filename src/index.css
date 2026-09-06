@@ -34,6 +34,15 @@
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
+    --network-mtn: 48 100% 50%;
+    --network-mtn-foreground: 220 20% 8%;
+    --network-airtel: 356 86% 48%;
+    --network-airtel-foreground: 0 0% 100%;
+    --network-utl: 214 78% 48%;
+    --network-utl-foreground: 0 0% 100%;
+    --network-lyca: 25 92% 52%;
+    --network-lyca-foreground: 0 0% 100%;
+
     --border: 220 13% 91%;
     --input: 220 13% 91%;
     --ring: 152 60% 36%;
