@@ -31,9 +31,9 @@ export const NETWORK_LABEL: Record<NetworkProvider, string> = {
 };
 
 export const NETWORK_COLOR: Record<NetworkProvider, string> = {
-  mtn: "bg-[#FFCC00] text-black",              // MTN yellow
-  airtel: "bg-[#E60000] text-white",           // Airtel red
-  utl: "bg-blue-600 text-white",
-  lycamobile: "bg-orange-500 text-white",
+  mtn: "bg-network-mtn text-network-mtn-foreground",
+  airtel: "bg-network-airtel text-network-airtel-foreground",
+  utl: "bg-network-utl text-network-utl-foreground",
+  lycamobile: "bg-network-lyca text-network-lyca-foreground",
   unknown: "bg-muted text-muted-foreground",
 };
