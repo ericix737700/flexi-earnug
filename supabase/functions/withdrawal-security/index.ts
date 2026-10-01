@@ -13,6 +13,11 @@ const bodySchema = z.discriminatedUnion("action", [
     network: z.enum(["MTN", "Airtel"]),
     recipient_name: z.string().trim().min(2).max(120),
   }),
+  z.object({
+    action: z.literal("reject"),
+    withdrawal_id: z.string().uuid(),
+    reason: z.string().trim().min(3).max(500),
+  }),
 ]);
 
 const encoder = new TextEncoder();
@@ -66,6 +71,18 @@ Deno.serve(async (req) => {
     const parsed = bodySchema.safeParse(await req.json());
     if (!parsed.success) return json({ error: "Invalid request" }, 400);
     const body = parsed.data;
+
+    if (body.action === "reject") {
+      const { data: role } = await admin.from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
+      if (!role) return json({ error: "Admin access required" }, 403);
+      const { data, error } = await admin.rpc("reject_secure_withdrawal", {
+        _withdrawal_id: body.withdrawal_id,
+        _admin_id: userId,
+        _reason: body.reason,
+      });
+      if (error) return json({ error: error.message }, 400);
+      return json(data);
+    }
 
     const { data: pinRecord } = await admin
       .from("withdrawal_pins")
