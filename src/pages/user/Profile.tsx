@@ -198,6 +198,7 @@ export default function Profile() {
         {/* Account */}
         <Group title="Account">
           <Row icon={User} label="Manage Profile" onClick={() => navigate("/profile/settings")} />
+          <Row icon={LockKeyhole} label="Security & FE PIN" value="Protected" onClick={() => navigate("/profile/settings#fe-pin")} iconClass="text-primary" />
           <Row icon={FileText} label="Statement" value="All transactions" onClick={() => navigate("/statement")} iconClass="text-primary" />
           <Row icon={Phone} label="Phone" value={profile?.phone} showChevron={false} />
           <Row icon={Mail} label="Email" value={profile?.email || "Not set"} showChevron={false} />
