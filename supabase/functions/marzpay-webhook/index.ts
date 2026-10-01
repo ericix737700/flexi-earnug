@@ -87,42 +87,22 @@ Deno.serve(async (req) => {
           notification_type: "transaction",
         });
       } else if (isFailure) {
-        // Refund the user
-        const { data: profileData } = await supabase
-          .from("profiles")
-          .select("balance")
-          .eq("user_id", withdrawal.user_id)
-          .single();
-
-        const newBalance = Number(profileData?.balance || 0) + Number(withdrawal.amount);
-        await supabase
-          .from("profiles")
-          .update({ balance: newBalance })
-          .eq("user_id", withdrawal.user_id);
-
-        await supabase.from("transactions").insert({
-          user_id: withdrawal.user_id,
-          transaction_type: "adjustment",
-          amount: Number(withdrawal.amount),
-          balance_after: newBalance,
-          description: "Withdrawal failed at MarzPay - refunded",
+        // Refund the user atomically (amount + processing fee, exactly once)
+        const { data: refundResult, error: refundError } = await supabase.rpc("refund_failed_withdrawal", {
+          _withdrawal_id: withdrawal.id,
+          _reason: "Payment failed at MarzPay",
         });
 
-        await supabase
-          .from("withdrawals")
-          .update({
-            status: "rejected",
-            rejection_reason: "Payment failed at MarzPay",
-            processed_at: new Date().toISOString(),
-          })
-          .eq("id", withdrawal.id);
-
-        await supabase.from("notifications").insert({
-          user_id: withdrawal.user_id,
-          title: "Withdrawal Failed",
-          message: `Your withdrawal of UGX ${Number(withdrawal.amount).toLocaleString()} failed and your balance has been refunded.`,
-          notification_type: "transaction",
-        });
+        if (refundError) {
+          console.error("Refund failed for withdrawal", withdrawal.id, refundError);
+        } else if (refundResult && !refundResult.already_refunded) {
+          await supabase.from("notifications").insert({
+            user_id: withdrawal.user_id,
+            title: "Withdrawal Failed",
+            message: `Your withdrawal of UGX ${Number(withdrawal.amount).toLocaleString()} failed and your balance has been refunded.`,
+            notification_type: "transaction",
+          });
+        }
       }
 
       return new Response(JSON.stringify({ success: true, kind: "withdrawal" }), {
