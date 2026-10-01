@@ -106,10 +106,7 @@ export default function Withdraw() {
       const { data, error } = await supabase.functions.invoke("withdrawal-security", {
         body: { action: "withdraw", pin, amount: requestedAmount, phone_number: phone, network, recipient_name: recipientName },
       });
-      if (error) {
-        const detail = await error.context?.json?.().catch?.(() => null);
-        throw new Error(detail?.error || error.message);
-      }
+      if (error) throw error;
       if (data?.error) throw new Error(data.error);
       if (data?.automatic && data?.withdrawal_id) {
         const payout = await supabase.functions.invoke("marzpay-send", { body: { withdrawal_id: data.withdrawal_id } });

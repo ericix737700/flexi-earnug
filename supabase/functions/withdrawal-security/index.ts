@@ -74,13 +74,13 @@ Deno.serve(async (req) => {
 
     if (body.action === "reject") {
       const { data: role } = await admin.from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
-      if (!role) return json({ error: "Admin access required" }, 403);
+      if (!role) return json({ error: "Admin access required" });
       const { data, error } = await admin.rpc("reject_secure_withdrawal", {
         _withdrawal_id: body.withdrawal_id,
         _admin_id: userId,
         _reason: body.reason,
       });
-      if (error) return json({ error: error.message }, 400);
+      if (error) return json({ error: error.message });
       return json(data);
     }
 
@@ -110,10 +110,10 @@ Deno.serve(async (req) => {
 
     if (body.action === "set_pin") {
       if (pinRecord) {
-        if (!body.current_pin) return json({ error: "Enter your current FE PIN" }, 400);
+        if (!body.current_pin) return json({ error: "Enter your current FE PIN" });
         const checked = await verifyPin(body.current_pin);
-        if (!checked.ok) return json({ error: checked.error }, checked.status);
-        if (body.current_pin === body.pin) return json({ error: "Choose a different FE PIN" }, 400);
+        if (!checked.ok) return json({ error: checked.error });
+        if (body.current_pin === body.pin) return json({ error: "Choose a different FE PIN" });
       }
       const salt = crypto.getRandomValues(new Uint8Array(16));
       const hash = await derivePin(body.pin, salt);
@@ -129,7 +129,7 @@ Deno.serve(async (req) => {
     }
 
     const checked = await verifyPin(body.pin);
-    if (!checked.ok) return json({ error: checked.error }, checked.status);
+    if (!checked.ok) return json({ error: checked.error });
 
     const { data, error } = await admin.rpc("create_secure_withdrawal", {
       _user_id: userId,
@@ -138,7 +138,7 @@ Deno.serve(async (req) => {
       _network: body.network,
       _recipient_name: body.recipient_name,
     });
-    if (error) return json({ error: error.message }, 400);
+    if (error) return json({ error: error.message });
 
     const { data: modeSetting } = await admin.from("platform_settings").select("setting_value").eq("setting_key", "withdrawal_mode").maybeSingle();
     return json({ ...data, automatic: modeSetting?.setting_value === "automatic" });
