@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   User, Phone, Shield, LogOut, ChevronRight,
   FileText, ArrowDownToLine, ArrowUpFromLine,
-  Copy, Lock, Users, MessageCircle, Mail, Pencil, Bell, Wallet as WalletIcon,
+   Copy, Lock, LockKeyhole, Users, MessageCircle, Mail, Pencil, Bell, Wallet as WalletIcon,
   Sun, Moon, Monitor, Palette,
   Cpu,
   Signal,
