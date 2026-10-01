@@ -106,10 +106,7 @@ export default function Withdraw() {
       const { data, error } = await supabase.functions.invoke("withdrawal-security", {
         body: { action: "withdraw", pin, amount: requestedAmount, phone_number: phone, network, recipient_name: recipientName },
       });
-      if (error) {
-        const detail = await error.context?.json?.().catch?.(() => null);
-        throw new Error(detail?.error || error.message);
-      }
+      if (error) throw error;
       if (data?.error) throw new Error(data.error);
       if (data?.automatic && data?.withdrawal_id) {
         const payout = await supabase.functions.invoke("marzpay-send", { body: { withdrawal_id: data.withdrawal_id } });
@@ -203,7 +200,7 @@ export default function Withdraw() {
       <section className="space-y-5 rounded-xl border bg-card p-5 shadow-sm">
         <div className="space-y-2">
           <Label htmlFor="withdraw-amount">Amount to send</Label>
-          <div className="relative"><span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-primary">UGX</span><Input id="withdraw-amount" type="number" inputMode="numeric" min={minimumWithdrawal} value={amount} onChange={(event) => setAmount(event.target.value)} className="h-13 pl-14 text-lg font-bold" placeholder="0" /></div>
+          <div className="relative"><span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-primary">UGX</span><Input id="withdraw-amount" type="number" inputMode="numeric" min={minimumWithdrawal} value={amount} onChange={(event) => setAmount(event.target.value)} className="h-12 pl-14 text-lg font-bold" placeholder="0" /></div>
         </div>
 
         <div className="space-y-2">

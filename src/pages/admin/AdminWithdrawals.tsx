@@ -192,7 +192,7 @@ export default function AdminWithdrawals() {
        await supabase.from("notifications").insert({
          user_id: selectedWithdrawal.user_id,
          title: "Withdrawal Rejected",
-         message: `Your withdrawal was rejected and UGX ${selectedWithdrawal.amount.toLocaleString()} has been refunded. Reason: ${rejectionReason}`,
+         message: `Your withdrawal was rejected and the deducted amount and processing fee have been refunded. Reason: ${rejectionReason}`,
          notification_type: "transaction",
        });
     },
