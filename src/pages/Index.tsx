@@ -20,6 +20,9 @@ import {
   Megaphone,
   Target,
   Eye,
+  Trophy,
+  Wallet,
+  ArrowUpRight,
 } from "lucide-react";
 
 import heroImg from "@/assets/hero-earning.jpg";
@@ -41,10 +44,10 @@ const Index = () => {
   if (bootLoading) return <LoadingScreen />;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="dark min-h-screen bg-emerald-night text-foreground">
       <SEO title="FlexiEarn Uganda — Smart Earning & Investments" description="Earn through investments, daily tasks, referrals and gift codes. Paid in UGX via mobile money. Join FlexiEarn Uganda today." path="/" />
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 border-b border-border/40 bg-background/90 backdrop-blur-xl">
+      <nav className="sticky top-0 z-50 border-b border-border/40 bg-background/40 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
             <PlatformLogo size="sm" />
@@ -64,143 +67,82 @@ const Index = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden border-b border-border/40 bg-gradient-to-b from-primary/[0.07] via-background to-background">
-        <div className="absolute -top-24 left-1/2 h-72 w-[36rem] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute bottom-0 -right-24 h-64 w-64 rounded-full bg-secondary/10 blur-3xl" />
-        <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
-          <div className="grid items-center gap-12 md:grid-cols-2">
-            <div className="space-y-7">
-              <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3.5 py-1.5 text-xs font-semibold text-primary">
-                <Zap className="h-3.5 w-3.5" />
-                Trusted by 10,000+ Ugandans
-              </div>
-              <h1 className="text-[2.5rem] font-extrabold leading-[1.05] tracking-tight text-foreground md:text-6xl">
-                Earning, investments, and everything in between.
+      <section className="relative overflow-hidden">
+        <div aria-hidden className="absolute left-1/2 top-10 h-72 w-[40rem] -translate-x-1/2 rounded-full bg-primary/20 blur-3xl" />
+        <div className="relative mx-auto max-w-6xl px-4 pb-10 pt-14 md:pt-20">
+          <div className="grid items-center gap-10 md:grid-cols-2">
+            <div className="text-center md:text-left">
+              <h1 className="text-5xl font-extrabold leading-[1.02] tracking-tight text-foreground md:text-7xl">
+                Your Phone,<br />Your Profit
               </h1>
-              <p className="max-w-lg text-base leading-relaxed text-muted-foreground md:text-lg">
-                One account to complete tasks, invest in machines, buy airtime and data, and cash out
-                instantly to MTN or Airtel Mobile Money — built for Uganda.
+              <p className="mx-auto mt-5 max-w-md text-base leading-relaxed text-muted-foreground md:mx-0 md:text-lg">
+                Earning, investments, and everything in between. One account to complete tasks and build a streak for even bigger rewards.
               </p>
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <Link to="/register" className="sm:w-auto">
-                  <Button size="lg" className="h-12 w-full gap-2 gradient-primary border-0 px-7 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/25 hover:opacity-90 sm:w-auto">
-                    Get started <ArrowRight className="h-4 w-4" />
+              <div className="mx-auto mt-7 grid max-w-md grid-cols-2 gap-3 md:mx-0">
+                <Link to="/register">
+                  <Button size="lg" className="h-12 w-full gap-2 rounded-full gradient-primary border-0 font-semibold text-primary-foreground shadow-lg shadow-primary/30 hover:opacity-90">
+                    Get Started <ArrowUpRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link to="/login" className="sm:w-auto">
-                  <Button size="lg" variant="outline" className="h-12 w-full border-border px-7 text-base font-medium sm:w-auto">
-                    Log in
+                <Link to="/login">
+                  <Button size="lg" variant="outline" className="h-12 w-full rounded-full border-primary/50 bg-transparent font-medium">
+                    Log In
                   </Button>
                 </Link>
               </div>
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-1 text-sm text-muted-foreground">
+              <div className="mt-5 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground md:justify-start">
                 {["Instant MTN & Airtel payouts", "Bank-grade security", "24/7 support"].map((t) => (
-                  <div key={t} className="flex items-center gap-1.5">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    {t}
-                  </div>
+                  <span key={t} className="flex items-center gap-1.5"><CheckCircle className="h-4 w-4 text-primary" />{t}</span>
                 ))}
               </div>
             </div>
-
-            <div className="relative">
-              <div className="absolute -inset-6 rounded-[2rem] bg-gradient-to-br from-primary/15 via-secondary/10 to-transparent blur-2xl" />
-              <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card shadow-2xl">
-                <img
-                  src={heroImg}
-                  alt="Ugandans earning and sending money on their phones with FlexiEarn"
-                  className="h-64 w-full object-cover md:h-80"
-                  loading="lazy"
-                />
-                <div className="grid grid-cols-2 divide-x divide-border/60 border-t border-border/60">
-                  <div className="p-4">
-                    <p className="text-xs text-muted-foreground">Payout status</p>
-                    <p className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-primary">
-                      <CheckCircle className="h-4 w-4" /> Completed
-                    </p>
-                  </div>
-                  <div className="p-4">
-                    <p className="text-xs text-muted-foreground">Average payout time</p>
-                    <p className="mt-1 text-sm font-semibold text-foreground">Under 2 minutes</p>
-                  </div>
-                </div>
+            <div className="relative hidden md:block">
+              <div className="absolute -inset-6 rounded-[2rem] bg-primary/15 blur-2xl" />
+              <div className="relative overflow-hidden rounded-3xl border border-primary/30 bg-card shadow-2xl">
+                <img src={heroImg} alt="Ugandans earning on their phones with FlexiEarn" className="h-80 w-full object-cover" loading="lazy" />
               </div>
-              <div className="absolute -bottom-5 -left-3 hidden rounded-2xl border border-border/60 bg-card px-4 py-3 shadow-xl sm:block">
+              <div className="absolute -bottom-5 -left-4 rounded-2xl card-neon px-4 py-3">
                 <p className="text-[11px] text-muted-foreground">Withdrawal sent</p>
                 <p className="text-sm font-bold text-foreground">UGX 45,000 → MTN</p>
               </div>
             </div>
           </div>
-        </div>
-      </section>
 
-
-      {/* Stats Bar */}
-      <section className="border-y border-border/50 bg-card">
-        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-4 px-4 py-8 md:grid-cols-4">
-          {[
-            { value: "10,000+", label: "Active Earners" },
-            { value: `UGX ${dailyReward.toLocaleString()}`, label: "Daily Login Bonus" },
-            { value: `UGX ${referralBonus.toLocaleString()}`, label: "Per Referral" },
-            { value: "Instant", label: "Mobile Money Payouts" },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center">
-              <p className="text-2xl font-extrabold text-primary md:text-3xl">{stat.value}</p>
-              <p className="mt-1 text-sm text-muted-foreground">{stat.label}</p>
-            </div>
-          ))}
+          {/* Stat chips */}
+          <div className="mt-12 grid grid-cols-3 gap-2 md:gap-4">
+            {[
+              { icon: Trophy, value: "10,000+", label: "Active Earners" },
+              { icon: Gift, value: `UGX ${dailyReward.toLocaleString()}`, label: "Daily Login Bonus" },
+              { icon: Zap, value: "Instant Mobile", label: "Money Payouts" },
+            ].map((s) => (
+              <div key={s.label} className="flex items-center gap-2 rounded-xl border border-secondary/30 bg-card/60 p-2.5 backdrop-blur md:p-4">
+                <div className="hidden shrink-0 rounded-lg bg-secondary/15 p-1.5 text-secondary sm:block"><s.icon className="h-4 w-4" /></div>
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-bold text-foreground md:text-base">{s.value}</p>
+                  <p className="truncate text-[10px] text-muted-foreground md:text-xs">{s.label}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section className="mx-auto max-w-6xl px-4 py-16 md:py-24">
-        <div className="mb-12 text-center">
-          <h2 className="text-3xl font-extrabold text-foreground md:text-4xl">
-            How It Works
-          </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
-            Start earning in just 3 simple steps. No experience needed — if you can use a phone, you can earn!
-          </p>
-        </div>
-        <div className="grid gap-8 md:grid-cols-3">
+      <section className="mx-auto max-w-6xl px-4 py-12 md:py-20">
+        <h2 className="mb-8 text-center text-3xl font-extrabold text-foreground md:text-4xl">How It Works</h2>
+        <div className="grid grid-cols-3 gap-2.5 md:gap-6">
           {[
-            {
-              step: "1",
-              icon: Smartphone,
-              title: "Create & Activate",
-              desc: `Register with your phone number and pay a one-time activation fee of UGX ${registrationFee.toLocaleString()} via Mobile Money. Your account is activated instantly!`,
-              gradient: "from-primary/10 to-primary/5",
-              iconBg: "bg-primary/15 text-primary",
-            },
-            {
-              step: "2",
-              icon: TrendingUp,
-              title: "Complete Tasks & Earn",
-              desc: "Watch videos, answer trivia questions, take surveys, and check in daily. Every task earns you real money deposited into your wallet.",
-              gradient: "from-secondary/10 to-secondary/5",
-              iconBg: "bg-secondary/15 text-secondary",
-            },
-            {
-              step: "3",
-              icon: Gift,
-              title: "Withdraw to Mobile Money",
-              desc: "Cash out your earnings anytime directly to your MTN or Airtel Mobile Money. Fast, secure, and hassle-free!",
-              gradient: "from-primary/10 to-secondary/5",
-              iconBg: "bg-primary/15 text-primary",
-            },
+            { step: 1, icon: Smartphone, title: "Join & Activate", desc: `Register and pay a one-time fee of UGX ${registrationFee.toLocaleString()} via Mobile Money.` },
+            { step: 2, icon: TrendingUp, title: "Complete Tasks & Earn", desc: "Watch videos, answer surveys, and check in daily. Build streaks for bonuses." },
+            { step: 3, icon: Wallet, title: "Cash Out", desc: "Withdraw your earnings anytime directly to your MTN or Airtel Mobile Money." },
           ].map((item) => (
-            <div
-              key={item.step}
-              className={`relative rounded-2xl border border-border/50 bg-gradient-to-br ${item.gradient} p-8 shadow-sm transition-all hover:shadow-lg hover:-translate-y-1`}
-            >
-              <div className="absolute -top-4 left-6 flex h-8 w-8 items-center justify-center rounded-full gradient-primary text-sm font-bold text-primary-foreground shadow-md">
-                {item.step}
+            <div key={item.step} className="rounded-2xl card-gold-glow p-3 transition-transform hover:-translate-y-1 md:p-6">
+              <div className="mb-4 w-fit rounded-lg border border-secondary/40 bg-secondary/10 p-2 text-secondary md:mb-6">
+                <item.icon className="h-5 w-5 md:h-6 md:w-6" />
               </div>
-              <div className={`mb-4 inline-flex rounded-xl p-3 ${item.iconBg}`}>
-                <item.icon className="h-7 w-7" />
-              </div>
-              <h3 className="mb-2 text-xl font-bold text-foreground">{item.title}</h3>
-              <p className="text-muted-foreground leading-relaxed">{item.desc}</p>
+              <p className="text-[11px] font-medium text-secondary md:text-sm">Step {item.step}</p>
+              <h3 className="mt-0.5 text-sm font-bold leading-tight text-foreground md:text-xl">{item.title}</h3>
+              <p className="mt-2 text-[11px] leading-snug text-muted-foreground md:text-sm">{item.desc}</p>
             </div>
           ))}
         </div>
