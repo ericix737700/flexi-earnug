@@ -107,13 +107,13 @@ export default function Dashboard() {
   });
 
   const taskCategories = [
-    { title: "Watch Videos", icon: Play, iconColor: "text-blue-500 bg-blue-500/15", description: "Earn by watching ads", href: "/tasks?type=video" },
-    { title: "Surveys", icon: ClipboardList, iconColor: "text-purple-500 bg-purple-500/15", description: "Complete quick surveys", href: "/tasks?type=survey" },
-    { title: "Machines", icon: Cpu, iconColor: "text-emerald-500 bg-emerald-500/15", description: "Invest & earn rewards", href: "/machines" },
-    { title: "Airtime & Data", icon: Signal, iconColor: "text-cyan-500 bg-cyan-500/15", description: "Top up any line", href: "/airtime-data" },
+    { title: "Watch Videos", icon: Play, iconColor: "text-primary bg-primary/15", description: "Watch & Earn: short videos", href: "/tasks?type=video" },
+    { title: "Surveys", icon: ClipboardList, iconColor: "text-primary bg-primary/15", description: "Quick Survey: share opinions", href: "/tasks?type=survey" },
+    { title: "Machines", icon: Cpu, iconColor: "text-primary bg-primary/15", description: "Invest & earn rewards", href: "/machines" },
+    { title: "Airtime & Data", icon: Signal, iconColor: "text-primary bg-primary/15", description: "Top up any line", href: "/airtime-data" },
     { title: "Trivia", icon: HelpCircle, iconColor: "text-secondary bg-secondary/15", description: "Answer quiz questions", href: "/tasks?type=trivia" },
-    { title: "Achievements", icon: Trophy, iconColor: "text-amber-500 bg-amber-500/15", description: "Claim bonuses", href: "/achievements" },
-    { title: "Ads", icon: Megaphone, iconColor: "text-rose-500 bg-rose-500/15", description: "Advertise on FlexiEarn", href: "/ads" },
+    { title: "Achievements", icon: Trophy, iconColor: "text-secondary bg-secondary/15", description: "Claim bonuses", href: "/achievements" },
+    { title: "Ads", icon: Megaphone, iconColor: "text-secondary bg-secondary/15", description: "Advertise on FlexiEarn", href: "/ads" },
     { title: "Referrals", icon: Gift, iconColor: "text-primary bg-primary/15", description: "Invite friends", href: "/referrals" },
   ];
 
@@ -159,38 +159,44 @@ export default function Dashboard() {
 
 
 
-        {/* Daily Check-in Card */}
-        <Card className="relative overflow-hidden border-0 shadow-md glow-primary">
-          <div className="relative gradient-primary p-4">
-            <div aria-hidden className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-secondary/30 blur-2xl" />
-            <div aria-hidden className="absolute -bottom-10 -left-6 h-28 w-28 rounded-full bg-primary-foreground/10 blur-2xl" />
-            <div className="relative flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="rounded-full bg-primary-foreground/20 p-2.5 backdrop-blur">
-                  <Sparkles className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <div>
-                  <p className="font-semibold text-primary-foreground">Daily Check-in</p>
-                  <p className="text-sm text-primary-foreground/80">
-                    {canCheckIn
-                      ? `Earn UGX ${settings?.daily_checkin_reward || 100}`
-                      : `🔥 Streak: ${profile?.daily_checkin_streak || 0} days`}
-                  </p>
-                </div>
-              </div>
-              <Button
-                onClick={() => checkInMutation.mutate()}
-                disabled={!canCheckIn || checkInMutation.isPending}
-                size="sm"
-                className={canCheckIn
-                  ? "gradient-gold border-0 text-secondary-foreground font-bold shadow-md hover:opacity-90 tap-pop"
-                  : "bg-primary-foreground/20 text-primary-foreground border-0"}
-              >
-                {canCheckIn ? "Check In" : "Done ✓"}
-              </Button>
-            </div>
+        {/* Balance */}
+        <div className="relative overflow-hidden rounded-2xl card-goldbar px-5 py-6 text-center">
+          <div className="absolute right-4 top-4 rounded-full bg-background/20 p-1.5"><Sparkles className="h-4 w-4 text-background" /></div>
+          <p className="text-sm font-medium text-background/80">Total Balance</p>
+          <p className="mt-1 text-3xl font-extrabold tracking-tight text-background">UGX {Number(profile?.balance || 0).toLocaleString()}</p>
+          <p className="mt-1 text-xs font-medium text-background/75">Available Balance · Today +UGX {(todayEarnings || 0).toLocaleString()}</p>
+        </div>
+
+        {/* Daily Bonuses */}
+        <div>
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="font-bold text-foreground">Daily Bonuses</h2>
+            <Link to="/achievements" className="text-xs font-medium text-muted-foreground">View all ›</Link>
           </div>
-        </Card>
+          <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 scrollbar-none">
+            <button
+              onClick={() => checkInMutation.mutate()}
+              disabled={!canCheckIn || checkInMutation.isPending}
+              className="w-28 shrink-0 rounded-xl card-neon p-3 text-center tap-pop disabled:opacity-80"
+            >
+              <Calendar className="mx-auto h-6 w-6 text-primary" />
+              <p className="mt-2 text-xs text-foreground">Daily Login</p>
+              <p className="text-xs font-bold text-primary">{canCheckIn ? `+${settings?.daily_checkin_reward || 100} UGX` : `🔥 ${profile?.daily_checkin_streak || 0} days`}</p>
+            </button>
+            {[
+              { icon: ClipboardList, label: "Complete Tasks", sub: "Earn rewards", href: "/tasks" },
+              { icon: Users, label: "Refer a Friend", sub: `${referralCount || 0} invited`, href: "/referrals" },
+              { icon: Trophy, label: "Achievements", sub: "Claim bonus", href: "/achievements" },
+              { icon: Gift, label: "Gift Code", sub: "Redeem", href: "/wallet" },
+            ].map((b) => (
+              <Link key={b.label} to={b.href} className="w-28 shrink-0 rounded-xl card-neon p-3 text-center tap-pop">
+                <b.icon className="mx-auto h-6 w-6 text-primary" />
+                <p className="mt-2 text-xs text-foreground">{b.label}</p>
+                <p className="text-xs font-bold text-primary">{b.sub}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
 
         {/* Sponsored banner */}
         <AdBanner placement="dashboard" />
@@ -206,48 +212,18 @@ export default function Dashboard() {
 
 
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-3">
-          {[
-            { icon: Wallet, label: "Balance", value: `UGX ${Number(profile?.balance || 0).toLocaleString()}`, color: "text-primary", bg: "bg-primary/10" },
-            { icon: TrendingUp, label: "Today", value: `+UGX ${(todayEarnings || 0).toLocaleString()}`, color: "text-success", bg: "bg-success/10" },
-            { icon: Calendar, label: "Streak", value: `${profile?.daily_checkin_streak || 0} days`, color: "text-secondary", bg: "bg-secondary/10" },
-            { icon: Users, label: "Referrals", value: `${referralCount || 0}`, color: "text-blue-600", bg: "bg-blue-500/10" },
-          ].map((stat) => (
-            <Card key={stat.label} className="glass-card border-0 tap-pop">
-              <CardContent className="flex items-center gap-3 py-3.5">
-                <div className={`rounded-xl p-2 ${stat.bg}`}>
-                  <stat.icon className={`h-4.5 w-4.5 ${stat.color}`} />
-                </div>
-                <div>
-                  <p className="text-[11px] text-muted-foreground">{stat.label}</p>
-                  <p className="font-bold text-sm">{stat.value}</p>
-                </div>
-              </CardContent>
-            </Card>
+        {/* Earning rows */}
+        <div className="space-y-4">
+          {taskCategories.map((c) => (
+            <div key={c.title}>
+              <h2 className="mb-2 font-bold text-foreground">{c.title}</h2>
+              <div className="flex items-center gap-3 rounded-2xl glass-card p-3">
+                <div className={`shrink-0 rounded-xl p-3 ${c.iconColor}`}><c.icon className="h-7 w-7" /></div>
+                <p className="min-w-0 flex-1 text-sm font-semibold text-foreground">{c.description}</p>
+                <Button size="sm" onClick={() => navigate(c.href)} className="rounded-full gradient-primary border-0 px-5 font-bold text-primary-foreground">Start</Button>
+              </div>
+            </div>
           ))}
-        </div>
-
-        {/* Task Categories */}
-        <div>
-          <h2 className="mb-3 font-bold text-foreground">Earn Money</h2>
-          <div className="grid grid-cols-2 gap-3">
-            {taskCategories.map((category) => (
-              <Card
-                key={category.title}
-                className="cursor-pointer glass-card border-border/50 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98]"
-                onClick={() => navigate(category.href)}
-              >
-                <CardContent className="py-4 text-center">
-                  <div className={`mx-auto mb-2.5 w-fit rounded-xl p-2.5 ${category.iconColor}`}>
-                    <category.icon className="h-6 w-6" />
-                  </div>
-                  <p className="font-semibold text-foreground">{category.title}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{category.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
         </div>
 
       </div>
