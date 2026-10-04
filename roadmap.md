@@ -6,4 +6,4 @@
 - [x] Add MTN and Airtel network badges
 - [x] Add FE PIN setup and change controls in Profile Settings
 - [x] Move admin rejection refunds behind the secure backend service
-- [ ] Deploy backend functions and complete authenticated visual checks after Lovable Cloud is resumed
+- [x] Deploy backend functions and complete authenticated visual checks after Lovable Cloud is resumed
