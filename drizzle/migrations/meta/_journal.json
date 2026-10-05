@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791178497870,
+      "tag": "0000_earn_pages_rpc",
+      "breakpoints": true
+    }
+  ]
+}
