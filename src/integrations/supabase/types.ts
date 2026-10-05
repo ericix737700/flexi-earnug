@@ -724,6 +724,38 @@ export type Database = {
         }
         Relationships: []
       }
+      survey_responses: {
+        Row: {
+          answers: Json
+          created_at: string
+          id: string
+          task_id: string
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          created_at?: string
+          id?: string
+          task_id: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          created_at?: string
+          id?: string
+          task_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "survey_responses_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       task_completions: {
         Row: {
           completed_at: string
@@ -756,6 +788,35 @@ export type Database = {
           },
         ]
       }
+      task_starts: {
+        Row: {
+          id: string
+          started_at: string
+          task_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          started_at?: string
+          task_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          started_at?: string
+          task_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_starts_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tasks: {
         Row: {
           created_at: string
@@ -763,6 +824,7 @@ export type Database = {
           description: string | null
           id: string
           is_active: boolean
+          min_watch_seconds: number
           reward_amount: number
           survey_questions: Json | null
           task_type: string
@@ -776,6 +838,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_active?: boolean
+          min_watch_seconds?: number
           reward_amount?: number
           survey_questions?: Json | null
           task_type?: string
@@ -789,6 +852,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_active?: boolean
+          min_watch_seconds?: number
           reward_amount?: number
           survey_questions?: Json | null
           task_type?: string
@@ -989,6 +1053,10 @@ export type Database = {
     }
     Functions: {
       claim_achievement: { Args: { _achievement_id: string }; Returns: Json }
+      complete_task: {
+        Args: { _answers?: Json; _task_id: string }
+        Returns: Json
+      }
       create_secure_withdrawal: {
         Args: {
           _amount: number
@@ -1026,6 +1094,7 @@ export type Database = {
         Args: { _admin_id: string; _reason: string; _withdrawal_id: string }
         Returns: Json
       }
+      start_task: { Args: { _task_id: string }; Returns: Json }
     }
     Enums: {
       achievement_type:
