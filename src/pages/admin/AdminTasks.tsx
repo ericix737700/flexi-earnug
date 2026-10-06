@@ -2,6 +2,8 @@ import { useState, useRef } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { TriviaQuestionEditor, type TriviaQuestion } from "@/components/admin/TriviaQuestionEditor";
+import { SurveyQuestionEditor } from "@/components/admin/SurveyQuestionEditor";
+import type { SurveyQuestion } from "@/hooks/useEarnTasks";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -78,6 +80,7 @@ export default function AdminTasks() {
     video_url: "",
   });
   const [triviaQuestions, setTriviaQuestions] = useState<TriviaQuestion[]>([]);
+  const [surveyQuestions, setSurveyQuestions] = useState<SurveyQuestion[]>([]);
 
   // Fetch tasks
   const { data: tasks, isLoading } = useQuery({
@@ -133,6 +136,7 @@ export default function AdminTasks() {
         is_active: formData.is_active,
         video_url: formData.task_type === "video" ? videoUrl : null,
         trivia_questions: formData.task_type === "trivia" ? JSON.parse(JSON.stringify(triviaQuestions)) : null,
+        survey_questions: formData.task_type === "survey" ? JSON.parse(JSON.stringify(surveyQuestions.filter((q) => q.question.trim()))) : null,
       };
 
       if (editingTask) {
@@ -201,6 +205,7 @@ export default function AdminTasks() {
       video_url: "",
     });
     setTriviaQuestions([]);
+    setSurveyQuestions([]);
     setVideoFile(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -221,6 +226,7 @@ export default function AdminTasks() {
     // Load existing trivia questions
     const existingQuestions = (task as any).trivia_questions as TriviaQuestion[] | null;
     setTriviaQuestions(existingQuestions || []);
+    setSurveyQuestions(Array.isArray((task as any).survey_questions) ? (task as any).survey_questions : []);
     setVideoFile(null);
     setIsCreateOpen(true);
   };
@@ -393,6 +399,12 @@ export default function AdminTasks() {
                         Current video: {editingTask.video_url.substring(0, 50)}...
                       </p>
                     )}
+                  </div>
+                )}
+
+                {formData.task_type === "survey" && (
+                  <div className="rounded-lg border p-3 bg-muted/50 space-y-3">
+                    <SurveyQuestionEditor questions={surveyQuestions} onChange={setSurveyQuestions} taskId={editingTask?.id} />
                   </div>
                 )}
 

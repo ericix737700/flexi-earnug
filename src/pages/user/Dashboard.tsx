@@ -107,9 +107,10 @@ export default function Dashboard() {
   });
 
   const taskCategories = [
-    { title: "Watch Videos", icon: Play, iconColor: "text-primary bg-primary/15", description: "Watch & Earn: short videos", href: "/tasks?type=video" },
-    { title: "Surveys", icon: ClipboardList, iconColor: "text-primary bg-primary/15", description: "Quick Survey: share opinions", href: "/tasks?type=survey" },
+    { title: "Watch Videos", icon: Play, iconColor: "text-primary bg-primary/15", description: "Watch & Earn: short videos", href: "/earn/videos" },
+    { title: "Surveys", icon: ClipboardList, iconColor: "text-primary bg-primary/15", description: "Quick Survey: share opinions", href: "/earn/surveys" },
     { title: "Machines", icon: Cpu, iconColor: "text-primary bg-primary/15", description: "Invest & earn rewards", href: "/machines" },
+    { title: "Gift Codes", icon: Gift, iconColor: "text-secondary bg-secondary/15", description: "Redeem codes for instant cash", href: "/earn/gift-codes" },
     { title: "Airtime & Data", icon: Signal, iconColor: "text-primary bg-primary/15", description: "Top up any line", href: "/airtime-data" },
     { title: "Trivia", icon: HelpCircle, iconColor: "text-secondary bg-secondary/15", description: "Answer quiz questions", href: "/tasks?type=trivia" },
     { title: "Achievements", icon: Trophy, iconColor: "text-secondary bg-secondary/15", description: "Claim bonuses", href: "/achievements" },
@@ -187,7 +188,7 @@ export default function Dashboard() {
               { icon: ClipboardList, label: "Complete Tasks", sub: "Earn rewards", href: "/tasks" },
               { icon: Users, label: "Refer a Friend", sub: `${referralCount || 0} invited`, href: "/referrals" },
               { icon: Trophy, label: "Achievements", sub: "Claim bonus", href: "/achievements" },
-              { icon: Gift, label: "Gift Code", sub: "Redeem", href: "/wallet" },
+              { icon: Gift, label: "Gift Code", sub: "Redeem", href: "/earn/gift-codes" },
             ].map((b) => (
               <Link key={b.label} to={b.href} className="w-28 shrink-0 rounded-xl card-neon p-3 text-center tap-pop">
                 <b.icon className="mx-auto h-6 w-6 text-primary" />
