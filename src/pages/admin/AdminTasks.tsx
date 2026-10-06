@@ -206,7 +206,6 @@ export default function AdminTasks() {
     });
     setTriviaQuestions([]);
     setSurveyQuestions([]);
-    setSurveyQuestions([]);
     setVideoFile(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -227,7 +226,6 @@ export default function AdminTasks() {
     // Load existing trivia questions
     const existingQuestions = (task as any).trivia_questions as TriviaQuestion[] | null;
     setTriviaQuestions(existingQuestions || []);
-    setSurveyQuestions(Array.isArray((task as any).survey_questions) ? (task as any).survey_questions : []);
     setSurveyQuestions(Array.isArray((task as any).survey_questions) ? (task as any).survey_questions : []);
     setVideoFile(null);
     setIsCreateOpen(true);
