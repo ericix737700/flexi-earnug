@@ -95,6 +95,9 @@ const Index = () => {
                   <span key={t} className="flex items-center gap-1.5"><CheckCircle className="h-4 w-4 text-primary" />{t}</span>
                 ))}
               </div>
+              <Link to="/make-money-online-uganda" className="mt-4 inline-block text-sm font-semibold text-primary underline-offset-4 hover:underline">
+                New here? Read our guide to making money online in Uganda →
+              </Link>
             </div>
             <div className="relative hidden md:block">
               <div className="absolute -inset-6 rounded-[2rem] bg-primary/15 blur-2xl" />
