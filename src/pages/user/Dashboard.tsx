@@ -107,8 +107,8 @@ export default function Dashboard() {
   });
 
   const taskCategories = [
-    { title: "Watch Videos", icon: Play, iconColor: "text-primary bg-primary/15", description: "Watch & Earn: short videos", href: "/tasks?type=video" },
-    { title: "Surveys", icon: ClipboardList, iconColor: "text-primary bg-primary/15", description: "Quick Survey: share opinions", href: "/tasks?type=survey" },
+    { title: "Watch Videos", icon: Play, iconColor: "text-primary bg-primary/15", description: "Watch & Earn: short videos", href: "/earn/videos" },
+    { title: "Surveys", icon: ClipboardList, iconColor: "text-primary bg-primary/15", description: "Quick Survey: share opinions", href: "/earn/surveys" },
     { title: "Machines", icon: Cpu, iconColor: "text-primary bg-primary/15", description: "Invest & earn rewards", href: "/machines" },
     { title: "Airtime & Data", icon: Signal, iconColor: "text-primary bg-primary/15", description: "Top up any line", href: "/airtime-data" },
     { title: "Trivia", icon: HelpCircle, iconColor: "text-secondary bg-secondary/15", description: "Answer quiz questions", href: "/tasks?type=trivia" },

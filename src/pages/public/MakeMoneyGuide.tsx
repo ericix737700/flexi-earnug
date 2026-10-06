@@ -69,7 +69,7 @@ export default function MakeMoneyGuide() {
 
       <main className="container mx-auto max-w-3xl flex-1 space-y-14 px-4 pb-14">
         <section className="pt-4 text-center">
-          <h1 className="text-4xl font-extrabold leading-tight md:text-5xl">Make Money Online <span className="text-gold-gradient">in Uganda</span></h1>
+          <h1 className="text-4xl font-extrabold leading-tight md:text-5xl">Make Money Online <span className="text-secondary">in Uganda</span></h1>
           <p className="mx-auto mt-4 max-w-xl text-muted-foreground">A simple guide to earning UGX from your phone and cashing out to MTN or Airtel mobile money.</p>
           <Button asChild size="lg" className="mt-6 rounded-full gradient-primary border-0 px-8 font-semibold text-primary-foreground"><Link to="/register">Start earning</Link></Button>
         </section>

@@ -33,6 +33,11 @@ import News from "./pages/user/News";
 import NewsDetail from "./pages/user/NewsDetail";
 
 import AirtimeData from "./pages/user/AirtimeData";
+import EarnVideos from "./pages/user/earn/Videos";
+import EarnSurveys from "./pages/user/earn/Surveys";
+import SurveyRun from "./pages/user/earn/SurveyRun";
+import EarnGiftCodes from "./pages/user/earn/GiftCodes";
+import MakeMoneyGuide from "./pages/public/MakeMoneyGuide";
 import Deposit from "./pages/user/Deposit";
 import Withdraw from "./pages/user/Withdraw";
 import ProfileSettings from "./pages/user/ProfileSettings";
@@ -131,6 +136,11 @@ function AppRoutes() {
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/about" element={<About />} />
       <Route path="/faq" element={<FAQ />} />
+      <Route path="/make-money-online-uganda" element={<MakeMoneyGuide />} />
+      <Route path="/earn/videos" element={<ProtectedRoute><EarnVideos /></ProtectedRoute>} />
+      <Route path="/earn/surveys" element={<ProtectedRoute><EarnSurveys /></ProtectedRoute>} />
+      <Route path="/earn/surveys/:id" element={<ProtectedRoute><SurveyRun /></ProtectedRoute>} />
+      <Route path="/earn/gift-codes" element={<ProtectedRoute><EarnGiftCodes /></ProtectedRoute>} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/status" element={<Status />} />
       <Route path="/support" element={<Support />} />

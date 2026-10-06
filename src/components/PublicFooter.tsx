@@ -47,6 +47,7 @@ export function PublicFooter() {
                 { to: "/", label: "Home" },
                 { to: "/about", label: "About" },
                 { to: "/faq", label: "FAQ" },
+                { to: "/make-money-online-uganda", label: "Earning Guide" },
                 { to: "/status", label: "System Status" },
               ]}
             />
