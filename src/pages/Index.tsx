@@ -152,7 +152,7 @@ const Index = () => {
       </section>
 
       {/* Earning Methods */}
-      <section className="bg-gradient-to-b from-accent/40 to-background">
+      <section className="border-y border-border/40 bg-card/20">
         <div className="mx-auto max-w-6xl px-4 py-16 md:py-24">
           <div className="mb-12 text-center">
             <h2 className="text-3xl font-extrabold text-foreground md:text-4xl">
@@ -365,8 +365,6 @@ const Index = () => {
         </div>
       </section>
 
-      <PublicFooter />
-
       {/* Advertise with FlexiEarn */}
 
       <section className="mx-auto max-w-6xl px-4 py-16">
@@ -458,7 +456,7 @@ const Index = () => {
         </div>
       </section>
 
-      
+      <PublicFooter />
 
     </div>
   );
