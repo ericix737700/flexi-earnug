@@ -13,6 +13,16 @@ import { Loader2, Phone, Lock, User, Users, Mail, Eye, EyeOff } from "lucide-rea
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { PasswordStrength, evaluatePassword } from "@/components/PasswordStrength";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { AuthPageShell } from "@/components/auth/AuthPageShell";
+import { Checkbox } from "@/components/ui/checkbox";
+import { z } from "zod";
+
+const registerSchema = z.object({
+  fullName: z.string().trim().min(2, "Enter your full name").max(100),
+  phone: z.string().regex(/^\d{10,12}$/, "Enter a valid 10-digit Ugandan phone number"),
+  email: z.string().trim().email("Enter a valid email address").max(255),
+  password: z.string().min(8, "Password must contain at least 8 characters").max(128),
+});
 
 export default function Register() {
   const navigate = useNavigate();
@@ -29,6 +39,8 @@ export default function Register() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [referrer, setReferrer] = useState<{ full_name: string | null; account_id: string | null; is_verified: boolean } | null>(null);
   const [referrerLoading, setReferrerLoading] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [fieldError, setFieldError] = useState<string | null>(null);
 
   // Look up the referrer so the invited user sees who referred them.
   useEffect(() => {
@@ -56,6 +68,8 @@ export default function Register() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    const validation = registerSchema.safeParse({ ...formData, phone: formData.phone.replace(/\D/g, "") });
+    if (!validation.success) { setFieldError(validation.error.issues[0]?.message ?? "Check your details"); return; }
     if (formData.password !== formData.confirmPassword) { toast.error("Passwords do not match"); return; }
     const { passed, total } = evaluatePassword(formData.password);
     if (passed < total - 1) {
@@ -65,6 +79,8 @@ export default function Register() {
     const trimmedEmail = formData.email.trim().toLowerCase();
     if (!trimmedEmail) { toast.error("Email is required"); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) { toast.error("Please enter a valid email address"); return; }
+    if (!acceptedTerms) { setFieldError("Agree to the Terms and Privacy Policy to continue"); return; }
+    setFieldError(null);
 
     setIsLoading(true);
     try {
@@ -117,34 +133,12 @@ export default function Register() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/10">
+    <AuthPageShell mode="register" title="Create your account" description="Join FlexiEarn with your Ugandan phone number and start your earning journey.">
       <SEO title="Create Account" description="Register on FlexiEarn Uganda in seconds. Start earning through tasks, referrals and gift codes paid via Mobile Money." path="/register" />
-      {/* Animated background shapes */}
-      <div className="absolute inset-0 gradient-hero opacity-[0.06]" />
-      <div className="absolute top-10 -right-24 h-80 w-80 rounded-full bg-primary/25 blur-3xl animate-pulse" />
-      <div className="absolute bottom-10 -left-24 h-80 w-80 rounded-full bg-secondary/30 blur-3xl animate-pulse [animation-delay:1.5s]" />
-      <div className="absolute top-1/2 left-1/3 h-44 w-44 rounded-full bg-accent/20 blur-3xl animate-pulse [animation-delay:0.7s]" />
-      <div className="absolute bottom-1/3 right-1/4 h-28 w-28 rounded-full bg-primary/15 blur-2xl" />
-      {/* Geometric accents */}
-      <div className="absolute top-12 left-8 h-16 w-16 rotate-12 rounded-2xl border-2 border-primary/30 hidden sm:block animate-pulse" />
-      <div className="absolute bottom-16 right-10 h-20 w-20 -rotate-6 rounded-full border-2 border-secondary/40 hidden sm:block" />
-      <div className="absolute top-1/3 right-12 h-10 w-10 rotate-45 bg-primary/15 rounded-md hidden md:block" />
-      <div className="absolute top-1/4 right-1/3 h-6 w-6 rotate-12 rounded bg-secondary/30 hidden md:block" />
-      <div className="absolute bottom-1/4 left-1/3 h-8 w-8 -rotate-12 rounded-full border border-accent/40 hidden md:block" />
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] bg-[size:32px_32px]" />
-
-      <Card className="relative w-full max-w-md border-border/50 shadow-2xl glass-card">
-        <CardHeader className="space-y-1 text-center pb-4">
-          <div className="mx-auto mb-4"><PlatformLogo size="lg" /></div>
-          <CardTitle className="text-2xl font-bold text-gradient-primary">Join FlexiEarn</CardTitle>
-          <CardDescription>Start earning money by completing simple tasks</CardDescription>
-          <div className="rounded-xl bg-primary/10 p-2.5 mt-2">
-            <p className="text-sm font-semibold">
-              One-time activation fee: <span className="text-primary">UGX {registrationFee.toLocaleString()}</span>
-            </p>
+          <div className="mb-5 flex items-center justify-between gap-4 rounded-lg border border-secondary/30 bg-secondary/10 p-3">
+            <div><p className="text-xs text-muted-foreground">One-time activation</p><p className="font-bold text-secondary">UGX {registrationFee.toLocaleString()}</p></div>
+            <div className="text-right"><p className="text-xs text-muted-foreground">Supported networks</p><p className="text-sm font-bold">MTN · Airtel</p></div>
           </div>
-        </CardHeader>
-        <CardContent>
           <form onSubmit={handleRegister} className="space-y-3.5">
             {[
               { name: "fullName", label: "Full Name", icon: User, type: "text", placeholder: "Enter your full name", required: true },
@@ -155,7 +149,7 @@ export default function Register() {
                 <label className="text-sm font-medium">{field.label}</label>
                 <div className="relative">
                   <field.icon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input name={field.name} type={field.type} placeholder={field.placeholder} value={formData[field.name as keyof typeof formData]} onChange={handleChange} className="pl-10 h-11" required={field.required} />
+                  <Input name={field.name} type={field.type} maxLength={field.name === "fullName" ? 100 : field.name === "email" ? 255 : 13} inputMode={field.name === "phone" ? "numeric" : undefined} placeholder={field.placeholder} value={formData[field.name as keyof typeof formData]} onChange={(event) => { handleChange(event); setFieldError(null); }} className="h-11 bg-background/60 pl-10" required={field.required} />
                 </div>
               </div>
             ))}
@@ -176,15 +170,17 @@ export default function Register() {
                     className="pl-10 pr-10 h-11"
                     required
                   />
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="sm"
                     onClick={field.toggle}
-                    className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+                    className="absolute right-1 top-1 h-9 w-9 p-0 text-muted-foreground hover:text-foreground"
                     aria-label={field.show ? "Hide password" : "Show password"}
                     tabIndex={-1}
                   >
                     {field.show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
+                  </Button>
                 </div>
                 {field.name === "password" && (
                   <div className="pt-1">
@@ -225,18 +221,17 @@ export default function Register() {
                 )
               )}
             </div>
+            {fieldError && <p role="alert" className="text-sm font-medium text-destructive">{fieldError}</p>}
+            <label className="flex cursor-pointer items-start gap-2.5 text-xs leading-relaxed text-muted-foreground">
+              <Checkbox className="mt-0.5" checked={acceptedTerms} onCheckedChange={(checked) => { setAcceptedTerms(checked === true); setFieldError(null); }} />
+              <span>I agree to the <Link to="/terms" className="font-semibold text-primary hover:underline">Terms &amp; Conditions</Link> and <Link to="/privacy" className="font-semibold text-primary hover:underline">Privacy Policy</Link>.</span>
+            </label>
             <Button type="submit" className="w-full h-11 font-semibold gradient-primary border-0 text-primary-foreground hover:opacity-90" disabled={isLoading}>
               {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Creating Account...</> : "Create Account"}
             </Button>
           </form>
-          <div className="mt-5 text-center text-sm">
-            <span className="text-muted-foreground">Already have an account? </span>
-            <Link to="/login" className="font-semibold text-primary hover:underline">Log In</Link>
-          </div>
-          <SecurityBadge variant="encrypted" className="mt-4" />
-        </CardContent>
-      </Card>
-    </div>
+          <SecurityBadge variant="encrypted" className="mt-5 border-primary/30 bg-primary/10" />
+    </AuthPageShell>
   );
 }
 
