@@ -7,11 +7,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlatformLogo } from "@/components/PlatformLogo";
 import { SecurityBadge } from "@/components/SecurityBadge";
+import { AuthPageShell } from "@/components/auth/AuthPageShell";
+import { Checkbox } from "@/components/ui/checkbox";
 import { SupportDialog } from "@/components/user/SupportDialog";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { SEO } from "@/components/SEO";
 import { toast } from "sonner";
 import { Loader2, Phone, Lock, ShieldAlert, Mail, Eye, EyeOff } from "lucide-react";
+import { z } from "zod";
+
+const loginSchema = z.object({
+  identifier: z.string().trim().min(1, "Enter your phone number or email").max(255),
+  password: z.string().min(1, "Enter your password").max(128),
+});
 
 export default function Login() {
   const navigate = useNavigate();
@@ -24,6 +32,8 @@ export default function Login() {
   const [showLoading, setShowLoading] = useState(false);
   const [blockedStatus, setBlockedStatus] = useState<{ status: string } | null>(null);
   const [supportOpen, setSupportOpen] = useState(false);
+  const [rememberDevice, setRememberDevice] = useState(true);
+  const [fieldError, setFieldError] = useState<string | null>(null);
 
   const formatPhoneForEmail = (phone: string) => {
     const cleaned = phone.replace(/\D/g, "");
@@ -32,6 +42,17 @@ export default function Login() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    const identifier = loginMode === "phone" ? phone : email;
+    const validation = loginSchema.safeParse({ identifier, password });
+    if (!validation.success) {
+      setFieldError(validation.error.issues[0]?.message ?? "Check your details and try again");
+      return;
+    }
+    if (loginMode === "phone" && phone.replace(/\D/g, "").length < 10) {
+      setFieldError("Enter a valid 10-digit Ugandan phone number");
+      return;
+    }
+    setFieldError(null);
     setIsLoading(true);
     setBlockedStatus(null);
 
@@ -64,6 +85,8 @@ export default function Login() {
       }
 
       setShowLoading(true);
+      if (!rememberDevice) sessionStorage.setItem("flexiearn_session_only", "true");
+      else sessionStorage.removeItem("flexiearn_session_only");
       toast.success("Welcome back!");
       setTimeout(() => navigate("/dashboard"), 800);
     } catch {
@@ -138,31 +161,10 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-secondary/10 via-background to-primary/5">
+    <AuthPageShell mode="login" title="Welcome back" description="Log in securely to continue earning, investing, and managing your wallet.">
       <SEO title="Log In" description="Sign in to your FlexiEarn Uganda account to check earnings, complete tasks and withdraw to Mobile Money." path="/login" />
-      {/* Animated background blobs */}
-      <div className="absolute inset-0 gradient-hero opacity-[0.06]" />
-      <div className="absolute top-20 -left-24 h-72 w-72 rounded-full bg-primary/25 blur-3xl animate-pulse" />
-      <div className="absolute bottom-20 -right-24 h-80 w-80 rounded-full bg-secondary/30 blur-3xl animate-pulse [animation-delay:1.5s]" />
-      <div className="absolute top-1/3 right-1/4 h-44 w-44 rounded-full bg-accent/20 blur-3xl animate-pulse [animation-delay:0.7s]" />
-      <div className="absolute bottom-1/4 left-1/4 h-32 w-32 rounded-full bg-primary/15 blur-2xl" />
-      {/* Geometric accents */}
-      <div className="absolute top-16 right-10 h-16 w-16 -rotate-12 rounded-2xl border-2 border-primary/30 hidden sm:block animate-pulse" />
-      <div className="absolute bottom-20 left-10 h-20 w-20 rotate-6 rounded-full border-2 border-secondary/40 hidden sm:block" />
-      <div className="absolute top-1/2 left-12 h-10 w-10 -rotate-45 bg-primary/15 rounded-md hidden md:block" />
-      <div className="absolute top-1/4 left-1/3 h-6 w-6 rotate-12 rounded bg-secondary/30 hidden md:block" />
-      <div className="absolute bottom-1/3 right-1/3 h-8 w-8 -rotate-12 rounded-full border border-accent/40 hidden md:block" />
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] bg-[size:32px_32px]" />
-
-      <Card className="relative w-full max-w-md border-border/50 shadow-2xl glass-card">
-        <CardHeader className="space-y-1 text-center pb-4">
-          <div className="mx-auto mb-4"><PlatformLogo size="lg" /></div>
-          <CardTitle className="text-2xl font-bold text-gradient-primary">Welcome Back</CardTitle>
-          <CardDescription>Log in to continue earning with FlexiEarn</CardDescription>
-        </CardHeader>
-        <CardContent>
           <Tabs value={loginMode} onValueChange={(v) => setLoginMode(v as "phone" | "email")} className="mb-4">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid h-11 w-full grid-cols-2 bg-background/50">
               <TabsTrigger value="phone" className="gap-1.5"><Phone className="h-3.5 w-3.5" />Phone</TabsTrigger>
               <TabsTrigger value="email" className="gap-1.5"><Mail className="h-3.5 w-3.5" />Email</TabsTrigger>
             </TabsList>
@@ -173,15 +175,16 @@ export default function Login() {
                 <label className="text-sm font-medium">Phone Number</label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input type="tel" placeholder="0700123456" value={phone} onChange={(e) => setPhone(e.target.value)} className="pl-10 h-11" required />
+                  <Input type="tel" inputMode="numeric" maxLength={13} placeholder="0700 123 456" value={phone} onChange={(e) => { setPhone(e.target.value); setFieldError(null); }} className="h-12 bg-background/60 pl-10" required />
                 </div>
+                <p className="text-xs text-muted-foreground">Use the MTN or Airtel number linked to your account.</p>
               </div>
             ) : (
               <div className="space-y-2">
                 <label className="text-sm font-medium">Email Address</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className="pl-10 h-11" required />
+                  <Input type="email" maxLength={255} placeholder="you@example.com" value={email} onChange={(e) => { setEmail(e.target.value); setFieldError(null); }} className="h-12 bg-background/60 pl-10" required />
                 </div>
               </div>
             )}
@@ -193,38 +196,40 @@ export default function Login() {
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 pr-10 h-11"
+                  onChange={(e) => { setPassword(e.target.value); setFieldError(null); }}
+                  maxLength={128}
+                  className="h-12 bg-background/60 pl-10 pr-10"
                   required
                 />
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+                  className="absolute right-1 top-1.5 h-9 w-9 p-0 text-muted-foreground hover:text-foreground"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                   tabIndex={-1}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
+                </Button>
               </div>
             </div>
-            <div className="flex justify-end -mt-1">
+            {fieldError && <p role="alert" className="text-sm font-medium text-destructive">{fieldError}</p>}
+            <div className="flex items-center justify-between gap-3 -mt-1">
+              <label className="flex cursor-pointer items-center gap-2 text-xs text-muted-foreground">
+                <Checkbox checked={rememberDevice} onCheckedChange={(checked) => setRememberDevice(checked === true)} />
+                Remember this device
+              </label>
               <Link to="/forgot-password" className="text-xs font-medium text-primary hover:underline">
                 Forgot password?
               </Link>
             </div>
-            <Button type="submit" className="w-full h-11 font-semibold gradient-primary border-0 text-primary-foreground hover:opacity-90" disabled={isLoading}>
+            <Button type="submit" className="h-12 w-full border-0 gradient-primary font-semibold text-primary-foreground hover:opacity-90" disabled={isLoading}>
               {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Logging in...</> : "Log In"}
             </Button>
           </form>
-          <div className="mt-6 text-center text-sm">
-            <span className="text-muted-foreground">Don't have an account? </span>
-            <Link to="/register" className="font-semibold text-primary hover:underline">Register Now</Link>
-          </div>
-          <SecurityBadge variant="encrypted" className="mt-4" />
-        </CardContent>
-      </Card>
-    </div>
+          <SecurityBadge variant="encrypted" className="mt-5 border-primary/30 bg-primary/10" />
+    </AuthPageShell>
   );
 }
 
