@@ -44,7 +44,7 @@ const Index = () => {
   if (bootLoading) return <LoadingScreen />;
 
   return (
-    <div className="dark min-h-screen bg-emerald-night text-foreground">
+    <div className="dark public-theme min-h-screen bg-emerald-night text-foreground">
       <SEO title="FlexiEarn Uganda — Smart Earning & Investments" description="Earn through investments, daily tasks, referrals and gift codes. Paid in UGX via mobile money. Join FlexiEarn Uganda today." path="/" />
       {/* Navigation */}
       <nav className="sticky top-0 z-50 border-b border-border/40 bg-background/40 backdrop-blur-xl">
@@ -68,12 +68,12 @@ const Index = () => {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div aria-hidden className="absolute left-1/2 top-10 h-72 w-[40rem] -translate-x-1/2 rounded-full bg-primary/20 blur-3xl" />
         <div className="relative mx-auto max-w-6xl px-4 pb-10 pt-14 md:pt-20">
           <div className="grid items-center gap-10 md:grid-cols-2">
             <div className="text-center md:text-left">
-              <h1 className="text-5xl font-extrabold leading-[1.02] tracking-tight text-foreground md:text-7xl">
-                Your Phone,<br />Your Profit
+              <p className="mb-3 text-sm font-bold text-secondary">FlexiEarn Uganda</p>
+              <h1 className="text-5xl font-extrabold leading-tight text-foreground md:text-6xl">
+                Your Phone,<br /><span className="text-secondary">Your Profit</span>
               </h1>
               <p className="mx-auto mt-5 max-w-md text-base leading-relaxed text-muted-foreground md:mx-0 md:text-lg">
                 Earning, investments, and everything in between. One account to complete tasks and build a streak for even bigger rewards.
@@ -100,7 +100,6 @@ const Index = () => {
               </Link>
             </div>
             <div className="relative hidden md:block">
-              <div className="absolute -inset-6 rounded-[2rem] bg-primary/15 blur-2xl" />
               <div className="relative overflow-hidden rounded-3xl border border-primary/30 bg-card shadow-2xl">
                 <img src={heroImg} alt="Ugandans earning on their phones with FlexiEarn" className="h-80 w-full object-cover" loading="lazy" />
               </div>
@@ -112,7 +111,7 @@ const Index = () => {
           </div>
 
           {/* Stat chips */}
-          <div className="mt-12 grid grid-cols-3 gap-2 md:gap-4">
+          <div className="mt-12 grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4">
             {[
               { icon: Trophy, value: "10,000+", label: "Active Earners" },
               { icon: Gift, value: `UGX ${dailyReward.toLocaleString()}`, label: "Daily Login Bonus" },
@@ -121,8 +120,8 @@ const Index = () => {
               <div key={s.label} className="flex items-center gap-2 rounded-xl border border-secondary/30 bg-card/60 p-2.5 backdrop-blur md:p-4">
                 <div className="hidden shrink-0 rounded-lg bg-secondary/15 p-1.5 text-secondary sm:block"><s.icon className="h-4 w-4" /></div>
                 <div className="min-w-0">
-                  <p className="truncate text-xs font-bold text-foreground md:text-base">{s.value}</p>
-                  <p className="truncate text-[10px] text-muted-foreground md:text-xs">{s.label}</p>
+                  <p className="text-sm font-bold text-foreground md:text-base">{s.value}</p>
+                  <p className="text-xs text-muted-foreground">{s.label}</p>
                 </div>
               </div>
             ))}
@@ -133,19 +132,19 @@ const Index = () => {
       {/* How It Works */}
       <section className="mx-auto max-w-6xl px-4 py-12 md:py-20">
         <h2 className="mb-8 text-center text-3xl font-extrabold text-foreground md:text-4xl">How It Works</h2>
-        <div className="grid grid-cols-3 gap-2.5 md:gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-6">
           {[
             { step: 1, icon: Smartphone, title: "Join & Activate", desc: `Register and pay a one-time fee of UGX ${registrationFee.toLocaleString()} via Mobile Money.` },
             { step: 2, icon: TrendingUp, title: "Complete Tasks & Earn", desc: "Watch videos, answer surveys, and check in daily. Build streaks for bonuses." },
             { step: 3, icon: Wallet, title: "Cash Out", desc: "Withdraw your earnings anytime directly to your MTN or Airtel Mobile Money." },
           ].map((item) => (
-            <div key={item.step} className="rounded-2xl card-gold-glow p-3 transition-transform hover:-translate-y-1 md:p-6">
+            <div key={item.step} className="rounded-lg card-gold-glow p-5 transition-transform hover:-translate-y-1 motion-reduce:transform-none md:p-6">
               <div className="mb-4 w-fit rounded-lg border border-secondary/40 bg-secondary/10 p-2 text-secondary md:mb-6">
                 <item.icon className="h-5 w-5 md:h-6 md:w-6" />
               </div>
               <p className="text-[11px] font-medium text-secondary md:text-sm">Step {item.step}</p>
-              <h3 className="mt-0.5 text-sm font-bold leading-tight text-foreground md:text-xl">{item.title}</h3>
-              <p className="mt-2 text-[11px] leading-snug text-muted-foreground md:text-sm">{item.desc}</p>
+              <h3 className="mt-0.5 text-lg font-bold leading-tight text-foreground md:text-xl">{item.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -237,9 +236,7 @@ const Index = () => {
 
       {/* Gift Codes - How It Works + Redeem CTA */}
       <section className="mx-auto max-w-6xl px-4 py-16">
-        <div className="relative overflow-hidden rounded-3xl border border-secondary/30 bg-gradient-to-br from-secondary/15 via-card to-primary/10 p-8 md:p-12">
-          <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-secondary/20 blur-3xl" />
-          <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />
+        <div className="relative border-y border-secondary/30 py-8 md:py-12">
 
           <div className="relative text-center">
             <div className="inline-flex items-center gap-2 rounded-full bg-secondary/15 px-3 py-1 text-sm font-semibold text-secondary">
@@ -329,7 +326,7 @@ const Index = () => {
 
       {/* Trust & Security */}
       <section className="mx-auto max-w-6xl px-4 py-16">
-        <div className="rounded-3xl border border-border/50 bg-gradient-to-br from-accent/50 via-card to-primary/5 p-8 md:p-12">
+        <div className="border-y border-border/50 py-8 md:py-12">
           <div className="mb-8 text-center">
             <h2 className="text-3xl font-extrabold text-foreground">
               Why Thousands Trust FlexiEarn
@@ -368,9 +365,7 @@ const Index = () => {
       {/* Advertise with FlexiEarn */}
 
       <section className="mx-auto max-w-6xl px-4 py-16">
-        <div className="relative overflow-hidden rounded-3xl border border-primary/30 bg-gradient-to-br from-primary/15 via-card to-secondary/10 p-8 md:p-12">
-          <div className="absolute -top-16 -right-16 h-52 w-52 rounded-full bg-primary/20 blur-3xl" />
-          <div className="absolute -bottom-16 -left-16 h-52 w-52 rounded-full bg-secondary/20 blur-3xl" />
+        <div className="relative py-8 md:py-12">
 
           <div className="relative grid items-center gap-10 md:grid-cols-2">
             <div>
@@ -417,10 +412,10 @@ const Index = () => {
 
             <div className="grid grid-cols-2 gap-4">
               {[
-                { icon: Megaphone, title: "Banner Ads", desc: "Rotating banner on user dashboard", color: "text-rose-500 bg-rose-500/15" },
-                { icon: Eye, title: "Popup Ads", desc: "Full-screen modal on app open", color: "text-purple-500 bg-purple-500/15" },
-                { icon: Target, title: "In-Feed Ads", desc: "Native card between tasks", color: "text-blue-500 bg-blue-500/15" },
-                { icon: Star, title: "Sponsored", desc: "Featured on dedicated Ads page", color: "text-amber-500 bg-amber-500/15" },
+                { icon: Megaphone, title: "Banner Ads", desc: "Rotating banner on user dashboard", color: "text-primary bg-primary/15" },
+                { icon: Eye, title: "Popup Ads", desc: "Full-screen modal on app open", color: "text-secondary bg-secondary/15" },
+                { icon: Target, title: "In-Feed Ads", desc: "Native card between tasks", color: "text-primary bg-primary/15" },
+                { icon: Star, title: "Sponsored", desc: "Featured on dedicated Ads page", color: "text-secondary bg-secondary/15" },
               ].map((t) => (
                 <div key={t.title} className="rounded-2xl border border-border/60 bg-card/70 p-4 backdrop-blur-sm shadow-sm">
                   <div className={`mb-3 inline-flex rounded-xl p-2.5 ${t.color}`}>
@@ -436,12 +431,12 @@ const Index = () => {
       </section>
 
 
-      <section className="gradient-primary py-16">
+      <section className="border-y border-secondary/30 bg-primary/10 py-16">
         <div className="mx-auto max-w-3xl px-4 text-center">
-          <h2 className="text-3xl font-extrabold text-primary-foreground md:text-4xl">
+          <h2 className="text-3xl font-extrabold text-foreground md:text-4xl">
             Ready to Start Earning?
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-lg text-primary-foreground/80">
+          <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
             Join FlexiEarn today for just UGX {registrationFee.toLocaleString()} and start earning immediately.
             Your phone is all you need!
           </p>

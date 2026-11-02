@@ -94,8 +94,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    const endExpiredTabSession = shouldEndTabSession();
-    if (endExpiredTabSession) void supabase.auth.signOut({ scope: "local" });
+    let endExpiredTabSession = shouldEndTabSession();
+    const initialSession = endExpiredTabSession
+      ? supabase.auth.signOut({ scope: "local" }).then(() => { endExpiredTabSession = false; return supabase.auth.getSession(); })
+      : supabase.auth.getSession();
     // Set up auth state listener BEFORE checking session
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -118,7 +120,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
 
     // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    initialSession.then(({ data: { session } }) => {
       if (endExpiredTabSession) { setIsLoading(false); return; }
       setSession(session);
       setUser(session?.user ?? null);
