@@ -3,8 +3,6 @@ import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlatformLogo } from "@/components/PlatformLogo";
 import { SecurityBadge } from "@/components/SecurityBadge";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { SEO } from "@/components/SEO";
@@ -15,14 +13,7 @@ import { PasswordStrength, evaluatePassword } from "@/components/PasswordStrengt
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { AuthPageShell } from "@/components/auth/AuthPageShell";
 import { Checkbox } from "@/components/ui/checkbox";
-import { z } from "zod";
-
-const registerSchema = z.object({
-  fullName: z.string().trim().min(2, "Enter your full name").max(100),
-  phone: z.string().regex(/^\d{10,12}$/, "Enter a valid 10-digit Ugandan phone number"),
-  email: z.string().trim().email("Enter a valid email address").max(255),
-  password: z.string().min(8, "Password must contain at least 8 characters").max(128),
-});
+import { registrationEntrySchema, setRememberedDevice } from "@/lib/auth-entry";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -68,12 +59,12 @@ export default function Register() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    const validation = registerSchema.safeParse({ ...formData, phone: formData.phone.replace(/\D/g, "") });
+    const validation = registrationEntrySchema.safeParse({ ...formData, phone: formData.phone.replace(/\D/g, ""), acceptedTerms });
     if (!validation.success) { setFieldError(validation.error.issues[0]?.message ?? "Check your details"); return; }
-    if (formData.password !== formData.confirmPassword) { toast.error("Passwords do not match"); return; }
+    if (formData.password !== formData.confirmPassword) { setFieldError("Passwords do not match"); return; }
     const { passed, total } = evaluatePassword(formData.password);
     if (passed < total - 1) {
-      toast.error("Password is too weak. Please meet at least 4 of the 5 rules.");
+      setFieldError("Password is too weak. Please meet at least 4 of the 5 rules.");
       return;
     }
     const trimmedEmail = formData.email.trim().toLowerCase();
@@ -84,6 +75,7 @@ export default function Register() {
 
     setIsLoading(true);
     try {
+      setRememberedDevice(true);
       const email = formatPhoneForEmail(formData.phone);
       const cleanedPhone = formData.phone.replace(/\D/g, "");
 
@@ -146,11 +138,12 @@ export default function Register() {
               { name: "email", label: "Email Address", icon: Mail, type: "email", placeholder: "you@example.com", required: true },
             ].map((field) => (
               <div key={field.name} className="space-y-1.5">
-                <label className="text-sm font-medium">{field.label}</label>
+                <label htmlFor={`register-${field.name}`} className="text-sm font-medium">{field.label}</label>
                 <div className="relative">
                   <field.icon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input name={field.name} type={field.type} maxLength={field.name === "fullName" ? 100 : field.name === "email" ? 255 : 13} inputMode={field.name === "phone" ? "numeric" : undefined} placeholder={field.placeholder} value={formData[field.name as keyof typeof formData]} onChange={(event) => { handleChange(event); setFieldError(null); }} className="h-11 bg-background/60 pl-10" required={field.required} />
+                  <Input id={`register-${field.name}`} autoComplete={field.name === "fullName" ? "name" : field.name === "phone" ? "tel" : "email"} name={field.name} type={field.type} maxLength={field.name === "fullName" ? 100 : field.name === "email" ? 255 : 13} inputMode={field.name === "phone" ? "numeric" : undefined} placeholder={field.placeholder} value={formData[field.name as keyof typeof formData]} onChange={(event) => { handleChange(event); setFieldError(null); }} className="h-11 bg-background/60 pl-10" required={field.required} />
                 </div>
+                {field.name === "phone" && <p className="text-xs text-muted-foreground">Use your own MTN or Airtel number, for example 0700 123 456.</p>}
               </div>
             ))}
             {([
@@ -158,16 +151,19 @@ export default function Register() {
               { name: "confirmPassword", label: "Confirm Password", placeholder: "Confirm your password", show: showConfirm, toggle: () => setShowConfirm(v => !v) },
             ] as const).map((field) => (
               <div key={field.name} className="space-y-1.5">
-                <label className="text-sm font-medium">{field.label}</label>
+                <label htmlFor={`register-${field.name}`} className="text-sm font-medium">{field.label}</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
+                    id={`register-${field.name}`}
+                    autoComplete="new-password"
+                    maxLength={128}
                     name={field.name}
                     type={field.show ? "text" : "password"}
                     placeholder={field.placeholder}
                     value={formData[field.name as keyof typeof formData]}
                     onChange={handleChange}
-                    className="pl-10 pr-10 h-11"
+                    className="h-11 bg-background/60 pl-10 pr-10"
                     required
                   />
                   <Button
@@ -177,7 +173,6 @@ export default function Register() {
                     onClick={field.toggle}
                     className="absolute right-1 top-1 h-9 w-9 p-0 text-muted-foreground hover:text-foreground"
                     aria-label={field.show ? "Hide password" : "Show password"}
-                    tabIndex={-1}
                   >
                     {field.show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
@@ -190,10 +185,10 @@ export default function Register() {
               </div>
             ))}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">Referral Code (Optional)</label>
+              <label htmlFor="register-referral" className="text-sm font-medium">Referral Code (Optional)</label>
               <div className="relative">
                 <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input name="referralCode" placeholder="Enter referral code" value={formData.referralCode} onChange={handleChange} className="pl-10 h-11 uppercase" />
+                <Input id="register-referral" maxLength={64} name="referralCode" placeholder="Enter referral code" value={formData.referralCode} onChange={handleChange} className="h-11 bg-background/60 pl-10 uppercase" />
               </div>
               {formData.referralCode.trim() && (
                 referrerLoading ? (

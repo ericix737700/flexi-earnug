@@ -14,12 +14,7 @@ import { LoadingScreen } from "@/components/LoadingScreen";
 import { SEO } from "@/components/SEO";
 import { toast } from "sonner";
 import { Loader2, Phone, Lock, ShieldAlert, Mail, Eye, EyeOff } from "lucide-react";
-import { z } from "zod";
-
-const loginSchema = z.object({
-  identifier: z.string().trim().min(1, "Enter your phone number or email").max(255),
-  password: z.string().min(1, "Enter your password").max(128),
-});
+import { loginEntrySchema, setRememberedDevice } from "@/lib/auth-entry";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -43,13 +38,9 @@ export default function Login() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const identifier = loginMode === "phone" ? phone : email;
-    const validation = loginSchema.safeParse({ identifier, password });
+    const validation = loginEntrySchema.safeParse({ mode: loginMode, identifier, password });
     if (!validation.success) {
       setFieldError(validation.error.issues[0]?.message ?? "Check your details and try again");
-      return;
-    }
-    if (loginMode === "phone" && phone.replace(/\D/g, "").length < 10) {
-      setFieldError("Enter a valid 10-digit Ugandan phone number");
       return;
     }
     setFieldError(null);
@@ -57,10 +48,12 @@ export default function Login() {
     setBlockedStatus(null);
 
     try {
-      const loginEmail = loginMode === "phone" ? formatPhoneForEmail(phone) : email;
+      setRememberedDevice(rememberDevice);
+      const loginEmail = loginMode === "phone" ? formatPhoneForEmail(phone) : email.trim().toLowerCase();
       const { data: authData, error } = await supabase.auth.signInWithPassword({ email: loginEmail, password });
 
       if (error) {
+        setFieldError(error.message.includes("Invalid login credentials") ? "The phone/email or password is incorrect. Please try again." : error.message);
         toast.error(error.message.includes("Invalid login credentials") ? "Invalid credentials" : error.message);
         return;
       }
@@ -85,8 +78,6 @@ export default function Login() {
       }
 
       setShowLoading(true);
-      if (!rememberDevice) sessionStorage.setItem("flexiearn_session_only", "true");
-      else sessionStorage.removeItem("flexiearn_session_only");
       toast.success("Welcome back!");
       setTimeout(() => navigate("/dashboard"), 800);
     } catch {
@@ -172,27 +163,29 @@ export default function Login() {
           <form onSubmit={handleLogin} className="space-y-4">
             {loginMode === "phone" ? (
               <div className="space-y-2">
-                <label className="text-sm font-medium">Phone Number</label>
+                <label htmlFor="login-phone" className="text-sm font-medium">Phone Number</label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input type="tel" inputMode="numeric" maxLength={13} placeholder="0700 123 456" value={phone} onChange={(e) => { setPhone(e.target.value); setFieldError(null); }} className="h-12 bg-background/60 pl-10" required />
+                  <Input id="login-phone" autoComplete="username" type="tel" inputMode="numeric" maxLength={13} placeholder="0700 123 456" value={phone} onChange={(e) => { setPhone(e.target.value); setFieldError(null); }} className="h-12 bg-background/60 pl-10" required />
                 </div>
                 <p className="text-xs text-muted-foreground">Use the MTN or Airtel number linked to your account.</p>
               </div>
             ) : (
               <div className="space-y-2">
-                <label className="text-sm font-medium">Email Address</label>
+                <label htmlFor="login-email" className="text-sm font-medium">Email Address</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input type="email" maxLength={255} placeholder="you@example.com" value={email} onChange={(e) => { setEmail(e.target.value); setFieldError(null); }} className="h-12 bg-background/60 pl-10" required />
+                  <Input id="login-email" autoComplete="username" type="email" maxLength={255} placeholder="you@example.com" value={email} onChange={(e) => { setEmail(e.target.value); setFieldError(null); }} className="h-12 bg-background/60 pl-10" required />
                 </div>
               </div>
             )}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Password</label>
+              <label htmlFor="login-password" className="text-sm font-medium">Password</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
+                  id="login-password"
+                  autoComplete="current-password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   value={password}
@@ -208,7 +201,6 @@ export default function Login() {
                   onClick={() => setShowPassword((v) => !v)}
                   className="absolute right-1 top-1.5 h-9 w-9 p-0 text-muted-foreground hover:text-foreground"
                   aria-label={showPassword ? "Hide password" : "Show password"}
-                  tabIndex={-1}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>

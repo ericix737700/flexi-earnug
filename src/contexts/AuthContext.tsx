@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { shouldEndTabSession } from "@/lib/auth-entry";
 
 interface Restrictions {
   no_transactions?: boolean;
@@ -93,9 +94,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
+    const endExpiredTabSession = shouldEndTabSession();
+    if (endExpiredTabSession) void supabase.auth.signOut({ scope: "local" });
     // Set up auth state listener BEFORE checking session
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (endExpiredTabSession && session) return;
         setSession(session);
         setUser(session?.user ?? null);
 
@@ -115,6 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (endExpiredTabSession) { setIsLoading(false); return; }
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
