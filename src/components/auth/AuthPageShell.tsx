@@ -17,7 +17,7 @@ const TRUST_POINTS = [
 
 export function AuthPageShell({ children, title, description, mode }: AuthPageShellProps) {
   return (
-    <main className="dark min-h-screen bg-emerald-night text-foreground">
+    <main className="dark public-theme min-h-screen bg-emerald-night text-foreground">
       <header className="border-b border-border/40 bg-background/30 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <Link to="/" className="flex items-center gap-2.5" aria-label="FlexiEarn home">

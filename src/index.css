@@ -125,13 +125,26 @@
 }
 
 @layer utilities {
+  .public-theme {
+    --background: 160 40% 6%;
+    --card: 155 35% 11%;
+    --muted: 156 22% 16%;
+    --muted-foreground: 150 12% 73%;
+    --border: 155 24% 22%;
+    --input: 155 24% 25%;
+    --destructive: 0 85% 72%;
+    --public-surface-start: 155 40% 14%;
+    --public-surface-end: 160 40% 8%;
+    --public-night-start: 155 45% 9%;
+    --public-night-end: 160 40% 6%;
+  }
   .bg-emerald-night {
     background:
       radial-gradient(ellipse 80% 50% at 50% 0%, hsl(var(--primary) / 0.28), transparent 70%),
-      linear-gradient(180deg, hsl(155 45% 9%), hsl(160 40% 6%));
+      linear-gradient(180deg, hsl(var(--public-night-start, 155 45% 9%)), hsl(var(--public-night-end, 160 40% 6%)));
   }
   .card-gold-glow {
-    background: linear-gradient(160deg, hsl(155 40% 14% / 0.9), hsl(160 40% 8% / 0.9));
+    background: linear-gradient(160deg, hsl(var(--public-surface-start, 155 40% 14%) / 0.9), hsl(var(--public-surface-end, 160 40% 8%) / 0.9));
     border: 1px solid hsl(var(--secondary) / 0.7);
     box-shadow: 0 0 22px -4px hsl(var(--secondary) / 0.45), inset 0 1px 0 hsl(var(--secondary) / 0.2);
   }
@@ -238,4 +251,7 @@
     50% { transform: translateY(-12px) translateX(8px); }
   }
   .animate-float-slow { animation: float-slow 9s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-float-slow, .animate-pulse { animation: none; }
+  }
 }
