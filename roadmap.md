@@ -12,3 +12,4 @@
 - [x] Upgrade registration with validation, legal consent, and responsive presentation
 - [x] Verify public page layouts and account-form validation on mobile and desktop
 - [ ] Verify successful sign-in and registration end-to-end — blocked by unavailable Lovable Cloud account service
+- [ ] Source and publish a batch of licensed earning videos with varied UGX 20–45 rewards — publishing blocked by unavailable Lovable Cloud database
