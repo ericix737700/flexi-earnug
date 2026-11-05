@@ -13,4 +13,4 @@
 - [x] Verify public page layouts and account-form validation on mobile and desktop
 - [ ] Verify successful sign-in and registration end-to-end — blocked by unavailable Lovable Cloud account service
 - [x] Prepare 30 distinct licensed video candidates with verified source pages and varied UGX 20, 28, 30, 33, and 45 rewards
-- [ ] Download, host, and publish the licensed video batch — blocked by paused Lovable Cloud database; duration/playback and earned-credit checks remain pending
+- [ ] Download, host, and publish the licensed video batch — Cloud is awake; check duration, playback, and earned credits
