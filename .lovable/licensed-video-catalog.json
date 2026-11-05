@@ -1,5 +1,5 @@
 {
-  "publication_status": "blocked_database_paused",
+  "publication_status": "19_published_11_blocked_source_rate_limit",
   "notes": "Source URLs are for downloading only. Download, check media duration, convert for mobile compatibility, upload with lovable-assets, then create active tasks using hosted asset URLs. Retain full creator and license attribution in task descriptions. Do not publish CC BY-SA adaptations without preserving the license. Set minimum watch time no longer than playable duration. Do not duplicate existing videos.",
   "videos": [
     {
@@ -12,8 +12,14 @@
       "credit": "Own work",
       "original_size_bytes": 3918011,
       "reward_amount": 28,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "published",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-01.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/86ddd23f-7f35-4fcb-95e7-dad356b197d3/commons-01.mp4",
+      "duration_seconds": 28.766667,
+      "min_watch_seconds": 23,
+      "conversion": "Transcoded to H.264/AAC MP4; licensed under the original license",
+      "hosted_size_bytes": 1134434
     },
     {
       "title": "Bees on flowers",
@@ -25,8 +31,14 @@
       "credit": "Own work",
       "original_size_bytes": 20973474,
       "reward_amount": 20,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "published",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-02.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/cb5cdd3d-4f96-4b50-b90a-49814a69fb5f/commons-02.mp4",
+      "duration_seconds": 100.6,
+      "min_watch_seconds": 80,
+      "conversion": "Transcoded to H.264/AAC MP4; licensed under the original license",
+      "hosted_size_bytes": 5830312
     },
     {
       "title": "Blennerville-3802, Dingle Peninsula, Co. Kerry, Ireland",
@@ -38,8 +50,14 @@
       "credit": "Own work",
       "original_size_bytes": 604695,
       "reward_amount": 30,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "published",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-03.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/5186fe93-c24c-41ad-9779-45a8e6ddb167/commons-03.mp4",
+      "duration_seconds": 9.941,
+      "min_watch_seconds": 7,
+      "conversion": "Transcoded to H.264/AAC MP4; licensed under the original license",
+      "hosted_size_bytes": 119148
     },
     {
       "title": "Common Darter Dragonfly (Sympetrum striolatum)",
@@ -51,8 +69,14 @@
       "credit": "Own work",
       "original_size_bytes": 3856397,
       "reward_amount": 45,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "published",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-04.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/ae99eca2-26a9-46aa-a974-2a4bfc679fc7/commons-04.mp4",
+      "duration_seconds": 6.795011,
+      "min_watch_seconds": 5,
+      "conversion": "Transcoded to H.264/AAC MP4; licensed under the original license",
+      "hosted_size_bytes": 137132
     },
     {
       "title": "Common green bottle fly (Phaenicia sericata)",
@@ -64,8 +88,14 @@
       "credit": "Own work",
       "original_size_bytes": 12095237,
       "reward_amount": 33,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "published",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-05.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/03f4687c-e51e-4e1e-9dda-b7a6b86e4757/commons-05.mp4",
+      "duration_seconds": 38.986009,
+      "min_watch_seconds": 31,
+      "conversion": "Transcoded to H.264/AAC MP4; licensed under the original license",
+      "hosted_size_bytes": 819110
     },
     {
       "title": "Cygnus olor RMOV0058",
@@ -77,8 +107,14 @@
       "credit": "No machine-readable source provided. Own work assumed (based on copyright claims).",
       "original_size_bytes": 2068025,
       "reward_amount": 28,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "published",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-06.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/d28370a2-b792-40db-b8e1-495333e43de6/commons-06.mp4",
+      "duration_seconds": 15.066742,
+      "min_watch_seconds": 12,
+      "conversion": "Transcoded to H.264/AAC MP4; licensed under the original license",
+      "hosted_size_bytes": 341464
     },
     {
       "title": "Devil's Churn 01",
@@ -90,8 +126,14 @@
       "credit": "Photo by Joe Mabel",
       "original_size_bytes": 7150780,
       "reward_amount": 20,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "published",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-07.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/16bcc3ff-8a25-413e-85db-b5fb94abb840/commons-07.mp4",
+      "duration_seconds": 36.999408,
+      "min_watch_seconds": 29,
+      "conversion": "Transcoded to H.264/AAC MP4; licensed under the original license",
+      "hosted_size_bytes": 1508947
     },
     {
       "title": "Dépolluer l’environnement (Partie 1 avec voix)",
@@ -103,8 +145,14 @@
       "credit": "Own work",
       "original_size_bytes": 12615490,
       "reward_amount": 30,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "published",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-08.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/ef54c2d0-4850-4d4c-b764-e23c277d8625/commons-08.mp4",
+      "duration_seconds": 347.96,
+      "min_watch_seconds": 278,
+      "conversion": "Transcoded to H.264/AAC MP4; licensed under the original license",
+      "hosted_size_bytes": 3893494
     },
     {
       "title": "Dépolluer l’environnement (Partie 1 sans voix)",
@@ -116,8 +164,14 @@
       "credit": "Own work",
       "original_size_bytes": 12995047,
       "reward_amount": 45,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "published",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-09.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/a7c3ec18-4138-40e5-8edc-9038bf5154f8/commons-09.mp4",
+      "duration_seconds": 347.96,
+      "min_watch_seconds": 278,
+      "conversion": "Transcoded to H.264/AAC MP4; licensed under the original license",
+      "hosted_size_bytes": 3893058
     },
     {
       "title": "Dépolluer l’environnement (Partie 2)",
@@ -129,8 +183,14 @@
       "credit": "Own work",
       "original_size_bytes": 23046677,
       "reward_amount": 33,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "published",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-10.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/b8af7bbe-5b3c-40e5-9a0a-e13c4bc8a677/commons-10.mp4",
+      "duration_seconds": 422.04,
+      "min_watch_seconds": 337,
+      "conversion": "Transcoded to H.264/AAC MP4; licensed under the original license",
+      "hosted_size_bytes": 4796711
     },
     {
       "title": "Dépolluer l’environnement (Partie 3)",
@@ -142,8 +202,14 @@
       "credit": "Own work",
       "original_size_bytes": 13343837,
       "reward_amount": 28,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "published",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-11.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/5d27ce1d-0cd5-4951-947a-76df08070566/commons-11.mp4",
+      "duration_seconds": 251.4,
+      "min_watch_seconds": 201,
+      "conversion": "Mobile-compatible H.264/AAC MP4; original content preserved",
+      "hosted_size_bytes": 2898363
     },
     {
       "title": "Environment decontamination (Part 1)",
@@ -155,8 +221,14 @@
       "credit": "Own work",
       "original_size_bytes": 12461298,
       "reward_amount": 20,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "published",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-12.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/c13eb430-b396-4d45-855b-24d30d773c17/commons-12.mp4",
+      "duration_seconds": 347.96,
+      "min_watch_seconds": 278,
+      "conversion": "Mobile-compatible H.264/AAC MP4; original content preserved",
+      "hosted_size_bytes": 3861111
     },
     {
       "title": "European garden spider (Araneus diadematus) in the UK",
@@ -168,8 +240,14 @@
       "credit": "Own work",
       "original_size_bytes": 21384188,
       "reward_amount": 30,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "published",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-13.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/8a212874-e807-407e-9871-61e0ef291250/commons-13.mp4",
+      "duration_seconds": 28.575011,
+      "min_watch_seconds": 22,
+      "conversion": "Mobile-compatible H.264/AAC MP4; original content preserved",
+      "hosted_size_bytes": 981245
     },
     {
       "title": "Ffusca",
@@ -181,8 +259,14 @@
       "credit": "Own work",
       "original_size_bytes": 14346497,
       "reward_amount": 45,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "published",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-14.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/8d6d725a-2100-49b1-bce1-46c5b8da15b9/commons-14.mp4",
+      "duration_seconds": 14.28,
+      "min_watch_seconds": 11,
+      "conversion": "Mobile-compatible H.264/AAC MP4; original content preserved",
+      "hosted_size_bytes": 572206
     },
     {
       "title": "Garden spider in the UK",
@@ -194,8 +278,14 @@
       "credit": "Own work",
       "original_size_bytes": 13841411,
       "reward_amount": 33,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "published",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-15.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/3909cc10-b043-4ece-a1e7-4ef366b5ea17/commons-15.mp4",
+      "duration_seconds": 87.072993,
+      "min_watch_seconds": 69,
+      "conversion": "Mobile-compatible H.264/AAC MP4; original content preserved",
+      "hosted_size_bytes": 2476881
     },
     {
       "title": "Lavender - 17156",
@@ -207,8 +297,14 @@
       "credit": "Own work",
       "original_size_bytes": 14332516,
       "reward_amount": 28,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "published",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-16.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/7d4a6950-3e6d-4d1f-afa1-94469e518a2f/commons-16.mp4",
+      "duration_seconds": 19.001,
+      "min_watch_seconds": 15,
+      "conversion": "Mobile-compatible H.264/AAC MP4; original content preserved",
+      "hosted_size_bytes": 1017739
     },
     {
       "title": "Les bâtiments écologiques (Partie 1 avec voix) 01",
@@ -220,8 +316,14 @@
       "credit": "Own work",
       "original_size_bytes": 11610723,
       "reward_amount": 20,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "published",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-17.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/0824b081-130c-4932-a72a-d421d21549b4/commons-17.mp4",
+      "duration_seconds": 349.525,
+      "min_watch_seconds": 279,
+      "conversion": "Mobile-compatible H.264/AAC MP4; original content preserved",
+      "hosted_size_bytes": 3811057
     },
     {
       "title": "Les bâtiments écologiques (Partie 1 sans voix)",
@@ -233,8 +335,14 @@
       "credit": "Own work",
       "original_size_bytes": 12074307,
       "reward_amount": 30,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "published",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-18.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/dc3f64e9-25d9-425e-882e-9a1603fa5314/commons-18.mp4",
+      "duration_seconds": 349.525,
+      "min_watch_seconds": 279,
+      "conversion": "Mobile-compatible H.264/AAC MP4; original content preserved",
+      "hosted_size_bytes": 3813280
     },
     {
       "title": "Lord Stirling Park (63693)",
@@ -246,8 +354,14 @@
       "credit": "Own work",
       "original_size_bytes": 16096590,
       "reward_amount": 45,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "published",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-19.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/07c626bd-f381-4647-98fe-a6b027eef586/commons-19.mp4",
+      "duration_seconds": 21.973,
+      "min_watch_seconds": 17,
+      "conversion": "Mobile-compatible H.264/AAC MP4; original content preserved",
+      "hosted_size_bytes": 438009
     },
     {
       "title": "Meadow brown (Maniola jurtina)",
@@ -259,8 +373,9 @@
       "credit": "Own work",
       "original_size_bytes": 29349677,
       "reward_amount": 33,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "failed_preparation",
+      "license_page_verified": true,
+      "error": "Command '['curl', '-fL', '--max-time', '25', '-A', 'FlexiEarnMedia/1.0 (licensed Commons reuse)', 'https://upload.wikimedia.org/wikipedia/commons/b/b7/Meadow_brown_%28Maniola_jurtina%29.webm', '-o', '/tmp/earning-videos/commons-20.source']' returned non-zero exit status 22."
     },
     {
       "title": "Mint moth (Pyrausta aurata) on shrubby cinquefoil (Dasiphora fruticosa)",
@@ -272,8 +387,9 @@
       "credit": "Own work",
       "original_size_bytes": 22432780,
       "reward_amount": 28,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "failed_preparation",
+      "license_page_verified": true,
+      "error": "Command '['curl', '-fL', '--max-time', '25', '-A', 'FlexiEarnMedia/1.0 (licensed Commons reuse)', 'https://upload.wikimedia.org/wikipedia/commons/8/86/Mint_moth_%28Pyrausta_aurata%29_on_shrubby_cinquefoil_%28Dasiphora_fruticosa%29.webm', '-o', '/tmp/earning-videos/commons-21.source']' returned non-zero exit status 22."
     },
     {
       "title": "Natural lake of Goalpara",
@@ -285,8 +401,9 @@
       "credit": "Own work",
       "original_size_bytes": 5552079,
       "reward_amount": 20,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "failed_preparation",
+      "license_page_verified": true,
+      "error": "Command '['curl', '-fL', '--max-time', '25', '-A', 'FlexiEarnMedia/1.0 (licensed Commons reuse)', 'https://upload.wikimedia.org/wikipedia/commons/6/6f/Natural_lake_of_Goalpara.webm', '-o', '/tmp/earning-videos/commons-22.source']' returned non-zero exit status 22."
     },
     {
       "title": "Pier, Dingle Peninsula, Co. Kerry, Ireland-1012590",
@@ -298,8 +415,9 @@
       "credit": "Own work",
       "original_size_bytes": 11862651,
       "reward_amount": 30,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "failed_preparation",
+      "license_page_verified": true,
+      "error": "Command '['curl', '-fL', '--max-time', '25', '-A', 'FlexiEarnMedia/1.0 (licensed Commons reuse)', 'https://upload.wikimedia.org/wikipedia/commons/0/00/Pier%2C_Dingle_Peninsula%2C_Co._Kerry%2C_Ireland-1012590.webm', '-o', '/tmp/earning-videos/commons-23.source']' returned non-zero exit status 22."
     },
     {
       "title": "Pollen beetles (Meligethes aeneus) on Meadowsweet (Filipendula ulmaria)",
@@ -311,8 +429,9 @@
       "credit": "Own work",
       "original_size_bytes": 12098183,
       "reward_amount": 45,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "failed_preparation",
+      "license_page_verified": true,
+      "error": "Command '['curl', '-fL', '--max-time', '25', '-A', 'FlexiEarnMedia/1.0 (licensed Commons reuse)', 'https://upload.wikimedia.org/wikipedia/commons/6/67/Pollen_beetles_%28Meligethes_aeneus%29_on_Meadowsweet_%28Filipendula_ulmaria%29.webm', '-o', '/tmp/earning-videos/commons-24.source']' returned non-zero exit status 22."
     },
     {
       "title": "Speckled wood butterfly (Pararge aegeria)",
@@ -324,8 +443,9 @@
       "credit": "Own work",
       "original_size_bytes": 24578294,
       "reward_amount": 33,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "failed_preparation",
+      "license_page_verified": true,
+      "error": "Command '['curl', '-fL', '--max-time', '25', '-A', 'FlexiEarnMedia/1.0 (licensed Commons reuse)', 'https://upload.wikimedia.org/wikipedia/commons/5/5f/Speckled_wood_butterfly_%28Pararge_aegeria%29.webm', '-o', '/tmp/earning-videos/commons-25.source']' returned non-zero exit status 22."
     },
     {
       "title": "Water flow sound",
@@ -337,8 +457,9 @@
       "credit": "Own work",
       "original_size_bytes": 4867915,
       "reward_amount": 28,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "failed_preparation",
+      "license_page_verified": true,
+      "error": "Command '['curl', '-fL', '--max-time', '25', '-A', 'FlexiEarnMedia/1.0 (licensed Commons reuse)', 'https://upload.wikimedia.org/wikipedia/commons/1/13/Water_flow_sound.webm', '-o', '/tmp/earning-videos/commons-26.source']' returned non-zero exit status 22."
     },
     {
       "title": "Wodogrzmoty Mickiewicza video",
@@ -350,8 +471,9 @@
       "credit": "Own work",
       "original_size_bytes": 14225200,
       "reward_amount": 20,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "failed_preparation",
+      "license_page_verified": true,
+      "error": "Command '['curl', '-fL', '--max-time', '25', '-A', 'FlexiEarnMedia/1.0 (licensed Commons reuse)', 'https://upload.wikimedia.org/wikipedia/commons/d/da/Wodogrzmoty_Mickiewicza_video.webm', '-o', '/tmp/earning-videos/commons-27.source']' returned non-zero exit status 22."
     },
     {
       "title": "Бузькі Пороги (Online-Video-Cutter.Com)",
@@ -363,8 +485,9 @@
       "credit": "Own work",
       "original_size_bytes": 14825825,
       "reward_amount": 30,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "failed_preparation",
+      "license_page_verified": true,
+      "error": "Command '['curl', '-fL', '--max-time', '25', '-A', 'FlexiEarnMedia/1.0 (licensed Commons reuse)', 'https://upload.wikimedia.org/wikipedia/commons/0/0b/%D0%91%D1%83%D0%B7%D1%8C%D0%BA%D1%96_%D0%9F%D0%BE%D1%80%D0%BE%D0%B3%D0%B8_%28Online-Video-Cutter.Com%29.ogv', '-o', '/tmp/earning-videos/commons-28.source']' returned non-zero exit status 22."
     },
     {
       "title": "Кінбурн",
@@ -376,8 +499,9 @@
       "credit": "Own work",
       "original_size_bytes": 1926811,
       "reward_amount": 45,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "failed_preparation",
+      "license_page_verified": true,
+      "error": "Command '['curl', '-fL', '--max-time', '25', '-A', 'FlexiEarnMedia/1.0 (licensed Commons reuse)', 'https://upload.wikimedia.org/wikipedia/commons/2/2b/%D0%9A%D1%96%D0%BD%D0%B1%D1%83%D1%80%D0%BD.ogv', '-o', '/tmp/earning-videos/commons-29.source']' returned non-zero exit status 22."
     },
     {
       "title": "ينبوع مائي في الورتان",
@@ -389,8 +513,9 @@
       "credit": "Own work",
       "original_size_bytes": 13748934,
       "reward_amount": 33,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "failed_preparation",
+      "license_page_verified": true,
+      "error": "Command '['curl', '-fL', '--max-time', '25', '-A', 'FlexiEarnMedia/1.0 (licensed Commons reuse)', 'https://upload.wikimedia.org/wikipedia/commons/1/19/%D9%8A%D9%86%D8%A8%D9%88%D8%B9_%D9%85%D8%A7%D8%A6%D9%8A_%D9%81%D9%8A_%D8%A7%D9%84%D9%88%D8%B1%D8%AA%D8%A7%D9%86.webm', '-o', '/tmp/earning-videos/commons-30.source']' returned non-zero exit status 22."
     }
   ]
 }
