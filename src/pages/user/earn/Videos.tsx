@@ -58,6 +58,7 @@ function Player({ task, onClose }: { task: EarnTask; onClose: () => void }) {
           />
         )}
       </div>
+      {task.description && <p className="break-words text-xs text-muted-foreground">{task.description}</p>}
       <div className="h-2 overflow-hidden rounded-full bg-muted">
         <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${pct}%` }} />
       </div>
