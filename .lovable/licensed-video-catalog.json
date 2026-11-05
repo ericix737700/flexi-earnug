@@ -1,5 +1,5 @@
 {
-  "publication_status": "blocked_database_paused",
+  "publication_status": "partial_hosted",
   "notes": "Source URLs are for downloading only. Download, check media duration, convert for mobile compatibility, upload with lovable-assets, then create active tasks using hosted asset URLs. Retain full creator and license attribution in task descriptions. Do not publish CC BY-SA adaptations without preserving the license. Set minimum watch time no longer than playable duration. Do not duplicate existing videos.",
   "videos": [
     {
@@ -12,8 +12,14 @@
       "credit": "Own work",
       "original_size_bytes": 3918011,
       "reward_amount": 28,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "hosted_pending_publication",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-01.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/86ddd23f-7f35-4fcb-95e7-dad356b197d3/commons-01.mp4",
+      "duration_seconds": 28.766667,
+      "min_watch_seconds": 23,
+      "conversion": "Transcoded to H.264/AAC MP4; licensed under the original license",
+      "hosted_size_bytes": 1134434
     },
     {
       "title": "Bees on flowers",
@@ -25,8 +31,14 @@
       "credit": "Own work",
       "original_size_bytes": 20973474,
       "reward_amount": 20,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "hosted_pending_publication",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-02.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/cb5cdd3d-4f96-4b50-b90a-49814a69fb5f/commons-02.mp4",
+      "duration_seconds": 100.6,
+      "min_watch_seconds": 80,
+      "conversion": "Transcoded to H.264/AAC MP4; licensed under the original license",
+      "hosted_size_bytes": 5830312
     },
     {
       "title": "Blennerville-3802, Dingle Peninsula, Co. Kerry, Ireland",
@@ -38,8 +50,14 @@
       "credit": "Own work",
       "original_size_bytes": 604695,
       "reward_amount": 30,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "hosted_pending_publication",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-03.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/5186fe93-c24c-41ad-9779-45a8e6ddb167/commons-03.mp4",
+      "duration_seconds": 9.941,
+      "min_watch_seconds": 7,
+      "conversion": "Transcoded to H.264/AAC MP4; licensed under the original license",
+      "hosted_size_bytes": 119148
     },
     {
       "title": "Common Darter Dragonfly (Sympetrum striolatum)",
@@ -51,8 +69,14 @@
       "credit": "Own work",
       "original_size_bytes": 3856397,
       "reward_amount": 45,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "hosted_pending_publication",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-04.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/ae99eca2-26a9-46aa-a974-2a4bfc679fc7/commons-04.mp4",
+      "duration_seconds": 6.795011,
+      "min_watch_seconds": 5,
+      "conversion": "Transcoded to H.264/AAC MP4; licensed under the original license",
+      "hosted_size_bytes": 137132
     },
     {
       "title": "Common green bottle fly (Phaenicia sericata)",
@@ -64,8 +88,14 @@
       "credit": "Own work",
       "original_size_bytes": 12095237,
       "reward_amount": 33,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "hosted_pending_publication",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-05.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/03f4687c-e51e-4e1e-9dda-b7a6b86e4757/commons-05.mp4",
+      "duration_seconds": 38.986009,
+      "min_watch_seconds": 31,
+      "conversion": "Transcoded to H.264/AAC MP4; licensed under the original license",
+      "hosted_size_bytes": 819110
     },
     {
       "title": "Cygnus olor RMOV0058",
@@ -77,8 +107,14 @@
       "credit": "No machine-readable source provided. Own work assumed (based on copyright claims).",
       "original_size_bytes": 2068025,
       "reward_amount": 28,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "hosted_pending_publication",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-06.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/d28370a2-b792-40db-b8e1-495333e43de6/commons-06.mp4",
+      "duration_seconds": 15.066742,
+      "min_watch_seconds": 12,
+      "conversion": "Transcoded to H.264/AAC MP4; licensed under the original license",
+      "hosted_size_bytes": 341464
     },
     {
       "title": "Devil's Churn 01",
@@ -90,8 +126,14 @@
       "credit": "Photo by Joe Mabel",
       "original_size_bytes": 7150780,
       "reward_amount": 20,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "hosted_pending_publication",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-07.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/16bcc3ff-8a25-413e-85db-b5fb94abb840/commons-07.mp4",
+      "duration_seconds": 36.999408,
+      "min_watch_seconds": 29,
+      "conversion": "Transcoded to H.264/AAC MP4; licensed under the original license",
+      "hosted_size_bytes": 1508947
     },
     {
       "title": "Dépolluer l’environnement (Partie 1 avec voix)",
@@ -103,8 +145,14 @@
       "credit": "Own work",
       "original_size_bytes": 12615490,
       "reward_amount": 30,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "hosted_pending_publication",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-08.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/ef54c2d0-4850-4d4c-b764-e23c277d8625/commons-08.mp4",
+      "duration_seconds": 347.96,
+      "min_watch_seconds": 278,
+      "conversion": "Transcoded to H.264/AAC MP4; licensed under the original license",
+      "hosted_size_bytes": 3893494
     },
     {
       "title": "Dépolluer l’environnement (Partie 1 sans voix)",
@@ -116,8 +164,14 @@
       "credit": "Own work",
       "original_size_bytes": 12995047,
       "reward_amount": 45,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "hosted_pending_publication",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-09.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/a7c3ec18-4138-40e5-8edc-9038bf5154f8/commons-09.mp4",
+      "duration_seconds": 347.96,
+      "min_watch_seconds": 278,
+      "conversion": "Transcoded to H.264/AAC MP4; licensed under the original license",
+      "hosted_size_bytes": 3893058
     },
     {
       "title": "Dépolluer l’environnement (Partie 2)",
@@ -129,8 +183,14 @@
       "credit": "Own work",
       "original_size_bytes": 23046677,
       "reward_amount": 33,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "hosted_pending_publication",
+      "license_page_verified": true,
+      "asset_pointer": "src/assets/earning-videos/commons-10.mp4.asset.json",
+      "video_url": "/__l5e/assets-v1/b8af7bbe-5b3c-40e5-9a0a-e13c4bc8a677/commons-10.mp4",
+      "duration_seconds": 422.04,
+      "min_watch_seconds": 337,
+      "conversion": "Transcoded to H.264/AAC MP4; licensed under the original license",
+      "hosted_size_bytes": 4796711
     },
     {
       "title": "Dépolluer l’environnement (Partie 3)",
