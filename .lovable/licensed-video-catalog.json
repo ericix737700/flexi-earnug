@@ -387,8 +387,9 @@
       "credit": "Own work",
       "original_size_bytes": 22432780,
       "reward_amount": 28,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "failed_preparation",
+      "license_page_verified": true,
+      "error": "Command '['curl', '-fL', '--max-time', '25', '-A', 'FlexiEarnMedia/1.0 (licensed Commons reuse)', 'https://upload.wikimedia.org/wikipedia/commons/8/86/Mint_moth_%28Pyrausta_aurata%29_on_shrubby_cinquefoil_%28Dasiphora_fruticosa%29.webm', '-o', '/tmp/earning-videos/commons-21.source']' returned non-zero exit status 22."
     },
     {
       "title": "Natural lake of Goalpara",
@@ -400,8 +401,9 @@
       "credit": "Own work",
       "original_size_bytes": 5552079,
       "reward_amount": 20,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "failed_preparation",
+      "license_page_verified": true,
+      "error": "Command '['curl', '-fL', '--max-time', '25', '-A', 'FlexiEarnMedia/1.0 (licensed Commons reuse)', 'https://upload.wikimedia.org/wikipedia/commons/6/6f/Natural_lake_of_Goalpara.webm', '-o', '/tmp/earning-videos/commons-22.source']' returned non-zero exit status 22."
     },
     {
       "title": "Pier, Dingle Peninsula, Co. Kerry, Ireland-1012590",
@@ -413,8 +415,9 @@
       "credit": "Own work",
       "original_size_bytes": 11862651,
       "reward_amount": 30,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "failed_preparation",
+      "license_page_verified": true,
+      "error": "Command '['curl', '-fL', '--max-time', '25', '-A', 'FlexiEarnMedia/1.0 (licensed Commons reuse)', 'https://upload.wikimedia.org/wikipedia/commons/0/00/Pier%2C_Dingle_Peninsula%2C_Co._Kerry%2C_Ireland-1012590.webm', '-o', '/tmp/earning-videos/commons-23.source']' returned non-zero exit status 22."
     },
     {
       "title": "Pollen beetles (Meligethes aeneus) on Meadowsweet (Filipendula ulmaria)",
@@ -426,8 +429,9 @@
       "credit": "Own work",
       "original_size_bytes": 12098183,
       "reward_amount": 45,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "failed_preparation",
+      "license_page_verified": true,
+      "error": "Command '['curl', '-fL', '--max-time', '25', '-A', 'FlexiEarnMedia/1.0 (licensed Commons reuse)', 'https://upload.wikimedia.org/wikipedia/commons/6/67/Pollen_beetles_%28Meligethes_aeneus%29_on_Meadowsweet_%28Filipendula_ulmaria%29.webm', '-o', '/tmp/earning-videos/commons-24.source']' returned non-zero exit status 22."
     },
     {
       "title": "Speckled wood butterfly (Pararge aegeria)",
@@ -439,8 +443,9 @@
       "credit": "Own work",
       "original_size_bytes": 24578294,
       "reward_amount": 33,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "failed_preparation",
+      "license_page_verified": true,
+      "error": "Command '['curl', '-fL', '--max-time', '25', '-A', 'FlexiEarnMedia/1.0 (licensed Commons reuse)', 'https://upload.wikimedia.org/wikipedia/commons/5/5f/Speckled_wood_butterfly_%28Pararge_aegeria%29.webm', '-o', '/tmp/earning-videos/commons-25.source']' returned non-zero exit status 22."
     },
     {
       "title": "Water flow sound",
@@ -452,8 +457,9 @@
       "credit": "Own work",
       "original_size_bytes": 4867915,
       "reward_amount": 28,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "failed_preparation",
+      "license_page_verified": true,
+      "error": "Command '['curl', '-fL', '--max-time', '25', '-A', 'FlexiEarnMedia/1.0 (licensed Commons reuse)', 'https://upload.wikimedia.org/wikipedia/commons/1/13/Water_flow_sound.webm', '-o', '/tmp/earning-videos/commons-26.source']' returned non-zero exit status 22."
     },
     {
       "title": "Wodogrzmoty Mickiewicza video",
@@ -465,8 +471,9 @@
       "credit": "Own work",
       "original_size_bytes": 14225200,
       "reward_amount": 20,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "failed_preparation",
+      "license_page_verified": true,
+      "error": "Command '['curl', '-fL', '--max-time', '25', '-A', 'FlexiEarnMedia/1.0 (licensed Commons reuse)', 'https://upload.wikimedia.org/wikipedia/commons/d/da/Wodogrzmoty_Mickiewicza_video.webm', '-o', '/tmp/earning-videos/commons-27.source']' returned non-zero exit status 22."
     },
     {
       "title": "Бузькі Пороги (Online-Video-Cutter.Com)",
@@ -478,8 +485,9 @@
       "credit": "Own work",
       "original_size_bytes": 14825825,
       "reward_amount": 30,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "failed_preparation",
+      "license_page_verified": true,
+      "error": "Command '['curl', '-fL', '--max-time', '25', '-A', 'FlexiEarnMedia/1.0 (licensed Commons reuse)', 'https://upload.wikimedia.org/wikipedia/commons/0/0b/%D0%91%D1%83%D0%B7%D1%8C%D0%BA%D1%96_%D0%9F%D0%BE%D1%80%D0%BE%D0%B3%D0%B8_%28Online-Video-Cutter.Com%29.ogv', '-o', '/tmp/earning-videos/commons-28.source']' returned non-zero exit status 22."
     },
     {
       "title": "Кінбурн",
@@ -491,8 +499,9 @@
       "credit": "Own work",
       "original_size_bytes": 1926811,
       "reward_amount": 45,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "failed_preparation",
+      "license_page_verified": true,
+      "error": "Command '['curl', '-fL', '--max-time', '25', '-A', 'FlexiEarnMedia/1.0 (licensed Commons reuse)', 'https://upload.wikimedia.org/wikipedia/commons/2/2b/%D0%9A%D1%96%D0%BD%D0%B1%D1%83%D1%80%D0%BD.ogv', '-o', '/tmp/earning-videos/commons-29.source']' returned non-zero exit status 22."
     },
     {
       "title": "ينبوع مائي في الورتان",
@@ -504,8 +513,9 @@
       "credit": "Own work",
       "original_size_bytes": 13748934,
       "reward_amount": 33,
-      "status": "pending_download_and_publication",
-      "license_page_verified": true
+      "status": "failed_preparation",
+      "license_page_verified": true,
+      "error": "Command '['curl', '-fL', '--max-time', '25', '-A', 'FlexiEarnMedia/1.0 (licensed Commons reuse)', 'https://upload.wikimedia.org/wikipedia/commons/1/19/%D9%8A%D9%86%D8%A8%D9%88%D8%B9_%D9%85%D8%A7%D8%A6%D9%8A_%D9%81%D9%8A_%D8%A7%D9%84%D9%88%D8%B1%D8%AA%D8%A7%D9%86.webm', '-o', '/tmp/earning-videos/commons-30.source']' returned non-zero exit status 22."
     }
   ]
 }
