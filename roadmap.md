@@ -11,6 +11,8 @@
 - [x] Upgrade login with professional trust essentials and responsive presentation
 - [x] Upgrade registration with validation, legal consent, and responsive presentation
 - [x] Verify public page layouts and account-form validation on mobile and desktop
-- [ ] Verify successful sign-in and registration end-to-end — blocked by unavailable Lovable Cloud account service
+- [ ] Verify successful sign-in and registration end-to-end — requesting user has no matching app account; needs preview sign-in
 - [x] Prepare 30 distinct licensed video candidates with verified source pages and varied UGX 20, 28, 30, 33, and 45 rewards
-- [ ] Download, host, and publish the licensed video batch — Cloud is awake; check duration, playback, and earned credits
+- [x] Download, host, and publish 19 licensed videos with UGX 20, 28, 30, 33, and 45 rewards
+- [ ] Publish remaining 11 videos — source download rate limit blocks access
+- [ ] Verify earned-credit flow signed in — requesting user has no matching app account; needs preview sign-in
