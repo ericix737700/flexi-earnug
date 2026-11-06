@@ -11,9 +11,11 @@ interface UserLayoutProps {
   children: ReactNode;
   /** Announcement banner is only shown where explicitly enabled (home page). */
   showAnnouncement?: boolean;
+  /** Hide the shared header when the page renders its own (e.g. dashboard). */
+  hideHeader?: boolean;
 }
 
-export function UserLayout({ children, showAnnouncement = false }: UserLayoutProps) {
+export function UserLayout({ children, showAnnouncement = false, hideHeader = false }: UserLayoutProps) {
   const { profile, refreshProfile } = useAuth();
   const { data: settings } = usePlatformSettings();
   const queryClient = useQueryClient();
@@ -44,6 +46,7 @@ export function UserLayout({ children, showAnnouncement = false }: UserLayoutPro
       </div>
 
       {/* Header */}
+      {!hideHeader && (
       <header className="sticky top-0 z-40 gradient-primary shadow-lg relative overflow-hidden">
         <div aria-hidden className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-primary-foreground/10 blur-2xl" />
         <div aria-hidden className="absolute -bottom-12 left-10 h-32 w-32 rounded-full bg-secondary/20 blur-2xl" />
@@ -85,9 +88,10 @@ export function UserLayout({ children, showAnnouncement = false }: UserLayoutPro
           </div>
         )}
       </header>
+      )}
 
       {/* Main Content */}
-      <main className="relative z-10 mx-auto max-w-lg px-4 py-4 animate-fade-in">{children}</main>
+      <main className={hideHeader ? "relative z-10 mx-auto max-w-lg pb-4" : "relative z-10 mx-auto max-w-lg px-4 py-4 animate-fade-in"}>{children}</main>
 
       {/* Bottom Navigation */}
       <MobileNav />

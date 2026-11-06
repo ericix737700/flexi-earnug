@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, User, Wallet, ListTodo, Signal } from "lucide-react";
+import { Home, User, Wallet, Trophy, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Item = {
@@ -9,12 +9,12 @@ type Item = {
 };
 
 const leftItems: Item[] = [
-  { href: "/dashboard", icon: LayoutDashboard, label: "Home" },
-  { href: "/tasks", icon: ListTodo, label: "Tasks" },
+  { href: "/dashboard", icon: Home, label: "Home" },
+  { href: "/tasks", icon: Trophy, label: "Earn" },
 ];
 
 const rightItems: Item[] = [
-  { href: "/airtime-data", icon: Signal, label: "Airtime" },
+  { href: "/machines", icon: TrendingUp, label: "Invest" },
   { href: "/profile", icon: User, label: "Profile" },
 ];
 
@@ -35,7 +35,7 @@ export function MobileNav() {
         <div
           className={cn(
             "relative flex items-center justify-center rounded-2xl p-2 transition-all duration-300",
-            isActive ? "bg-primary/15 glow-primary scale-110" : "bg-transparent group-hover:bg-muted/50"
+            isActive ? "bg-primary/15" : "bg-transparent group-hover:bg-muted/50"
           )}
         >
           <item.icon className={cn("h-5 w-5 transition-transform", isActive && "stroke-[2.5]")} />
@@ -52,9 +52,7 @@ export function MobileNav() {
       className={cn(
         "fixed bottom-0 left-0 right-0 z-50 md:hidden",
         "rounded-t-3xl border-t border-border/40",
-        "bg-card/85 backdrop-blur-2xl backdrop-saturate-150",
-        "shadow-[0_-16px_44px_-14px_rgba(0,0,0,0.28)]",
-        "supports-[backdrop-filter]:bg-card/70"
+        "bg-card shadow-soft"
       )}
     >
       <div className="mx-auto flex max-w-lg items-end justify-around px-2 py-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]">
@@ -66,13 +64,13 @@ export function MobileNav() {
             to="/wallet"
             aria-label="Wallet"
             className={cn(
-              "-mt-8 flex h-16 w-16 items-center justify-center rounded-full",
-              "gradient-primary text-primary-foreground",
+              "-mt-7 flex h-14 w-14 items-center justify-center rounded-full",
+              "bg-primary text-primary-foreground",
               "border-4 border-background shadow-xl transition-transform duration-300 tap-pop",
-              walletActive ? "scale-105 glow-primary" : "hover:scale-105"
+              walletActive ? "ring-2 ring-primary/30" : ""
             )}
           >
-            <Wallet className="h-7 w-7" strokeWidth={2.2} />
+            <Wallet className="h-6 w-6" strokeWidth={2.2} />
           </Link>
           <span
             className={cn(
