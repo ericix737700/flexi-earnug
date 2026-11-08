@@ -1,5 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Bell, BellOff, Loader2 } from "lucide-react";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -16,14 +14,10 @@ export function PushNotificationToggle() {
 
   if (!isSupported) {
     return (
-      <Card>
-        <CardContent className="flex items-center gap-3 py-4">
+      <section aria-label="Device notifications" className="flex items-start gap-3 py-4">
           <BellOff className="h-5 w-5 text-muted-foreground" />
-          <span className="text-muted-foreground">
-            Push notifications not supported in this browser
-          </span>
-        </CardContent>
-      </Card>
+          <div><h2 className="font-semibold">Device notifications unavailable</h2><p className="mt-1 text-sm text-muted-foreground">This browser doesn't support push notifications. Your alerts are still available in your inbox.</p></div>
+      </section>
     );
   }
 
@@ -36,16 +30,16 @@ export function PushNotificationToggle() {
   };
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
+    <section aria-label="Device notifications">
+      <div className="pb-4">
+        <h2 className="flex items-center gap-2 text-base font-semibold">
           <Bell className="h-5 w-5" />
-          Push Notifications
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
+          Device notifications
+        </h2>
+      </div>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between gap-4">
+          <div className="min-w-0 space-y-1">
             <p className="text-sm font-medium">
               {isSubscribed ? "Notifications enabled" : "Enable notifications"}
             </p>
@@ -62,6 +56,7 @@ export function PushNotificationToggle() {
               checked={isSubscribed}
               onCheckedChange={handleToggle}
               disabled={permission === "denied"}
+              aria-label="Enable device notifications"
             />
           )}
         </div>
@@ -71,7 +66,7 @@ export function PushNotificationToggle() {
             Please enable notifications in your browser settings to receive alerts.
           </p>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }

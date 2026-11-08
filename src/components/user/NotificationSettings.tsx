@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BellRing } from "lucide-react";
@@ -28,21 +27,21 @@ export function NotificationSettings() {
   };
 
   return (
-    <Card className="glass-card border-0">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
+    <section aria-label="Notification preferences" className="border-t pt-6">
+      <div className="pb-3">
+        <h2 className="flex items-center gap-2 text-base font-semibold">
           <BellRing className="h-5 w-5" />
-          What you get notified about
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+          Account alerts
+        </h2>
+      </div>
+      <div className="divide-y">
         {isLoading || !prefs ? (
           <div className="space-y-3">
             {ITEMS.map((i) => <Skeleton key={i.key} className="h-10 w-full" />)}
           </div>
         ) : (
           ITEMS.map((item) => (
-            <div key={item.key} className="flex items-center justify-between gap-3">
+            <div key={item.key} className="flex items-center justify-between gap-4 py-4">
               <div className="min-w-0 space-y-0.5">
                 <p className="text-sm font-medium">{item.label}</p>
                 <p className="text-xs text-muted-foreground">{item.hint}</p>
@@ -51,11 +50,12 @@ export function NotificationSettings() {
                 checked={prefs[item.key]}
                 onCheckedChange={(v) => toggle(item.key, v)}
                 aria-label={item.label}
+                disabled={update.isPending}
               />
             </div>
           ))
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }
