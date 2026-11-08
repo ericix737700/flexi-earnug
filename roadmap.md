@@ -1,5 +1,8 @@
 # Roadmap
 
+- [ ] Improve notification inbox layout, filters, read controls, and preferences presentation
+- [ ] Verify notification center with a signed-in account on mobile and desktop
+
 - [x] Add secure hashed 4-digit FE PIN storage and lockout protection
 - [x] Add atomic server-side withdrawal creation and accurate fee recording
 - [x] Redesign withdrawal details and review pages using the supplied reference
