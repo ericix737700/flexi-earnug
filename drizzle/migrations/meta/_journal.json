@@ -8,6 +8,13 @@
       "when": 1791178497870,
       "tag": "0000_earn_pages_rpc",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794303316860,
+      "tag": "0001_video_social",
+      "breakpoints": true
     }
   ]
 }

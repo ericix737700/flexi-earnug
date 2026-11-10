@@ -288,6 +288,8 @@
   background: hsl(var(--video-surface) / 0.7);
   color: hsl(var(--video-foreground));
 }
+.video-reward-pill { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
+.video-feed-progress-reward::-webkit-progress-value { background: hsl(var(--success, var(--primary))); }
 .video-feed-scroll { scrollbar-width: none; }
 .video-feed-scroll::-webkit-scrollbar { display: none; }
 .video-feed-progress { appearance: none; background: hsl(var(--video-foreground) / 0.25); }
