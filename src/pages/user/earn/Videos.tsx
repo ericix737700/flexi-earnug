@@ -1,116 +1,71 @@
 import { useEffect, useRef, useState } from "react";
-import { FeaturePage } from "@/components/layout/FeaturePage";
+import { Link } from "react-router-dom";
+import { ArrowLeft, ChevronDown, ChevronUp, Video, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { supabase } from "@/integrations/supabase/client";
-import { useEarnTasks, useCompleteTask, type EarnTask } from "@/hooks/useEarnTasks";
-import { CheckCircle2, Play, Clock } from "lucide-react";
-import { toast } from "sonner";
-
-const ytId = (url: string) => url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([^&?/]+)/)?.[1];
-
-function Player({ task, onClose }: { task: EarnTask; onClose: () => void }) {
-  const need = Math.max(task.min_watch_seconds || 30, 5);
-  const [elapsed, setElapsed] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const lastTime = useRef(0);
-  const complete = useCompleteTask(() => onClose());
-  const yt = task.video_url ? ytId(task.video_url) : null;
-
-  useEffect(() => {
-    (supabase.rpc as any)("start_task", { _task_id: task.id }).then(({ data, error }: any) => {
-      if (error || !data?.success) toast.error(data?.error || "Could not start video");
-    });
-  }, [task.id]);
-
-  // YouTube: count wall-clock time while the page is visible.
-  useEffect(() => {
-    if (!yt) return;
-    const t = setInterval(() => { if (!document.hidden) setElapsed((e) => Math.min(e + 1, need)); }, 1000);
-    return () => clearInterval(t);
-  }, [yt, need]);
-
-  useEffect(() => {
-    if (yt || !playing) return;
-    const t = setInterval(() => { if (!document.hidden) setElapsed((e) => Math.min(e + 1, need)); }, 1000);
-    return () => clearInterval(t);
-  }, [yt, playing, need]);
-
-  const pct = Math.round((elapsed / need) * 100);
-  const ready = elapsed >= need;
-
-  return (
-    <div className="space-y-3 rounded-2xl border border-primary/30 bg-card p-3">
-      <div className="aspect-video overflow-hidden rounded-xl bg-muted">
-        {yt ? (
-          <iframe className="h-full w-full" src={`https://www.youtube.com/embed/${yt}?autoplay=1&controls=0&modestbranding=1&rel=0&disablekb=1`} allow="autoplay; encrypted-media" title={task.title} />
-        ) : (
-          <video
-            src={task.video_url || ""}
-            autoPlay
-            playsInline
-            className="h-full w-full"
-            onPlay={() => setPlaying(true)}
-            onPause={() => setPlaying(false)}
-            onEnded={() => setPlaying(false)}
-            onTimeUpdate={(e) => { const v = e.currentTarget; if (v.currentTime > lastTime.current + 1.5) v.currentTime = lastTime.current; else lastTime.current = v.currentTime; }}
-            onClick={(e) => { const v = e.currentTarget; v.paused ? v.play() : v.pause(); }}
-          />
-        )}
-      </div>
-      {task.description && <p className="break-words text-xs text-muted-foreground">{task.description}</p>}
-      <div className="h-2 overflow-hidden rounded-full bg-muted">
-        <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${pct}%` }} />
-      </div>
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-xs text-muted-foreground">{ready ? "Video complete — claim your reward" : `Keep watching… ${need - elapsed}s left`}</span>
-        <div className="flex gap-2">
-          <Button size="sm" variant="ghost" onClick={onClose}>Close</Button>
-          <Button size="sm" disabled={!ready || complete.isPending} onClick={() => complete.mutate({ taskId: task.id })} className="rounded-full gradient-primary border-0 text-primary-foreground">
-            Claim UGX {Number(task.reward_amount).toLocaleString()}
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
+import { MobileNav } from "@/components/layout/MobileNav";
+import { VideoFeedItem } from "@/components/user/VideoFeedItem";
+import { useEarnTasks } from "@/hooks/useEarnTasks";
 
 export default function EarnVideos() {
   const { tasks, done } = useEarnTasks("video");
-  const [active, setActive] = useState<string | null>(null);
   const list = tasks.data || [];
+  const feed = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(0);
+  const [muted, setMuted] = useState(true);
+
+  useEffect(() => {
+    const container = feed.current;
+    if (!container) return;
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.65) {
+          const index = Number((entry.target as HTMLElement).dataset.index);
+          setActive(index);
+        }
+      }
+    }, { root: container, threshold: 0.65 });
+    container.querySelectorAll("[data-index]").forEach((element) => observer.observe(element));
+    return () => observer.disconnect();
+  }, [list.length]);
+
+  const move = (offset: number) => {
+    const index = Math.max(0, Math.min(list.length - 1, active + offset));
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    feed.current?.children[index]?.scrollIntoView({ behavior: reduced ? "instant" : "smooth", block: "nearest" });
+  };
 
   return (
-    <FeaturePage title="Watch Videos" description="Watch short videos to the end and get paid. Each video pays once a day." backTo="/dashboard">
-      <div className="space-y-3">
-        {tasks.isLoading && Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-20 w-full rounded-2xl" />)}
-        {!tasks.isLoading && list.length === 0 && <p className="py-10 text-center text-sm text-muted-foreground">No videos available right now. Check back soon.</p>}
-        {list.map((t) => {
-          const isDone = done.data?.has(t.id);
-          return (
-            <div key={t.id} className="space-y-3">
-              <div className="card-neon flex items-center gap-3 rounded-2xl p-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/15 text-primary"><Play className="h-5 w-5" /></div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-semibold">{t.title}</p>
-                  <p className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span className="font-bold text-primary">+UGX {Number(t.reward_amount).toLocaleString()}</span>
-                    <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{t.min_watch_seconds}s</span>
-                  </p>
-                </div>
-                {isDone ? (
-                  <span className="flex items-center gap-1 text-xs font-medium text-primary"><CheckCircle2 className="h-4 w-4" />Done</span>
-                ) : (
-                  <Button size="sm" disabled={!t.video_url} onClick={() => setActive(active === t.id ? null : t.id)} className="rounded-full gradient-primary border-0 px-5 font-bold text-primary-foreground">
-                    {active === t.id ? "Watching" : "Start"}
-                  </Button>
-                )}
-              </div>
-              {active === t.id && !isDone && <Player task={t} onClose={() => setActive(null)} />}
+    <div className="video-feed-page flex h-dvh flex-col overflow-hidden bg-background">
+      <header className="z-10 flex h-16 shrink-0 items-center justify-between border-b bg-card px-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <Button size="icon" variant="ghost" asChild><Link to="/dashboard" aria-label="Back to dashboard"><ArrowLeft className="h-5 w-5" /></Link></Button>
+          <h1 className="text-base font-semibold">Watch Videos</h1>
+        </div>
+        <Button size="icon" variant="ghost" asChild><Link to="/wallet" aria-label="Open wallet"><Wallet className="h-5 w-5" /></Link></Button>
+      </header>
+      <main className="relative mx-auto min-h-0 w-full max-w-lg flex-1">
+        {tasks.isLoading || done.isLoading ? <Skeleton className="h-full w-full rounded-none" /> : tasks.isError ? (
+          <div role="alert" className="flex h-full flex-col items-center justify-center gap-4 px-6 text-center"><p>Couldn’t load videos.</p><Button onClick={() => tasks.refetch()}>Try again</Button></div>
+        ) : list.length === 0 ? (
+          <div className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center"><Video className="h-10 w-10 text-muted-foreground" /><p>No videos available right now.</p><Button variant="outline" onClick={() => tasks.refetch()}>Refresh</Button></div>
+        ) : (
+          <>
+            <div ref={feed} role="region" aria-label="Video feed" tabIndex={0} className="video-feed-scroll h-full snap-y snap-mandatory overflow-y-auto overscroll-y-contain" onKeyDown={(event) => {
+              if (event.target !== event.currentTarget) return;
+              if (event.key === "ArrowDown" || event.key === "ArrowUp") { event.preventDefault(); move(event.key === "ArrowDown" ? 1 : -1); }
+            }}>
+              {list.map((task, index) => <div key={task.id} data-index={index} className="h-full snap-start snap-always"><VideoFeedItem task={task} active={active === index} done={done.data?.has(task.id) || false} muted={muted} onMute={() => setMuted((value) => !value)} /></div>)}
             </div>
-          );
-        })}
-      </div>
-    </FeaturePage>
+            <div className="pointer-events-none absolute left-4 top-4 rounded-full bg-card/90 px-3 py-1 text-xs font-medium text-card-foreground">{active + 1} / {list.length}</div>
+            <div className="absolute right-3 top-1/2 flex -translate-y-1/2 flex-col gap-2">
+              <Button size="icon" variant="ghost" className="video-feed-control rounded-full" disabled={active === 0} aria-label="Previous video" title="Previous video" onClick={() => move(-1)}><ChevronUp className="h-5 w-5" /></Button>
+              <Button size="icon" variant="ghost" className="video-feed-control rounded-full" disabled={active === list.length - 1} aria-label="Next video" title="Next video" onClick={() => move(1)}><ChevronDown className="h-5 w-5" /></Button>
+            </div>
+          </>
+        )}
+      </main>
+      <MobileNav />
+    </div>
   );
 }
