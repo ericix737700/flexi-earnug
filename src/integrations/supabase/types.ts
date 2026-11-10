@@ -257,6 +257,24 @@ export type Database = {
           },
         ]
       }
+      creator_follows: {
+        Row: {
+          created_at: string
+          creator_name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          creator_name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          creator_name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       deposits: {
         Row: {
           amount: number
@@ -820,6 +838,8 @@ export type Database = {
       tasks: {
         Row: {
           created_at: string
+          creator_avatar_url: string | null
+          creator_name: string | null
           daily_limit: number | null
           description: string | null
           id: string
@@ -834,6 +854,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          creator_avatar_url?: string | null
+          creator_name?: string | null
           daily_limit?: number | null
           description?: string | null
           id?: string
@@ -848,6 +870,8 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          creator_avatar_url?: string | null
+          creator_name?: string | null
           daily_limit?: number | null
           description?: string | null
           id?: string
@@ -966,6 +990,67 @@ export type Database = {
         }
         Relationships: []
       }
+      video_comments: {
+        Row: {
+          author_name: string | null
+          body: string
+          created_at: string
+          id: string
+          task_id: string
+          user_id: string
+        }
+        Insert: {
+          author_name?: string | null
+          body: string
+          created_at?: string
+          id?: string
+          task_id: string
+          user_id: string
+        }
+        Update: {
+          author_name?: string | null
+          body?: string
+          created_at?: string
+          id?: string
+          task_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_comments_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_likes: {
+        Row: {
+          created_at: string
+          task_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          task_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          task_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_likes_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       withdrawal_pins: {
         Row: {
           created_at: string
@@ -1076,6 +1161,17 @@ export type Database = {
           account_id: string
           full_name: string
           is_verified: boolean
+        }[]
+      }
+      get_video_stats: {
+        Args: never
+        Returns: {
+          comments: number
+          completions: number
+          likes: number
+          rewards_paid: number
+          task_id: string
+          views: number
         }[]
       }
       has_role: {
