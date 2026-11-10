@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Replace the video list with a vertical single-video feed; verify phone/desktop layout and one-at-a-time playback with hosted videos in a temporary test
+- [ ] Verify the new video feed and reward claim signed in — injected session redirects to login and account-session refresh finds no matching account; needs preview sign-in
+
 - [x] Improve notification inbox layout, filters, read controls, and preferences presentation
 - [x] Verify notification center with a signed-in account on mobile and desktop
 
