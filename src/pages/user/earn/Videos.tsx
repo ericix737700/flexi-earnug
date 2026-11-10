@@ -27,7 +27,7 @@ export default function EarnVideos() {
     }, { root: container, threshold: 0.65 });
     container.querySelectorAll("[data-index]").forEach((element) => observer.observe(element));
     return () => observer.disconnect();
-  }, [list.length]);
+  }, [list.length, tasks.isLoading, done.isLoading]);
 
   const move = (offset: number) => {
     const index = Math.max(0, Math.min(list.length - 1, active + offset));
