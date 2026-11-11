@@ -1,3 +1,4 @@
+import { useVideoStats } from "@/hooks/useVideoSocial";
 import { useState, useRef } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -57,6 +58,9 @@ interface Task {
   is_active: boolean;
   daily_limit: number | null;
   video_url: string | null;
+  min_watch_seconds?: number;
+  creator_name?: string | null;
+  creator_avatar_url?: string | null;
   created_at: string;
 }
 
@@ -78,6 +82,9 @@ export default function AdminTasks() {
     daily_limit: "",
     is_active: true,
     video_url: "",
+    min_watch_seconds: "30",
+    creator_name: "",
+    creator_avatar_url: "",
   });
   const [triviaQuestions, setTriviaQuestions] = useState<TriviaQuestion[]>([]);
   const [surveyQuestions, setSurveyQuestions] = useState<SurveyQuestion[]>([]);
@@ -95,6 +102,8 @@ export default function AdminTasks() {
       return data as Task[];
     },
   });
+
+  const { data: videoStats } = useVideoStats();
 
   // Upload video to storage
   const uploadVideo = async (file: File): Promise<string> => {
@@ -135,6 +144,9 @@ export default function AdminTasks() {
         daily_limit: formData.daily_limit ? Number(formData.daily_limit) : null,
         is_active: formData.is_active,
         video_url: formData.task_type === "video" ? videoUrl : null,
+        min_watch_seconds: Math.max(5, Number(formData.min_watch_seconds) || 30),
+        creator_name: formData.creator_name.trim() || null,
+        creator_avatar_url: formData.creator_avatar_url.trim() || null,
         trivia_questions: formData.task_type === "trivia" ? JSON.parse(JSON.stringify(triviaQuestions)) : null,
         survey_questions: formData.task_type === "survey" ? JSON.parse(JSON.stringify(surveyQuestions.filter((q) => q.question.trim()))) : null,
       };
@@ -222,6 +234,9 @@ export default function AdminTasks() {
       daily_limit: task.daily_limit?.toString() || "",
       is_active: task.is_active,
       video_url: task.video_url || "",
+      min_watch_seconds: String(task.min_watch_seconds ?? 30),
+      creator_name: task.creator_name || "",
+      creator_avatar_url: task.creator_avatar_url || "",
     });
     // Load existing trivia questions
     const existingQuestions = (task as any).trivia_questions as TriviaQuestion[] | null;
@@ -402,6 +417,14 @@ export default function AdminTasks() {
                   </div>
                 )}
 
+                {formData.task_type === "video" && (
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    <div className="space-y-2"><Label>Min watch (seconds)</Label><Input type="number" min={5} value={formData.min_watch_seconds} onChange={(e) => setFormData({ ...formData, min_watch_seconds: e.target.value })} /></div>
+                    <div className="space-y-2"><Label>Creator name</Label><Input placeholder="FlexiEarn" value={formData.creator_name} onChange={(e) => setFormData({ ...formData, creator_name: e.target.value })} /></div>
+                    <div className="space-y-2"><Label>Creator picture URL</Label><Input placeholder="https://..." value={formData.creator_avatar_url} onChange={(e) => setFormData({ ...formData, creator_avatar_url: e.target.value })} /></div>
+                  </div>
+                )}
+
                 {formData.task_type === "survey" && (
                   <div className="rounded-lg border p-3 bg-muted/50 space-y-3">
                     <SurveyQuestionEditor questions={surveyQuestions} onChange={setSurveyQuestions} taskId={editingTask?.id} />
@@ -512,11 +535,10 @@ export default function AdminTasks() {
                                   {task.description}
                                 </p>
                               )}
-                              {task.video_url && (
-                                <p className="text-xs text-blue-500">
-                                  Has video attached
-                                </p>
-                              )}
+                              {task.video_url && (() => { const st = videoStats?.get(task.id); return (
+                                <p className="text-xs text-primary">
+                                  {task.min_watch_seconds ?? 30}s watch · {st?.views ?? 0} views · {st?.likes ?? 0} likes · {st?.comments ?? 0} comments · {st?.completions ?? 0} rewards (UGX {(st?.rewards_paid ?? 0).toLocaleString()})
+                                </p>); })()}
                             </div>
                           </div>
                         </TableCell>
